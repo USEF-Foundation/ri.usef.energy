@@ -1,0 +1,68 @@
+<persistence version="1.0"
+	xmlns="http://java.sun.com/xml/ns/persistence">
+	<persistence-unit name="test" transaction-type="RESOURCE_LOCAL">
+
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+		<class>energy.usef.core.model.Message</class>
+		<class>energy.usef.core.model.MessageError</class>
+		<class>energy.usef.core.model.PtuContainer</class>
+		<class>energy.usef.core.model.Document</class>
+		<class>energy.usef.core.model.Exchange</class>
+		<class>energy.usef.core.model.PtuFlexOffer</class>
+		<class>energy.usef.core.model.PtuFlexOrder</class>
+		<class>energy.usef.core.model.PtuFlexRequest</class>
+		<class>energy.usef.core.model.PtuPrognosis</class>
+		<class>energy.usef.core.model.SignedMessageHash</class>
+        <class>energy.usef.core.model.PlanboardMessage</class>
+		<class>energy.usef.core.model.Connection</class>
+		<class>energy.usef.core.model.ConnectionGroup</class>
+		<class>energy.usef.core.model.ConnectionGroupState</class>
+		<class>energy.usef.core.model.CongestionPointConnectionGroup</class>
+		<class>energy.usef.core.model.BrpConnectionGroup</class>
+		<class>energy.usef.core.model.PtuState</class>
+		<class>energy.usef.core.model.PtuSettlement</class>
+		<class>energy.usef.core.model.FlexOrderSettlement</class>
+
+		<class>energy.usef.dso.model.Aggregator</class>
+		<class>energy.usef.dso.model.AggregatorOnConnectionGroupState</class>
+		<class>energy.usef.dso.model.MeterDataCompany</class>
+
+        <class>energy.usef.dso.model.CommonReferenceOperator</class>
+        <class>energy.usef.dso.model.SynchronisationCongestionPoint</class>
+        <class>energy.usef.dso.model.SynchronisationConnection</class>
+        <class>energy.usef.dso.model.SynchronisationCongestionPointStatus</class>
+
+		<class>energy.usef.dso.model.NonAggregatorForecast</class>
+		<class>energy.usef.dso.model.GridSafetyAnalysis</class>
+        <class>energy.usef.dso.model.PrognosisUpdateDeviation</class>
+		<class>energy.usef.dso.model.PtuGridMonitor</class>
+
+		<class>energy.usef.dso.model.ConnectionMeterEvent</class>
+		<class>energy.usef.dso.model.ConnectionCapacityLimitationPeriod</class>
+		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<!-- <shared-cache-mode>DISABLE_SELECTIVE</shared-cache-mode> -->
+
+		<properties>
+            <property name="javax.persistence.schema-generation.scripts.action" value="none"/>
+            <property name="javax.persistence.database-product-name" value="H2"/>
+            <property name="javax.persistence.database-major-version" value="1" />		    
+            <property name="javax.persistence.database-minor-version" value="3.172" />
+
+			<property name="javax.persistence.schema-generation.database.action"   value="drop-and-create" />
+			<property name="javax.persistence.schema-generation.create-source" value="metadata" />
+			<property name="javax.persistence.sql-load-script-source" value="repository_test_data.sql" />
+
+			<property name="javax.persistence.jdbc.driver" value="org.h2.Driver" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:TestDB;DB_CLOSE_DELAY=-1" />
+			<property name="javax.persistence.jdbc.user" value="" />
+			<property name="javax.persistence.jdbc.password" value="" />
+
+			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+			<property name="hibernate.show_sql" value="true" />
+		</properties>
+
+	</persistence-unit>
+
+</persistence>

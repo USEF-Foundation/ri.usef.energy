@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding">
+    <file url="file://$PROJECT_DIR$" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-core" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-core/usef-core-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-core/usef-core-commons" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-core/usef-core-planboard" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-core/usef-core-transport" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-core/usef-core-workflow" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-core/usef-core-workflow-api" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-deployments" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-deployments/usef-deployment-agr" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-deployments/usef-deployment-brp" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-deployments/usef-deployment-cro" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-deployments/usef-deployment-dso" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-deployments/usef-deployment-mdc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-deployments/usef-deployment-pbcfeeder" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-deployments/usef-deployment-time" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-endpoints" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-endpoints/usef-endpoint-agr" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-endpoints/usef-endpoint-brp" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-endpoints/usef-endpoint-cro" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-endpoints/usef-endpoint-dso" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-endpoints/usef-endpoint-mdc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-simulation" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-simulation/usef-simulation-agr" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-simulation/usef-simulation-brp" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-simulation/usef-simulation-dso" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-simulation/usef-simulation-mdc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-simulation/usef-simulation-pbcfeeder" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-workflow" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-workflow/usef-agr" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-workflow/usef-brp" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-workflow/usef-cro" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-workflow/usef-dso" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/usef-workflow/usef-mdc" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>

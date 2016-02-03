@@ -1,0 +1,23 @@
+---
+# This yaml file contains DNS information about USEF participants for demonstration purposes
+participants:
+    - domain-name: "usef-example.com"
+      spec-version: "2014:I"
+      cro-role:
+        - public-keys: "cs1.b1aQGV46PsNyMSVjGrqU7TqiiSjXNkxLW+9FWKdKZ8I="
+          hostname: "192.168.59.103:8081/cro"
+    - domain-name: "usef-example.com"
+      spec-version: "2014:I"
+      dso-role:
+        - public-keys: "cs1.82IDHPcYSl4s0S/8d9+4umtPlN+m9ouPZN+T8hTr0ZQ="
+          hostname: "192.168.59.103:8082/dso" 
+    - domain-name: "usef-example.com"
+      spec-version: "2014:I"
+      aggregator-role:
+        - public-keys: "cs1.nHKbxKyPW3IPVecs/ycGe+3j3K91RaRROr0EhdSZKNo="
+          hostname: "192.168.59.103:8083/agr"
+    - domain-name: "usef-example.com"
+      spec-version: "2014:I"
+      brp-role:
+        - public-keys: "cs1.2Wro3Vu3k/TubMtKyOJLdQUTrTG2B0Urm6RCAzvyc5k="
+          hostname: "192.168.59.103:8084/brp"

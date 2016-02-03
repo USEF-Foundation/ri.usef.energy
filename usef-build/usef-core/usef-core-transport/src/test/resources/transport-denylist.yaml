@@ -1,0 +1,7 @@
+---
+# This list contains the ip addresses and EA (Entity Addresses) which are not allowed to send messages
+
+ - localhost:8081/usef
+ - 192.168.59.103:8082/void
+ - 192.168.1.10
+ - denylisted.test.usef.energy

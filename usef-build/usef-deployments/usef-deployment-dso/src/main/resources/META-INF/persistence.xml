@@ -1,0 +1,69 @@
+<persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+
+	<persistence-unit name="ApplicationPersistenceUnit" transaction-type="JTA">
+
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+		<jta-data-source>java:jboss/datasources/USEF_DS</jta-data-source>
+
+		<class>energy.usef.core.model.Message</class>
+		<class>energy.usef.core.model.MessageError</class>
+		<class>energy.usef.core.model.PtuContainer</class>
+		<class>energy.usef.core.model.Document</class>
+		<class>energy.usef.core.model.Exchange</class>
+		<class>energy.usef.core.model.PtuFlexOffer</class>
+		<class>energy.usef.core.model.PtuFlexOrder</class>
+		<class>energy.usef.core.model.PtuFlexRequest</class>
+		<class>energy.usef.core.model.PtuPrognosis</class>
+		<class>energy.usef.core.model.SignedMessageHash</class>
+        <class>energy.usef.core.model.PlanboardMessage</class>
+		<class>energy.usef.core.model.Connection</class>
+		<class>energy.usef.core.model.ConnectionGroup</class>
+		<class>energy.usef.core.model.ConnectionGroupState</class>
+		<class>energy.usef.core.model.CongestionPointConnectionGroup</class>
+		<class>energy.usef.core.model.BrpConnectionGroup</class>
+		<class>energy.usef.core.model.PtuState</class>
+		<class>energy.usef.core.model.PtuSettlement</class>
+		<class>energy.usef.core.model.FlexOrderSettlement</class>
+
+		<class>energy.usef.dso.model.Aggregator</class>
+		<class>energy.usef.dso.model.AggregatorOnConnectionGroupState</class>
+		<class>energy.usef.dso.model.MeterDataCompany</class>
+
+        <class>energy.usef.dso.model.CommonReferenceOperator</class>
+        <class>energy.usef.dso.model.SynchronisationCongestionPoint</class>
+        <class>energy.usef.dso.model.SynchronisationConnection</class>
+        <class>energy.usef.dso.model.SynchronisationCongestionPointStatus</class>
+
+		<class>energy.usef.dso.model.NonAggregatorForecast</class>
+		<class>energy.usef.dso.model.GridSafetyAnalysis</class>
+        <class>energy.usef.dso.model.PrognosisUpdateDeviation</class>
+        <class>energy.usef.dso.model.PtuGridMonitor</class>
+
+		<class>energy.usef.dso.model.ConnectionMeterEvent</class>
+		<class>energy.usef.dso.model.ConnectionCapacityLimitationPeriod</class>
+		
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<!-- <shared-cache-mode>DISABLE_SELECTIVE</shared-cache-mode> -->
+
+		<properties>
+			<property name="javax.persistence.schema-generation.database.action" value="none" />
+
+			<property name="hibernate.order_updates" value="true"/>
+			<property name="hibernate.order_inserts" value="true"/>
+			<!--property name="hibernate.jdbc.batch_versioned_data" value="true"/-->
+			<!--property name="hibernate.jdbc.fetch_size" value="20"/-->
+			<property name="hibernate.jdbc.batch_size" value="20"/>
+			<!--property name="hibernate.default_batch_fetch_size" value="20" /-->
+			<!--property name="hibernate.connection.release_mode" value="auto"/-->
+
+			<property name="hibernate.dialect" value="org.hibernate.dialect.H2Dialect" />
+			<property name="hibernate.show_sql" value="false" />
+			<property name="hibernate.default_schema" value="DSO_USEF_EXAMPLE_COM_DSO" />
+			<!-- <property name="wildfly.jpa.twophasebootstrap" value="false"/> -->
+		</properties>
+
+	</persistence-unit>
+
+</persistence>

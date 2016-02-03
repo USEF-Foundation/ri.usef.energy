@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CommonReferenceQueryResponse Result="Success">
+    <MessageMetadata SenderDomain="cro1.usef-example.com" SenderRole="CRO" RecipientDomain="agr1.usef-example.com"
+                     RecipientRole="AGR" TimeStamp="2015-03-13T12:03:54.438" MessageID="11df69d6-1ee1-4b98-8279-be0cf910b0e1"
+                     ConversationID="4cfd90e0-550d-4a54-aff1-0c0660555c93" Precedence="Routine"/>
+    <CongestionPoint EntityAddress="ean.1111111111" DSO-Domain="dso1.usef-example.com">
+        <Connection EntityAddress="ean.1000000001"/>
+        <Connection EntityAddress="ean.1000000002"/>
+    </CongestionPoint>
+    <CongestionPoint EntityAddress="ean.2222222222" DSO-Domain="dso1.usef-example.com">
+        <Connection EntityAddress="ean.1000000003"/>
+    </CongestionPoint>
+    <CongestionPoint EntityAddress="ean.3333333333" DSO-Domain="dso2.usef-example.com">
+        <Connection EntityAddress="ean.1000000005"/>
+        <Connection EntityAddress="ean.1000000006"/>
+    </CongestionPoint>
+    <CongestionPoint EntityAddress="ean.4444444444" DSO-Domain="dso1.usef-example.com">
+        <Connection EntityAddress="ean.1000000007"/>
+        <Connection EntityAddress="ean.1000000008"/>
+    </CongestionPoint>
+    <CongestionPoint EntityAddress="ean.6666666666" DSO-Domain="dso1.usef-example.com">
+        <Connection EntityAddress="ean.1000000009"/>
+        <Connection EntityAddress="ean.1000000010"/>
+    </CongestionPoint>
+</CommonReferenceQueryResponse>

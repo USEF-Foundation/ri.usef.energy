@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CommonReferenceQuery Entity="BRP">
+    <MessageMetadata SenderDomain="usef-example.com" SenderRole="AGR" RecipientDomain="usef-example.com"
+                     RecipientRole="CRO" Precedence="Transactional" MessageID="12345678-1234-1234-1234-1234567890ab"
+                     ConversationID="12345678-1234-1234-1234-1234567890ab"
+                     TimeStamp="2014-11-10T11:00:00.000"/>
+</CommonReferenceQuery>
