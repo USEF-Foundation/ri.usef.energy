@@ -1,0 +1,1188 @@
+<!-- 
+USEF 2014:I XML Schema, version 1.02
+
+Copyright 2015 USEF Foundation
+
+Licensed under the Apache License, Version 2.0 (the \"License\");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an \"AS IS\" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<!-- Helper types -->
+	<xs:simpleType name="UUID">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="EntityAddress">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(ea1\.[0-9]{4}-[0-9]{2}\..{1,244}:.{1,244}|ean\.[0-9]{12,34})"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="InternetDomain">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ISO4217Currency">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="[A-Z]{3}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CurrencyAmount">
+		<xs:restriction base="xs:decimal">
+			<xs:fractionDigits value="4"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="USEF-Role">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="AGR"/>
+			<xs:enumeration value="BRP"/>
+			<xs:enumeration value="CRO"/>
+			<xs:enumeration value="DSO"/>
+			<xs:enumeration value="MDC"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Period">
+		<xs:restriction base="xs:date"/>
+	</xs:simpleType>
+	<xs:simpleType name="TimeZoneName">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="(Africa|America|Australia|Europe|Pacific)/[a-zA-Z0-9_/]{3,}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Disposition-AcceptedRejected">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Accepted"/>
+			<xs:enumeration value="Rejected"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Disposition-SuccessFailure">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Success"/>
+			<xs:enumeration value="Failure"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Disposition-AvailableRequested">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Available"/>
+			<xs:enumeration value="Requested"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="Disposition-AcceptedDisputed">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Accepted"/>
+			<xs:enumeration value="Disputed"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MessageStatus">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="InvalidMessage">
+				<xs:annotation>
+					<xs:documentation>Despite being schema-compliant, the syntax, type or semantics of the message were unacceptable for the receiving implementation.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="InvalidSender">
+				<xs:annotation>
+					<xs:documentation>There is a mismatch between the SenderDomain/Role combination in the message wrapper and the inner XML message.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="UnknownRecipient">
+				<xs:annotation>
+					<xs:documentation>The RecipientDomain and/or RecipientRole specified in the inner XML message is not handled by this endpoint.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="BarredSender">
+				<xs:annotation>
+					<xs:documentation>This endpoint is explicitly blocking messages from this sender.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="DuplicateIdentifier">
+				<xs:annotation>
+					<xs:documentation>The MessageID attribute of the inner XML message is not unique, and has already been used for a message with different content. This message has been rejected.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="AlreadySubmitted">
+				<xs:annotation>
+					<xs:documentation>The MessageID attribute of the inner XML message is not unique, but since the message content is the same as that of a previously accepted message, this copy can be considered to be successfully submitted as well.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+			<xs:enumeration value="Submitted">
+				<xs:annotation>
+					<xs:documentation>The message has been accepted.</xs:documentation>
+				</xs:annotation>
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MessagePrecedence">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Critical"/>
+			<xs:enumeration value="Routine"/>
+			<xs:enumeration value="Transactional"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="CommonReferenceEntityType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CongestionPoint"/>
+			<xs:enumeration value="Aggregator"/>
+			<xs:enumeration value="BRP"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="PrognosisType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="A-Plan"/>
+			<xs:enumeration value="D-Prognosis"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MeterDataQueryType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Any"/>
+			<xs:enumeration value="Usage"/>
+			<xs:enumeration value="Events"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="MeterEventType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="CapacityManagement"/>
+			<xs:enumeration value="ConnectionInterruption"/>
+			<xs:enumeration value="ConnectionResumption"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<!--  -->
+	<xs:element name="SignedMessage">
+		<xs:annotation>
+			<xs:documentation>The SignedMessage element represents the secure wrapper used to submit USEF XML messages from the local message queue to the message queue of a remote participant. It contains minimal metadata (which is distinct from the common metadata used for all other messages), allowing the recipient to look up the sender's cryptographic scheme and public keys, and the actual XML message, as transformed (signed/sealed) using that cryptographic scheme.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="SenderDomain" type="InternetDomain" use="required">
+				<xs:annotation>
+					<xs:documentation>The Internet domain of the USEF participant sending this message. Upon receiving a message, the recipient should validate that its value matches the corresponding attribute value specified in the inner XML message, once un-sealed: if not, the message must be rejected as invalid.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="SenderRole" type="USEF-Role" use="required">
+				<xs:annotation>
+					<xs:documentation>The USEF role of the participant sending this message: AGR, BRP, CRO, DSO or MDC. Receive-time validation should take place as described for the SenderDomain attribute above.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Body" type="xs:base64Binary" use="required">
+				<xs:annotation>
+					<xs:documentation>The Base-64 encoded inner XML message contained in this wrapper, as transformed (signed/sealed) using the sender's cryptographic scheme. The recipient can determine which scheme applies using a DNS or configuration file lookup, based on the combination of SenderDomain and SenderRole.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="SignedMessageReply">
+		<xs:annotation>
+			<xs:documentation>The SignedMessageReply element represents the status message returned by the receiving implementation when a SignedMessage containing a valid and schema-conformant inner XML message has been POSTed to it. It allows the sending implementation to determine whether the receiver has successfully stored the message in its message queue.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="MessageID" type="UUID" use="required">
+				<xs:annotation>
+					<xs:documentation>Message identifier this reply applies to, obtained from the inner XML message's MessageID attribute.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Result" type="Disposition-AcceptedRejected" use="required">
+				<xs:annotation>
+					<xs:documentation>Indication whether the receiving implementation successfully stored the message in its inbound message queue or not.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Status" type="MessageStatus" use="required">
+				<xs:annotation>
+					<xs:documentation>More detailed indication of the reason for the acceptance or rejection of the message.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!--  -->
+	<xs:element name="MessageMetadata">
+		<xs:annotation>
+			<xs:documentation>The MessageMetadata element contains mandatory metadata which is common for each non-wrapper USEF message. This element is always included as part of a message and never transmitted by itself.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="SenderDomain" type="InternetDomain" use="required">
+				<xs:annotation>
+					<xs:documentation>The Internet domain of the USEF participant sending this message. When receiving a message, its value should match the value specified in the SignedMessage wrapper: otherwise, the message must be rejected as invalid. When replying to this message, this attribute, combined with the SenderRole, is used to look up the USEF endpoint the reply message should be delivered to.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="SenderRole" type="USEF-Role" use="required">
+				<xs:annotation>
+					<xs:documentation>USEF role of the participant sending this message: AGR, BRP, CRO, DSO or MDC. When receiving a message, its value should match the value specified in the SignedMessage wrapper: otherwise, the message must be rejected as invalid.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="RecipientDomain" type="InternetDomain" use="required">
+				<xs:annotation>
+					<xs:documentation>Internet domain of the participant this message is intended for. When sending a message, this attribute, combined with the RecipientRole, is used to look up the USEF endpoint the message should be delivered to.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="RecipientRole" type="USEF-Role" use="required">
+				<xs:annotation>
+					<xs:documentation>USEF role of the participant this message is intended for: AGR, BRP, CRO, DSO or MDC.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="TimeStamp" type="xs:dateTime" use="required">
+				<xs:annotation>
+					<xs:documentation>Date and time this message was created, including the time zone (ISO 8601 formatted as per http://www.w3.org/TR/NOTE-datetime).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="MessageID" type="UUID" use="required">
+				<xs:annotation>
+					<xs:documentation>Unique identifier (UUID/GUID as per IETF RFC 4122) for this message, to be generated when composing each message.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="ConversationID" type="UUID" use="required">
+				<xs:annotation>
+					<xs:documentation>Unique identifier (UUID/GUID as per IETF RFC 4122) used to correlate responses with requests, to be generated when composing the first message in a conversation and subsequently copied from the original message to each reply message.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Precedence" type="MessagePrecedence" use="required">
+				<xs:annotation>
+					<xs:documentation>Indication of the importance and impact of the message: Routine, Transactional or Critical. Used to determine time-out values during message exchange and the level of error notification used in the sending implementation.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="ValidUntil" type="xs:dateTime">
+				<xs:annotation>
+					<xs:documentation>Optional absolute date and time (ISO 8601 formatted, including time zone) this message expires. Used by implementations to determine if a pending message should still be processed.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!--  -->
+	<xs:element name="TestMessage">
+		<xs:annotation>
+			<xs:documentation>TestMessage does not have any content (other than the mandatory message metadata) and may be used by implementations for (connectivity) testing purposes.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="TestMessageResponse">
+		<xs:annotation>
+			<xs:documentation>Upon receiving a TestMessage, the receiving implementation must reply with a TestMessageResponse. Like the TestMessage itself, the TestMessageResponse does not have any content (other than the mandatory message metadata).</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!--  -->
+	<xs:element name="Connection">
+		<xs:annotation>
+			<xs:documentation>The Connection entity is used in Common Reference-related messages. For updates, it is used either by a DSO to register the Connections belonging to a Congestion Point, by a BRP to indicate which Connections are part of its coverage area, or by an Aggregator to indicate on which Congestion Points it represents customers. In queries, it is used to inform Aggregators about the BRP(s) responsible for their Connections. This element is always included as part of a message and never transmitted by itself.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="EntityAddress" type="EntityAddress" use="required">
+				<xs:annotation>
+					<xs:documentation>Entity Address of the referenced Connection.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="IsCustomer" type="xs:boolean" use="optional" default="false">
+				<xs:annotation>
+					<xs:documentation>Indication whether the referenced Connection is represented by the Aggregator performing the Common Reference update. Ignored if the SenderRole of the message is not AGR.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="BRP-Domain" type="InternetDomain" use="optional">
+				<xs:annotation>
+					<xs:documentation>Internet domain of the BRP for this Connection. Optional, only included in CommonReferenceQueryResponse messages sent to Aggregators in response to BRP queries.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="AGR-Domain" type="InternetDomain" use="optional">
+				<xs:annotation>
+					<xs:documentation>Internet domain of the Aggregator for this Connection. Optional, only included in CommonReferenceQueryResponse messages sent to BRPs in response to Aggregator queries.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- -->
+	<xs:element name="CommonReferenceUpdate">
+		<xs:annotation>
+			<xs:documentation>CommonReferenceUpdate is used by the DSO to declare a Congestion Point and registering the Connection(s) associated with it (or, if the Connection count is 0, to delete the Congestion Point). BRPs use CommonReferenceUpdate to register themselves are responsible for the Connections listed in the message. Aggregators use CommonReferenceUpdate to declare whether they represent customers on the Connection(s) listed in the message.|
+			Note that there is no start date attribute for updates: any valid change will take effect immediately. This is a deliberate design decision, intended to keep the Common Reference implementation as straightforward as possible. Implementations of the DSO and/or Aggregator role will most likely store start/end date fields for Congestion Point-related data, as well as a history of changes. None of this local data is reflected in the Common Reference, though, and implementations are responsible for sending updates only when they become applicable.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:element ref="Connection" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Entity" type="CommonReferenceEntityType" use="required">
+				<xs:annotation>
+					<xs:documentation>Indication which type of entity is being updated: CongestionPoint for DSO-originated updates, Aggregator for AGR-originated updates, BRP for BRP-originated updates.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="EntityAddress" type="EntityAddress" use="optional">
+				<xs:annotation>
+					<xs:documentation>Entity Address of the CongestionPoint entity being updated. Not included (and ignored if present) for Aggregator and BRP entity updates.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- -->
+	<xs:element name="CommonReferenceUpdateResponse">
+		<xs:annotation>
+			<xs:documentation>Upon receiving and processing a CommonReferenceUpdate message, the receiving implementation must reply with a CommonReferenceUpdateResponse, indicating whether the update was handled successfully.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Result" type="Disposition-AcceptedRejected" use="required">
+				<xs:annotation>
+					<xs:documentation>Indication whether the update was accepted or rejected.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="EntityAddress" type="EntityAddress" use="optional">
+				<xs:annotation>
+					<xs:documentation>For CongestionPoint updates: Entity Address of the CongestionPoint for which the update was accepted or rejected (this will always match the EA specified in the corresponding CommonReferenceUpdate message; it is included to simplify implementation).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Message" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>In case the update was rejected, this attribute must contain a human-readable description of the failure.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!--  -->
+	<xs:element name="CommonReferenceQuery">
+		<xs:annotation>
+			<xs:documentation>CommonReferenceQuery is used by DSOs to discover which Aggregators represent which number of Connections on its registered Congestion Point(s). Aggregators use CommonReferenceQuery to discover which DSOs they should be supplying D-prognoses to, based on the Congestion Point(s) they represent Connections on. Meter Data Companies use this message to discover Congestion Point and Aggregator information for the Connections they supply metering data for to DSOs.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:element name="ConnectionEntityAddress" type="EntityAddress" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Entity" type="CommonReferenceEntityType" use="optional" default="CongestionPoint">
+				<xs:annotation>
+					<xs:documentation>Indication which type of entity is being queried.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="EntityAddress" type="EntityAddress" use="optional">
+				<xs:annotation>
+					<xs:documentation>Entity Address of the entity for which query results should be returned. Optional: if omitted, results for all applicable entities will be returned.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!--  -->
+	<xs:element name="Aggregator">
+		<xs:annotation>
+			<xs:documentation>One or more Aggregator elements may be included in CongestionPoint elements and indicate which Aggregators represent which number of Connections on a Connection Point. This element is always included as part of a message and never transmitted by itself.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="Domain" type="InternetDomain" use="optional">
+				<xs:annotation>
+					<xs:documentation>Internet domain of the Aggregator. If absent, this element represents the number of connections not represented by an Aggregator.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="ConnectionCount" type="xs:integer" use="required">
+				<xs:annotation>
+					<xs:documentation>Number of Connections represented by the Aggregator on this Congestion Point.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!--  -->
+	<xs:element name="CongestionPoint">
+		<xs:annotation>
+			<xs:documentation>The CongestionPoint element is used in CommonReferenceQueryResponse messages. A DSO registers its Congestion Points with associated connections, allowing an Aggregator to determine on which Congestion Points it represents customers. This element is always included as part of a message and never transmitted by itself.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="Connection" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Aggregator" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="EntityAddress" type="EntityAddress" use="required">
+				<xs:annotation>
+					<xs:documentation>Entity Address of the Congestion Point.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="DSO-Domain" type="InternetDomain" use="optional">
+				<xs:annotation>
+					<xs:documentation>Internet domain of the DSO responsible for this Congestion Point. Optional, only included in CommonReferenceQueryResponse messages sent to Aggregators.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- -->
+	<xs:element name="CommonReferenceQueryResponse">
+		<xs:annotation>
+			<xs:documentation>Upon receiving and processing a CommonReferenceQuery message, the receiving implementation must reply with a CommonReferenceQueryResponse, indicating whether the query executed successfully, and if it did, including the query results. Most queries will return zero or more Congestion Points: responses to Aggregator-originated queries with Entity=BRP will consist of zero or more Connections.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:element ref="CongestionPoint" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="Connection" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Result" type="Disposition-SuccessFailure" use="required">
+				<xs:annotation>
+					<xs:documentation>Indication whether the query was executed successfully or failed.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Message" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>In case the query failed, this attribute must contain a human-readable description of the failure reason.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!--
+	-->
+	<xs:element name="PTU">
+		<xs:annotation>
+			<xs:documentation>The PTU element represents one or more Program Time Units and is used by Prognosis and Flex-related messages. This element is always included as part of a message and never transmitted by itself.|
+
+Each PTU includes a Power value, the sign of which is used to distinguish between production and consumption, from the perspective of the Prosumer. A positive value indicates that power flows towards the Prosumer (consumption), a negative value indicates flow towards the grid (production).|
+
+For FlexRequests, the single Power value is insufficient, since it would be impossible to make a distinction between a request for the reduction of the amount of energy produced (two minus signs, thus a positive value) and the indication of room for more consumption (a positive value as well). Hence, each PTU also includes an indicator, Disposition, to distinguish between these situations. |
+
+Note that a request is always relative to an earlier prognosis, and the intent of the party sending the request can only be determined by taking into account whether the net outcome of the PTU is expected to be production or consumption.|
+
+Also note that all scenarios have valid alternative realizations: a reduction in production by 100 can also be accomplished by an increase in consumption by that amount. The resulting flexibility offer for the PTU will have the same Power value in both cases.
+</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="Disposition" type="Disposition-AvailableRequested" use="optional">
+				<xs:annotation>
+					<xs:documentation>Optional, used only for FlexRequest messages: indication whether the Power specified for this PTU represents available capacity or a request for reduction/increase.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Power" type="xs:integer" use="required">
+				<xs:annotation>
+					<xs:documentation>Power specified for this PTU in Watts. Also see the important notes about the sign of this attribute in the main documentation entry for the PTU element.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Start" type="xs:integer" use="required">
+				<xs:annotation>
+					<xs:documentation>Number of the first PTU this element refers to. The first PTU of a day has number 1.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Duration" type="xs:integer" use="optional" default="1">
+				<xs:annotation>
+					<xs:documentation>The number of the PTUs this element represents. Optional, default value is 1.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Price" type="CurrencyAmount" use="optional">
+				<xs:annotation>
+					<xs:documentation>The price offered or accepted for supplying the indicated amount of flexibility in this PTU. Only valid for FlexOffer and FlexOrder messages; the currency associated with this amount is included in the main part of those messages.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!---->
+	<xs:element name="Prognosis">
+		<xs:annotation>
+			<xs:documentation>Prognosis messages are used to communicate A-plans and D-prognoses between USEF participants. Prognosis messages always contain a full list of PTUs for the Period they apply to, even if a Prognosis is sent after the start of the Period, when one or more PTUs are already in the operate or settlement phase. Receiving implementations should ignore the information supplied for those PTUs.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:element ref="PTU" maxOccurs="unbounded"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Type" type="PrognosisType" use="required">
+				<xs:annotation>
+					<xs:documentation>Indication of the kind of prognosis this message represents: A-plan or D-prognosis.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="PTU-Duration" type="xs:duration" use="required">
+				<xs:annotation>
+					<xs:documentation>ISO 8601 time interval (minutes only, for example PT15M) indicating the duration of the PTUs referenced in this message. Although the PTU length is a market-wide fixed value, making this assumption explicit in each message is important for validation purposes, allowing implementations to reject messages with an errant PTU duration.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Period" type="Period" use="required">
+				<xs:annotation>
+					<xs:documentation>Day (in yyyy-mm-dd format) the PTUs referenced in this message belong to.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="TimeZone" type="TimeZoneName" use="required">
+				<xs:annotation>
+					<xs:documentation>Time zone ID (as per the IANA time zone database, http://www.iana.org/time-zones, for example: Europe/Amsterdam) indicating the UTC offset that applies to the Period referenced in this message. Although the time zone is a market-wide fixed value, making this assumption explicit in each message is important for validation purposes, allowing implementations to reject messages with an errant UTC offset.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="CongestionPoint" type="EntityAddress" use="optional">
+				<xs:annotation>
+					<xs:documentation>Entity Address of the Congestion Point this prognosis applies to. Required for D-prognoses, prohibited for other prognosis types.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Sequence" type="xs:long" use="required">
+				<xs:annotation>
+					<xs:documentation>Sequence number of this message, which should be incremented each time a new revision of a prognosis is sent. To ensure unique incrementing sequence numbers, use of the format yyyymmddHHMMSSssss (year, month, day, hour, minutes, seconds and milliseconds, respectively) is highly recommended.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!---->
+	<xs:element name="FlexOrderStatus">
+		<xs:annotation>
+			<xs:documentation>The FlexOrderStatus entity is used in PrognosisResponse messages to indicate the status of a previously submitted FlexOrder. If used, this element is included as part of a PrognosisResponse message (where it may occur multiple times) and never transmitted by itself.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="Sequence" type="xs:long" use="required">
+				<xs:annotation>
+					<xs:documentation>Sequence of the previously submitted FlexOrder.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="IsValidated" type="xs:boolean" use="optional" default="false">
+				<xs:annotation>
+					<xs:documentation>Indication whether the Prognosis that was just received reflects this previously submitted FlexOrder.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!---->
+	<xs:element name="PrognosisResponse">
+		<xs:annotation>
+			<xs:documentation>Upon receiving and processing a Prognosis message, the receiving implementation must reply with a PrognosisResponse, indicating whether the prognosis was syntactically and semantically valid, and, in case any FlexOrder messages have previously been sent for any PTU in the Period the Prognosis applies to, a FlexOrderStatus indication for each of those orders.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:element ref="FlexOrderStatus" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Result" type="Disposition-AcceptedRejected" use="required">
+				<xs:annotation>
+					<xs:documentation>Indication whether the prognosis was accepted or rejected. A receiving implementation may reject a prognosis if it's syntactically invalid, uses a PTU duration or time zone that deviates from what is normal for the market, is for a unknown Congestion Point or from an Aggregator that is not listed in the Common Reference, does not contain a full list of PTUs for the Period it applies to, contains absurd power values, applies to a Period for which all PTUs are already pending settlement, or if a Prognosis of the same type and from the same originator with a higher sequence number was already processed previously.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="PrognosisSequence" type="xs:long" use="required">
+				<xs:annotation>
+					<xs:documentation>Sequence number of the prognosis which was accepted or rejected (this will always match the sequence number of the corresponding Prognosis message; it is included to simplify implementation).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Message" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>In case the update was rejected, this attribute must contain a human-readable description of the failure.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!---->
+	<xs:complexType name="FlexBase" abstract="true">
+		<xs:annotation>
+			<xs:documentation>FlexBase elements are the basis for the various Flex* messages, such as FlexRequest, FlexOffer and FlexOrder, and contain all attributes common to those messages. This is an abstract element which is always used to instantiate another message type and never used or transmitted by itself.</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element ref="MessageMetadata"/>
+			<xs:element ref="PTU" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="PTU-Duration" type="xs:duration" use="required">
+			<xs:annotation>
+				<xs:documentation>ISO 8601 time interval (minutes only, for example PT15M) indicating the duration of the PTUs referenced in this Flex* message. Although the PTU length is a market-wide fixed value, making this assumption explicit in each message is important for validation purposes, allowing implementations to reject messages with an errant PTU duration.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="Period" type="Period" use="required">
+			<xs:annotation>
+				<xs:documentation>Day (in yyyy-mm-dd format) the PTUs referenced in this Flex* message belong to.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="TimeZone" type="TimeZoneName" use="required">
+			<xs:annotation>
+				<xs:documentation>Time zone ID (as per the IANA time zone database, http://www.iana.org/time-zones, for example: Europe/Amsterdam) indicating the UTC offset that applies to the Period referenced in this message. Although the time zone is a market-wide fixed value, making this assumption explicit in each message is important for validation purposes, allowing implementations to reject messages with an errant UTC offset.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="CongestionPoint" type="EntityAddress" use="optional">
+			<xs:annotation>
+				<xs:documentation>Entity Address of the Congestion Point this Flex* message applies to. Optional: if left out (which is only legal for BRP FlexOffers), it applies to all BRP Connections.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="Sequence" type="xs:long" use="required">
+			<xs:annotation>
+				<xs:documentation>Sequence number of this message, which should be incremented each time a new revision of a Flex* message is sent. To ensure unique incrementing sequence numbers, use of the format yyyymmddHHMMSSssss (year, month, day, hour, minutes, seconds and milliseconds, respectively) is highly recommended.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+		<xs:attribute name="ExpirationDateTime" type="xs:dateTime" use="required">
+			<xs:annotation>
+				<xs:documentation>Date and time, including the time zone (ISO 8601 formatted as per http://www.w3.org/TR/NOTE-datetime) until which the Flex* message is valid.</xs:documentation>
+			</xs:annotation>
+		</xs:attribute>
+	</xs:complexType>
+	<!---->
+	<xs:element name="FlexRequest">
+		<xs:annotation>
+			<xs:documentation>FlexRequest messages are used by BRPs and DSOs to request flexibility from Aggregators. In addition to one or more PTU elements with Disposition=Requested, indicating the actual need to reduce consumption or production, the message should also include the remaining PTUs for the current Period where Disposition=Available, so the receiving Aggregator can decide whether time-shifting load is an option to meet the needs of the requesting party.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="FlexBase">
+					<xs:attribute name="PrognosisOrigin" type="InternetDomain" use="required">
+						<xs:annotation>
+							<xs:documentation>The Internet domain of the USEF participant that sent the Prognosis message (more specifically: the D-Prognosis) this request is based on.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="PrognosisSequence" type="xs:long" use="required">
+						<xs:annotation>
+							<xs:documentation>Sequence number of the D-Prognosis this request is based on. The combination of PrognosisOrigin and PrognosisSequence should be unique.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<!---->
+	<xs:element name="FlexRequestResponse">
+		<xs:annotation>
+			<xs:documentation>Upon receiving and processing a FlexRequest message, the receiving implementation must reply with a FlexRequestResponse, indicating whether the flex request was processed successfully.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Sequence" type="xs:long" use="required">
+				<xs:annotation>
+					<xs:documentation>Sequence number of the FlexRequest that has been received.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Result" type="Disposition-AcceptedRejected" use="required">
+				<xs:annotation>
+					<xs:documentation>Indication whether the flex request was accepted or rejected. Rejection is allowed in case the FlexRequest is not based on our latest Prognosis, a FlexRequest from the same participant for the indicated period with a higher sequence number was already accepted previously, the FlexRequest does not contain any PTUs with Disposition=Requested, or in case those PTUs do not cover the entire Period, no PTUs with Disposition=Available are included.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Message" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>In case the request was rejected, this attribute must contain a human-readable description of the reason.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!---->
+	<xs:element name="FlexOffer">
+		<xs:annotation>
+			<xs:documentation>FlexOffer messages are used by Aggregators to make DSOs and BRPs an offer for providing flexibility. A FlexOffer message contains a list of PTUs, with for each PTU the change in consumption or production offered, plus the price for this amount of flexibility. FlexOffer messages should only be sent once a FlexRequest message has been received and must never be sent unsolicited. Note that multiple FlexOffer messages may be sent based on a single FlexRequest: for example, one offer that exactly matches the power reduction requested, plus one with a different amount of reduction, with more favorable pricing.|When responding to a BRP-originated FlexRequest, an Aggregator may send an empty FlexOffer message (i.e. a message not containing any PTU elements) in order to indicate that no flexibility is available and the submitted A-plan is expected to be approved as-is.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="FlexBase">
+					<xs:attribute name="FlexRequestOrigin" type="InternetDomain" use="required">
+						<xs:annotation>
+							<xs:documentation>The Internet domain of the USEF participant that sent the FlexRequest this offer is based on.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="FlexRequestSequence" type="xs:long" use="required">
+						<xs:annotation>
+							<xs:documentation>Sequence number of the FlexRequest message this request is based on. The combination of FlexRequestOrigin and FlexRequestSequence should be unique.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="Currency" type="ISO4217Currency" use="required">
+						<xs:annotation>
+							<xs:documentation>ISO 4217 code indicating the currency that applies to the prices listed for each PTU.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<!---->
+	<xs:element name="FlexOfferResponse">
+		<xs:annotation>
+			<xs:documentation>Upon receiving and processing a FlexOffer message, the receiving implementation must reply with a FlexOfferResponse, indicating whether the flex offer was processed successfully.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Sequence" type="xs:long" use="required">
+				<xs:annotation>
+					<xs:documentation>Sequence number of the FlexOffer that has been received.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Result" type="Disposition-AcceptedRejected" use="required">
+				<xs:annotation>
+					<xs:documentation>Indication whether the flex offer was accepted or rejected. Rejection is allowed in case no matching FlexRequest can be found, or the FlexOffer does not contain a valid price for each PTU with Disposition=Requested in the corresponding FlexRequest.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Message" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>In case the offer was rejected, this attribute must contain a human-readable description of the reason.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!---->
+	<xs:element name="FlexOfferRevocation">
+		<xs:annotation>
+			<xs:documentation>The FlexOfferRevocation message is used by the Aggegator to revoke a FlexOffer previously sent to a DSO or BRP. It voids the FlexOffer, even if its validity time has not yet expired, even if a FlexOrder has already been issued based on this offer. The FlexOffer should exist and have been previously acknowledged, though, and may NOT apply to a period of which one PTU is already in the operate phase.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Sequence" type="xs:long" use="required">
+				<xs:annotation>
+					<xs:documentation>Sequence number of the FlexOffer message that is being revoked: this FlexOffer must have been accepted previously.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!---->
+	<xs:element name="FlexOfferRevocationResponse">
+		<xs:annotation>
+			<xs:documentation>Upon receiving and processing a FlexOfferRevocation message, the receiving implementation must reply with a FlexOfferRevocationResponse, indicating whether the revocation was handled successfully.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Sequence" type="xs:long" use="required">
+				<xs:annotation>
+					<xs:documentation>Sequence number of the FlexOffer that a revocation message was received for.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Result" type="Disposition-AcceptedRejected" use="required">
+				<xs:annotation>
+					<xs:documentation>Indication whether the revocation was accepted or rejected. Rejection is only allowed in case the FlexOffer is unknown (it is the responsibility of the sending party not to revoke FlexOffer messages which have not yet been accepted) or if it applies to a period of which a PTU is already in the Operate phase (at which time USEF explicitly forbids revocation).</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Message" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>In case the revocation was rejected, this attribute must contain a human-readable description of the reason.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!---->
+	<xs:element name="FlexOrder">
+		<xs:annotation>
+			<xs:documentation>FlexOrder messages are used by DSOs and BRPs to purchase flexibility from an Aggregator based on a previous FlexOffer. A FlexOrder message contains a list of PTUs, with, for each PTU, the change in consumption or production to be realized by the Aggregator, plus the accepted price to be paid by the DSO or BRP for this amount of flexibility. This PTU list should be copied from the FlexOffer message without modification: Aggregator implementations will (and must) reject FlexOrder messages where the PTU list is not exactly the same as offered.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:complexContent>
+				<xs:extension base="FlexBase">
+					<xs:attribute name="FlexOfferOrigin" type="InternetDomain" use="required">
+						<xs:annotation>
+							<xs:documentation>The Internet domain of the USEF participant that sent the FlexOffer this order is based on.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="FlexOfferSequence" type="xs:long" use="required">
+						<xs:annotation>
+							<xs:documentation>Sequence number of the FlexOffer message this order is based on. The combination of FlexOfferOrigin and FlexOfferSequence should be unique.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="Currency" type="ISO4217Currency" use="required">
+						<xs:annotation>
+							<xs:documentation>ISO 4217 code indicating the currency that applies to the prices listed for each PTU.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+					<xs:attribute name="OrderReference" type="xs:string" use="required">
+						<xs:annotation>
+							<xs:documentation>Order number assigned by the BRP or DSO originating the FlexOrder. To be stored by the Aggregator and used in the settlement phase.</xs:documentation>
+						</xs:annotation>
+					</xs:attribute>
+				</xs:extension>
+			</xs:complexContent>
+		</xs:complexType>
+	</xs:element>
+	<!---->
+	<xs:element name="FlexOrderResponse">
+		<xs:annotation>
+			<xs:documentation>Upon receiving and processing a FlexOrder message, the receiving implementation must reply with a FlexOrderResponse, indicating whether the update was handled successfully. FlexOrderResponse messages must always be sent with Precedence=Critical.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Sequence" type="xs:long" use="required">
+				<xs:annotation>
+					<xs:documentation>Sequence number of the FlexOrder that has just been received.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Result" type="Disposition-AcceptedRejected" use="required">
+				<xs:annotation>
+					<xs:documentation>Indication whether the order was accepted or rejected. Rejection is only allowed in case the FlexOrder was already accepted previously, can not be found, or does not exactly match the contents of the corresponding FlexOffer.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Message" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>In case the order was rejected, this attribute must contain a human-readable description of the reason.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- -->
+	<xs:element name="SettlementMessage">
+		<xs:annotation>
+			<xs:documentation>The SettlementMessage is sent by DSOs and BRPs on a regular basis (typically monthly) to AGRs in order to initiate settlement. It includes a list of all FlexOrders placed by the originating party during the settlement period.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:element ref="FlexOrderSettlement" maxOccurs="unbounded"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="TimeZone" type="TimeZoneName" use="required">
+				<xs:annotation>
+					<xs:documentation>Time zone ID (as per the IANA time zone database, http://www.iana.org/time-zones, for example: Europe/Amsterdam) indicating the UTC offset that applies to the Period referenced in this message. Although the time zone is a market-wide fixed value, making this assumption explicit in each message is important for validation purposes, allowing implementations to reject messages with an errant UTC offset.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="PeriodStart" type="Period" use="required">
+				<xs:annotation>
+					<xs:documentation>First day (in yyyy-mm-dd format) of the settlement period this message applies to.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="PeriodEnd" type="Period" use="required">
+				<xs:annotation>
+					<xs:documentation>Last day (in yyyy-mm-dd format) of the settlement period this message applies to.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Reference" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Settlement reference, assigned by the BRP or DSO originating the SettlementMessage.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="PTU-Duration" type="xs:duration" use="required">
+				<xs:annotation>
+					<xs:documentation>ISO 8601 time interval (minutes only, for example PT15M) indicating the duration of the PTUs referenced in this message. Although the PTU length is a market-wide fixed value, making this assumption explicit in each message is important for validation purposes, allowing implementations to reject messages with an errant PTU duration.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Currency" type="ISO4217Currency" use="required">
+				<xs:annotation>
+					<xs:documentation>ISO 4217 code indicating the currency that applies to all amounts (flex price, penalty and net settlement) in this message.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- -->
+	<xs:element name="FlexOrderSettlement">
+		<xs:annotation>
+			<xs:documentation>The FlexOrderSettlement element contains settlement details for a single FlexOrder placed by the party originating the message during the settlement period.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PTU-Settlement" maxOccurs="unbounded"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Period" type="Period" use="required">
+				<xs:annotation>
+					<xs:documentation>Day (in yyyy-mm-dd format) the FlexOrder refers to to.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="OrderReference" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Order reference assigned by the BRP or DSO when originating the FlexOrder.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="CongestionPoint" type="EntityAddress" use="optional">
+				<xs:annotation>
+					<xs:documentation>Entity Address of the Congestion Point the FlexOrder applies to.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!--  -->
+	<xs:element name="PTU-Settlement">
+		<xs:annotation>
+			<xs:documentation>The PTU-Settlement element contains settlement details for a single PTU (or set of identical PTUs) belonging to the FlexOrder placed by the party originating the message during the settlement period.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="Start" type="xs:integer" use="required">
+				<xs:annotation>
+					<xs:documentation>Number of the first PTU this element refers to. The first PTU of a day has number 1.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Duration" type="xs:integer" use="optional" default="1">
+				<xs:annotation>
+					<xs:documentation>The number of the PTUs this element represents. Optional, default value is 1.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="PrognosisPower" type="xs:integer" use="required">
+				<xs:annotation>
+					<xs:documentation>Power originally forecast (as per the referenced Prognosis message) for this PTU in Watts.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="OrderedFlexPower" type="xs:integer" use="required">
+				<xs:annotation>
+					<xs:documentation>Amount of flex power ordered (as per the referenced FlexOrder message) for this PTU in Watts.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Price" type="CurrencyAmount" use="required">
+				<xs:annotation>
+					<xs:documentation>The price accepted for supplying the ordered amount of flexibility in this PTU, as per the referenced FlexOrder message.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="ActualPower" type="xs:integer" use="required">
+				<xs:annotation>
+					<xs:documentation>Actual amount of power for this PTU in Watts, as measured/determined by the DSO or BRP and allocated to the AGR.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="DeliveredFlexPower" type="xs:integer" use="required">
+				<xs:annotation>
+					<xs:documentation>Actual amount of flex power delivered for this PTU in Watts, as determined by the DSO or BRP.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="PowerDeficiency" type="xs:integer" use="optional" default="0">
+				<xs:annotation>
+					<xs:documentation>Optional (default zero) amount of flex power sold but not delivered for this PTU in Watts, as determined by the DSO or BRP.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Penalty" type="CurrencyAmount" use="optional" default="0.0000">
+				<xs:annotation>
+					<xs:documentation>Optional (default zero) penalty due a non-zero PowerDeficiency.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="NetSettlement" type="CurrencyAmount" use="required">
+				<xs:annotation>
+					<xs:documentation>Net settlement amount for this PTU: Price minus Penalty, if applicable.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- -->
+	<xs:element name="SettlementMessageResponse">
+		<xs:annotation>
+			<xs:documentation>Upon receiving and processing a SettlementMessage, the receiving implementation must reply with a SettlementMessageResponse, indicating whether the initial message was handled successfully. In case a SettlementMessage is rejected, the sender of the original message should consider all FlexOrderSettlement elements in that message to be disputed.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:element ref="FlexOrderSettlementStatus" maxOccurs="unbounded"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Reference" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Reference included in the SettlementMessage that has just been received.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Result" type="Disposition-AcceptedRejected" use="required">
+				<xs:annotation>
+					<xs:documentation>Indication whether the message was accepted or rejected. Wholesale rejection is only allowed in case a SettlementMessage covering a given period was already accepted previously, or contains invalid data. If one or more settlement items included in the message are not in accordance with the recipient's accounting, the message should still be accepted, and the dispute communicated using the appropriate FlexOrderSettlementStatus elements.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Message" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>In case the message was rejected, this attribute must contain a human-readable description of the reason.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- -->
+	<xs:element name="FlexOrderSettlementStatus">
+		<xs:annotation>
+			<xs:documentation>Each FlexOrderSettlementStatus element indicates whether the settlement details included in the corresponding FlexOrderSettlement element are accepted or disputed by the recipient of the FlexSettlementMessage.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="OrderReference" type="xs:string" use="required">
+				<xs:annotation>
+					<xs:documentation>Order reference assigned by the BRP or DSO when originating the FlexOrder.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Disposition" type="Disposition-AcceptedDisputed" use="required">
+				<xs:annotation>
+					<xs:documentation>Indication whether the aggregator accepts the settlement details provided by the DSO or BRP (and will invoice accordingly), or disputes these details. Handling disputed flex orders is a manual process outside the USEF scope.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- -->
+	<xs:element name="MeterDataQuery">
+		<xs:annotation>
+			<xs:documentation>MeterDataQuery is used by customers of a Meter Data Company to query per-Connection, per-PTU power consumption/production values for a specified period.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:element ref="Connections" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="DateRangeStart" type="Period" use="required">
+				<xs:annotation>
+					<xs:documentation>First day (in yyyy-mm-dd format) of the date range for which metering data is requested.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="DateRangeEnd" type="Period" use="required">
+				<xs:annotation>
+					<xs:documentation>Last day (in yyyy-mm-dd format) of the date range for which metering data is requested.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="QueryType" type="MeterDataQueryType" use="optional" default="Usage">
+				<xs:annotation>
+					<xs:documentation>Requested meter data: per-PTU usage, metering events (capacity reduction, outages, etc.), or any available data.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!--  -->
+	<xs:element name="MeterData">
+		<xs:annotation>
+			<xs:documentation>The MeterData entity encapsulates metering data for a single day, as indicated by the Period attribute. It is always included as part of a MeterDataQueryResponse message and never transmitted by itself.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ConnectionMeterData" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="ConnectionMeterEvent" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Period" type="Period" use="required">
+				<xs:annotation>
+					<xs:documentation>Day (in yyyy-mm-dd format) the returned meter data entries apply to.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- -->
+	<xs:element name="Connections">
+		<xs:complexType>
+			<xs:annotation>
+				<xs:documentation>This element is used in meter data queries to represent a group of connections, linked to a parent (Congestion Point or BRP).
+				</xs:documentation>
+			</xs:annotation>
+			<xs:sequence>
+				<xs:element name="Connection" type="EntityAddress" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Parent" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<!-- -->
+	<xs:element name="ConnectionMeterEvent">
+		<xs:annotation>
+			<xs:documentation>The ConnectionMeterEvent entity encapsulates a metering event for the single connection identified by the EntityAddress attribute. It is always included as part of a MeterDataQueryResponse message and never transmitted by itself.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="EntityAddress" type="EntityAddress" use="required">
+				<xs:annotation>
+					<xs:documentation>Entity Address of the Connection the metering event applies to.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="EventType" type="MeterEventType" use="required">
+				<xs:annotation>
+					<xs:documentation>Event type: ConnectionInterruption (feed from DSO to Connection was fully interrupted); ConnectionResumption (feed from DSO to Connection was restored); CapacityManagement: the maximum usage of the Connection was set to the value indicated in the EventData attribute. A CapacityManagement event without a specified maximum usage (missing EventData attribute) indicates the end of capacity management.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="EventData" type="xs:integer" use="optional">
+				<xs:annotation>
+					<xs:documentation>Optional, only included for EventType=CapacityManagement: the maximum usage specified for the Connection in Watts.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="EventDateTime" type="xs:dateTime" use="required">
+				<xs:annotation>
+					<xs:documentation>The date/time, local to the time zone specified in the message metadata, the event occurred.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!--  -->
+	<xs:element name="ConnectionMeterData">
+		<xs:annotation>
+			<xs:documentation>The ConnectionMeterData entity encapsulates metering data for the single connection identified by the EntityAddress attribute. It is always included as part of a MeterDataQueryResponse message and never transmitted by itself.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="PTU-MeterData" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="EntityAddress" type="EntityAddress" use="optional">
+				<xs:annotation>
+					<xs:documentation>Entity Address of the Connection the metering data applies to. Optional, and only included in MDC responses to BRPs: for MDC responses to DSOs, the PTU-MeterData elements are aggregated by AGR.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="EntityCount" type="xs:integer" use="optional">
+				<xs:annotation>
+					<xs:documentation>Optional: in case EntityAddress is not specified, this attribute indicates the number of connections represented by the aggregated consumption data.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="AGR-Domain" type="InternetDomain" use="optional">
+				<xs:annotation>
+					<xs:documentation>Optional: if the Connection the metering data applies to is represented by an Aggregator, its Internet domain is included here.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!--  -->
+	<xs:element name="PTU-MeterData">
+		<xs:annotation>
+			<xs:documentation>The PTU-MeterData entity includes metering data for the PTU indicated. It is always included as part of a MeterDataQueryResponse message and never transmitted by itself.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:attribute name="Power" type="xs:integer" use="required">
+				<xs:annotation>
+					<xs:documentation>Power consumed (negative value) or produced (positive value) for this PTU in Watts.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Start" type="xs:integer" use="required">
+				<xs:annotation>
+					<xs:documentation>Number of the first PTU this element refers to. The first PTU of a day has number 1.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Duration" type="xs:integer" use="optional" default="1">
+				<xs:annotation>
+					<xs:documentation>The number of the PTUs this element represents. Optional, default value is 1.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!--  -->
+	<xs:element name="MeterDataQueryResponse">
+		<xs:annotation>
+			<xs:documentation>Upon receiving and processing a MeterDataQuery message, the receiving implementation must reply with a MeterDataQueryResponse, indicating whether the query executed successfully, and if it did, including the query results. Most queries will return zero or more MeterData entries, each encapsulating metering data for a single day in the requested period.</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="MessageMetadata"/>
+				<xs:element ref="MeterDataSet" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="Result" type="Disposition-SuccessFailure" use="required">
+				<xs:annotation>
+					<xs:documentation>Indication whether the query was executed successfully or failed.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Message" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation>In case the query failed, this attribute must contain a human-readable description of the failure reason.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="DateRangeStart" type="Period" use="required">
+				<xs:annotation>
+					<xs:documentation>First day (in yyyy-mm-dd format) of the date range for which metering data was requested, copied from the request.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="DateRangeEnd" type="Period" use="required">
+				<xs:annotation>
+					<xs:documentation>Last day (in yyyy-mm-dd format) of the date range for which metering data was requested, copied from the request.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="QueryType" type="MeterDataQueryType" use="required">
+				<xs:annotation>
+					<xs:documentation>Requested meter data, copied from the request.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+	<!-- -->
+	<xs:element name="MeterDataSet">
+		<xs:complexType>
+			<xs:annotation>
+				<xs:documentation>This element is used in meter data responses to represent a group of meter data entries, linked to a parent (Congestion Point or BRP).
+				</xs:documentation>
+			</xs:annotation>
+			<xs:sequence>
+				<xs:element ref="MeterData" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="EntityAddress" type="xs:string" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<!-- -->
+</xs:schema>

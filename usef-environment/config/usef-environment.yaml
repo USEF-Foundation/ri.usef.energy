@@ -1,0 +1,504 @@
+#
+# Copyright 2015 USEF Foundation
+#
+# Licensed under the Apache License, Version 2.0 (the \"License\");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an \"AS IS\" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+### USEF Environment Properties ##########################################################################################
+
+##########################################################################################################################
+# Schedule parameters common to all USEF roles.
+##########################################################################################################################
+# Duration of one program time unit (PTU) in minutes. Integer value greater than 0 and less than the minimum number
+# of minutes in a day for the timezone.
+ptu_duration: 15
+
+# Number of program time units as a margin for the intraday gate closure.
+intraday_gate_closure_ptus: 1
+
+# Day ahead gate closure time (in format 'HH:mm').
+day_ahead_gate_closure_time: '22:00'
+
+# Day ahead gate closure PTUs
+day_ahead_gate_closure_ptus: 8
+
+# The agreed upon used currency
+currency: EUR
+
+# The agreed upon local time zone.
+time_zone: Europe/Amsterdam
+
+##########################################################################################################################
+# Keystore parameters
+##########################################################################################################################
+# A keystore is a repository of security certificates, either authorization certificates or public key certificates
+# which are used for de/encryption of the xml messages.
+
+# The password to access the keystore. The keystore can be accessed with the Java keytool.
+keystore_password: usef1234
+
+# The keystore contains a secret key entry which consists of an alias and password. The private key is used
+# to sign the xml messages which are sent to other participants.
+keystore_private_key_alias: usef
+keystore_private_key_password: usef1234
+
+##########################################################################################################################
+# Settings for sending / receiving messages.
+##########################################################################################################################
+
+# If this participant sends an xml message, it will be send to the RECIPIENT_ENDPOINT. The URL contains of a host, port 
+# (defined in the participants_dns_info.yaml file) and a path, which is defined by the RECIPIENT_ENDPOINT.
+# e.g. localhost:8080/dso/rest/ReceiverService/receiveMessage
+# where /rest/ReceiverService/receiveMessage is the configured RECIPIENT_ENDPOINT.
+# If this value is missing, the USEF-compliant URL will be used. In that case a proxy server is required.
+# See "USEF Reference Implementation Installation Manual".
+recipient_endpoint: '/rest/ReceiverService/receiveMessage'
+
+# Comma-separated http error codes for which a send request should be retried. When a message is send to a participant and
+# an HTTP error code is received, the message will be send again.
+retry_http_error_codes: 404,408,419,429
+
+# Maximum error message length. When an error occurs when a message is sent, it will be stored in the database. The error
+# message will be truncated to the configured length.
+max_error_message_length: 255
+
+##########################################################################################################################
+# Configuration file locations
+##########################################################################################################################
+# Name of the file of the participants and their DNS which is located in the configuration folder. When the participant 
+# is not in the file, the messages from/to the participant are not accepted.
+participant_dns_info_filename: participants_dns_info.yaml
+
+# The allowlist mechanism only works when SENDER_ALLOW_LIST_FORCED is set to true. When the allowlist mechanism is turned
+# on, the participant should be listed on the allowlist to accept messages.
+# Force the USEF implementation to use the sender allow list ('true') or not ('false').
+sender_allow_list_forced: false
+
+# Name of file containing the list of participants whose messages will be accepted when sender_allow_list_forced is set to 'true'.
+# The file is ignored if sender_allow_list_forced is set to 'false'.
+sender_allow_list_filename: transport-allowlist.yaml
+
+# Name of file containing the list of participants whose messages will be rejected. 
+# Messages from participants that are on both the allow list and the deny list will not be accepted.
+sender_deny_list_filename: transport-denylist.yaml
+
+##########################################################################################################################
+# Settings for the exponential backoff
+##########################################################################################################################
+# Exponential backoff is an algorithm that retries requests to the server based on certain status codes in the
+# server response. The retries exponentially increase the waiting time up to a certain threshold. The idea is
+# that if the server is down temporarily, it is not overwhelmed with requests hitting at the same time when it
+# comes back up. See also: https://code.google.com/p/google-http-java-client/wiki/ExponentialBackoff
+
+# The message precedence is part of the message metadata which can be set to ROUTINE, TRANSACTIONAL or
+# CRITICAL. The importance of the message can be defined by its precedence. Every constant has its own set of
+# exponential backoff parameters which can be set.
+
+# Precedence of the message is ROUTINE.
+# The maximum number of http retries is set to this value.
+routine_http_request_max_retries: 2
+
+# The initial retry interval in milliseconds.
+routine_exponential_backoff_initial_interval_millis: 300
+
+# The maximum elapsed time in milliseconds.
+routine_exponential_backoff_max_elapsed_time_millis: 2000
+
+# The maximum value of the back off period in milliseconds.
+routine_exponential_backoff_max_interval_millis: 60000
+
+# The value to multiply the current interval with for each retry attempt.
+routine_exponential_backoff_multiplier: 1.5
+
+# The randomization factor to use for creating a range around the retry interval.
+routine_exponential_backoff_randomization_factor: 0.5
+
+# Precedence of the message is TRANSACTIONAL.
+# The maximum number of http retries is set to this value.
+transactional_http_request_max_retries: 3
+
+# The initial retry interval in milliseconds.
+transactional_exponential_backoff_initial_interval_millis: 200
+
+# The maximum elapsed time in milliseconds.
+transactional_exponential_backoff_max_elapsed_time_millis: 2000
+
+# The maximum value of the back off period in milliseconds.
+transactional_exponential_backoff_max_interval_millis: 60000
+
+# The value to multiply the current interval with for each retry attempt.
+transactional_exponential_backoff_multiplier: 1.5
+
+# The randomization factor to use for creating a range around the retry interval.
+transactional_exponential_backoff_randomization_factor: 0.5
+
+# This configured notification factor is multiplied with the PTU duration. The result of this is used by services
+# to check whether a response message is received. If no message has been received within time, an error is shown.
+# e.g. When a query is sent, the response on the query needs to be received in (factor * ptu duration) minutes.
+transactional_message_notification_factor: 0.3
+
+# Precedence of the message is CRITICAL.
+# The maximum number of http retries is set to this value.
+critical_http_request_max_retries: 5
+
+# The initial retry interval in milliseconds.
+critical_exponential_backoff_initial_interval_millis: 100
+
+# The maximum elapsed time in milliseconds.
+critical_exponential_backoff_max_elapsed_time_millis: 1000
+
+# The maximum value of the back off period in milliseconds.
+critical_exponential_backoff_max_interval_millis: 50000
+
+# The value to multiply the current interval with for each retry attempt.
+critical_exponential_backoff_multiplier: 1.5
+
+# The randomization factor to use for creating a range around the retry interval.
+critical_exponential_backoff_randomization_factor: 0.5
+
+# This configured notification factor is multiplied with the PTU duration. The result of this is used by services
+# to check whether a response message is received. If no message has been received within time, an error is shown.
+# e.g. When a query is sent, the response on the query needs to be received in (factor * ptu duration) minutes.
+critical_message_notification_factor: 0.2
+
+##########################################################################################################################
+# DSO Properties
+##########################################################################################################################
+# Configured time of day the common reference update is executed (in format 'HH:mm').
+dso_common_reference_update_time: '11:00'
+
+# The time of the day the planboard is initialized (in format 'HH:mm').
+dso_initialize_planboard_time: '12:00'
+
+# The number of days between subsequent planboard initializations (and thus the number of days to initialize at a time).
+# Must be an integer value greater than zero.
+dso_initialize_planboard_days_interval: 1
+
+# The time of day when the connection forecast is generated (in format 'HH:mm').
+# The DSO must create the non-aggregator connection forecast before it can process any D-Prognoses from AGRs. Therefore the DSO
+# connection forecast is scheduled earlier than the AGRs connection forecast.
+dso_connection_forecast_time: '13:00'
+
+# The number of days between connection forecasts. The connection forecast is generated once a day if the interval is set to 1.
+# Must be an integer value greater than zero.
+dso_connection_forecast_days_interval: 1
+
+# Scheduling paramers for "Flex Order Events".
+dso_flexorder_initial_delay_in_seconds: 5
+dso_flexorder_interval_in_seconds: 900
+
+# Configuration for initiating the settlement process (Day of month in range [1..28] and time of day in format 'HH:mm').
+dso_initiate_settlement_day_of_month: 1
+dso_initiate_settlement_time: '11:00'
+
+# The interval between subsequent checks for MeterDataQueries in minutes.
+dso_meter_data_query_expiration_check_interval_in_minutes: 60
+
+# The expiration time for meterDataQuery messages in hours.
+dso_meter_data_query_expiration_in_hours: 6
+
+# The number of days to wait after sending SettlementMessages before they can be considered DISPUTED if no response was received.
+dso_settlement_response_waiting_duration: 4
+
+# The time of the day settlement messages will be flagged DISPUTED if no response was received (in format 'HH:mm').
+dso_settlement_message_disposal_time: '22:00'
+
+# Scheduling parameters for operate events.
+dso_operate_initial_delay_in_seconds: 1
+dso_operate_interval_in_seconds: 60
+
+# Configuration for firering the initiate collect orange regime event (Day of month in range [1..28] and time of day in format 'HH:mm').
+dso_initiate_collect_orange_regime_data_day_of_month: 1
+dso_initiate_collect_orange_regime_data_time: '12:00'
+
+##########################################################################################################################
+# CRO Properties
+##########################################################################################################################
+# Common reference mode which can be set on OPEN or CLOSED. In closed mode, participants will need to be pre-configured 
+# in the CRO's database in order for updates to be accepted.
+common_reference_mode: OPEN
+
+##########################################################################################################################
+# BRP Properties
+##########################################################################################################################
+# Configured time of day the common reference update is executed (in format 'HH:mm').
+brp_common_reference_update_time_of_day: '11:00'
+
+# The time of the day the planboard is initialized (in format 'HH:mm').
+brp_initialize_planboard_time: '12:00'
+
+# The number of days between subsequent planboard initializations (and thus the number of days to initialize at a time).
+# Must be an integer value greater than zero.
+brp_initialize_planboard_days_interval: 1
+
+# The offset in days of the first day to initialize during of the planboard initialization.
+# Must be an integer value greater than zero.
+brp_initialize_planboard_days_ahead: 1
+
+# Scheduling parameter for "Flex Order Events".
+brp_flexorder_initial_delay_in_seconds: 5
+brp_flexorder_interval_in_seconds: 30
+
+# Configuration for initiating the settlement process (Day of month in range [1..28] and time of day in format 'HH:mm').
+brp_initiate_settlement_day_of_month: 1
+brp_initiate_settlement_time: '10:00'
+
+# The Interval for how often one should check if there are any expired MeterDataQuery's.
+brp_meter_data_query_expiration_check_interval_in_minutes: 60
+
+# The expiration time in hours for meterDataQuery messages.
+brp_meter_data_query_expiration_in_hours: 6
+
+# Number of PTUs before day ahead closure time to finalize the A-Plans
+brp_finalize_aplans_ptus_before_gate_closure: 4
+
+# The number of days to wait after sending SettlementMessages before they can be considered DISPUTED if no response was received.
+brp_settlement_response_waiting_duration: 4
+
+# The time of the day BRP can flag a settlement message as DISPUTED if no response came in
+brp_settlement_message_disposal_time: '22:00'
+
+##########################################################################################################################
+# AGR Properties
+##########################################################################################################################
+# Configured time of day the common reference update is executed (in format 'HH:mm').
+agr_common_reference_update_time: '11:00'
+
+# The time of the day the planboard is initialized (in format 'HH:mm').
+agr_initialize_planboard_time: '12:00'
+
+# The number of days between subsequent planboard initializations.
+agr_initialize_planboard_days_interval: 1
+
+# The time of day when the connection forecast is generated by the AGR. Format HH:mm.
+# The DSO must create the non-aggregator connection forecast before it can process any D-Prognoses from AGRs. Therefore the DSO
+# connection forecast is scheduled earlier than the AGRs connection forecast.
+agr_connection_forecast_time: '13:30'
+
+# The number of days between subsequent connection forecasts. The interval should be an integer value greater than zero.
+agr_connection_forecast_days_interval: 1
+
+# Scheduling parameters for "Flex Offer Events".
+agr_flexoffer_initial_delay_in_seconds: 5
+agr_flexoffer_interval_in_seconds: 900
+
+# Scheduling parameters for "Determine Net Demands" (depending on the smallest DTU duration).
+agr_determine_netdemands_initial_delay_in_seconds: 5
+agr_determine_netdemands_interval_in_seconds: 300
+
+# Scheduling parameters for "Control ADS Messages"
+agr_control_ads_initial_delay_in_seconds: 5
+agr_control_ads_interval_in_seconds: 900
+agr_control_ads_timeout_in_seconds: 10
+
+# Configuration for initiating the settlement process (Day of month in range [1..28] and time of day in format 'HH:mm').
+agr_initiate_settlement_day_of_month: 1
+agr_initiate_settlement_time_of_day: '01:00'
+
+# Number of PTUs before day ahead closure time to finalize A-Plans
+agr_finalize_a_plan_ptus: 10
+
+# Scheduling parameters for "Identify Changes in Forecast".
+agr_identify_change_in_forecast_initial_delay_in_seconds: 5
+agr_identify_change_in_forecast_interval_in_seconds: 900
+
+# Boolean indicating if aggregator is non-UDI or not.
+agr_is_non_udi_aggregator: false
+
+# Interval between each non-UDI retriev ADS goal realization execution.
+agr_non_udi_retrieve_ads_goal_realization_initial_delay_in_minutes: 15
+agr_non_udi_retrieve_ads_goal_realization_interval_in_minutes: 15
+
+# PowerMatcher rest endpoint address
+agr_powermatcher_endpoint_uri: 'http://localhost:8081'
+
+# The time of the day that a non-UDI aggregator initializes the PowerMatcher cluster (in format 'HH:mm')
+agr_initialize_non_udi_time_of_day: '00:01'
+
+##########################################################################################################################
+# MDC Properties
+##########################################################################################################################
+# Configured time of day the common reference query is executed (in format 'HH:mm').
+mdc_common_reference_query_time: '05:00'
+
+##########################################################################################################################
+# Settings for demo purposes
+##########################################################################################################################
+# When a message is sent or received the dns of the sender / receiver is checked by default.
+# If you don't have DNSSEC configured yet, set this to "true"
+bypass_dns_verification: true
+
+# TLS/SSL verification flag. Based on this flag the certificates of the destination of the message will not be checked.
+# If you don't have proper SSL certificates yet, set this to "true"
+bypass_tls_verification: true
+
+# Scheduled Events flag. Based on this flag scheduled messages can be bypassed for testing purposes.
+bypass_scheduled_events: false
+
+# XSD Validation flags to enable/disable validation of incoming and outgoing xml messages.
+validate_outgoing_xml: false
+validate_incoming_xml: true
+
+# PBCFeeder is used in the PBCs to have a consistent, more realistic dataset.
+# If you want to run the PBC Feeder in the USEF environment, the following endpoint is used.
+# All reference participants need the PBC feeder for feeding the stub PBCs.
+# So, when this is commented out, the stub PBCs won't work correctly.
+pbc_feeder_endpoint: http://localhost:8080/usef-pbcfeeder/rest/PBCFeeder  
+
+# A Time Server may be configured to create faster simulations, if this is done, the following properties must be enabled.
+# The following two properties are used by the participants in this USEF environment to connect to the time server
+#time_server: 127.0.0.1
+#time_server_port: 8900
+
+# If you want to run a time server in this USEF environment, the following properties are used.
+# The node property specifies on which node the time server process should run, this must match one of the defined nodes.
+#timeserver:
+#   time_factor: 4
+#   server_port: 8900
+
+# This is the node where all service component such as the time server and the PBC feeder are deployed
+service_node: "localhost"
+
+# The processes section describes which participants are deployed on the application server. Per section (described with
+# a minus sign), one domain is described with a specific role. The following roles can be defined cro-role, agr-role,
+# brp-role, dso-role.
+# Configuration items which are described are passed to the participant. If you want to overwrite a configuration item,
+# configure the item specific for the participant. For example, below the configuration item bypass_dns_verification
+# is overwritten from the default.
+# If configuration items are not listed in this file, the participant will fallback to its default. During startup of
+# the application server, the configuration items (properties) are displayed.
+
+# Participants can be added to the environment by copying sections. Make sure that each section has a unique domain-name. 
+# For example, an additional aggregator role can be added by adding:
+# - domain-name: "agr02.usef-example.com"
+#      agr-role:
+#          bypass_dns_verification: false
+#          bypass_tls_verification: false
+
+nodes:
+    - node: "localhost"
+      address: "127.0.0.1"
+      processes:
+        - domain-name: "cro1.usef-example.com"
+          cro-role:
+              # Example on how the parent configuration item can be overwritten.
+              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
+              # bypass_dns_verification: true
+              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
+              # bypass_tls_verification: true
+
+              # This private key is used to sign the xml message which is send to another participant. Never give
+              # this private key to anybody. 
+              private-signing-key: "QRRb5Q+mq7HI7CaoAd7sWmXoo6uxNiwpyWGJa/TEGsqmOh3cfshlw3UdW9Hz+xPg+1Sq0jCBLBeAQaY8Zddhcw=="
+
+              # This public key is used to verify incoming xml messages to verify if the xml messages comes from the
+              # participant it says it was. This public key is used by DNSSEC to verify is the domain-name is of the
+              # participant it says it was.
+              public-signing-key: "t886iY+jfsirTyJtORRRi8xQwCgFKmTe3/XbO+ERCDl+DZKIacWr3qTBhjgMCDbTGX12hRb+p+u2LMBzseqQ8w=="
+
+              # This private key is used to encrypt xml message which is send to another participant. Never give
+              # this private key to anybody.
+              private-encryption-key: "ESYb/oNvExurPygjLqbzwGtcJPeJqyNHXw6AaXbsRwY="
+
+              # This public key is used to decrypt incoming xml messages.
+              public-encryption-key: "oJsWvumLo1PHdE3ij/sPiLeoiqtMnOZMEmPoz45pIZI="
+
+#        - domain-name: "agr.usef-example.com"
+#          agr-role:
+              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
+              # bypass_dns_verification: true
+              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
+              # bypass_tls_verification: true
+
+#        - domain-name: "brp.usef-example.com"
+#          brp-role:
+              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
+              # bypass_dns_verification: true
+              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
+              # bypass_tls_verification: true
+
+#        - domain-name: "cro.usef-example.com"
+#          cro-role:
+              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
+              # bypass_dns_verification: true
+              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
+              # bypass_tls_verification: true
+
+#        - domain-name: "dso.usef-example.com"
+#          dso-role:
+              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
+              # bypass_dns_verification: true
+              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
+              # bypass_tls_verification: true
+
+#        - domain-name: "mdc.usef-example.com"
+#          mdc-role:
+              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
+              # bypass_dns_verification: true
+              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
+              # bypass_tls_verification: true
+
+        - domain-name: "agr1.usef-example.com"
+          agr-role:
+              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
+              # bypass_dns_verification: true
+              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
+              # bypass_tls_verification: true
+              # Boolean indicating if aggregator is non-udi aggregator or not
+              agr_is_non_udi_aggregator: false
+ 
+        - domain-name: "agr2.usef-example.com"
+          agr-role:
+              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
+              # bypass_dns_verification: true
+              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
+              # bypass_tls_verification: true
+              # Boolean indicating if aggregator is non-udi aggregator or not
+              agr_is_non_udi_aggregator: true
+ 
+        - domain-name: "agr3.usef-example.com"
+          agr-role:
+              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
+              # bypass_dns_verification: true
+              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
+              # bypass_tls_verification: true
+              # Boolean indicating if aggregator is non-udi aggregator or not
+              agr_is_non_udi_aggregator: false
+ 
+        - domain-name: "brp1.usef-example.com"
+          brp-role:
+              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
+              # bypass_dns_verification: true
+              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
+              # bypass_tls_verification: true
+
+        - domain-name: "brp2.usef-example.com"
+          brp-role:
+              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
+              # bypass_dns_verification: true
+              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
+              # bypass_tls_verification: true
+
+        - domain-name: "dso1.usef-example.com"
+          dso-role:
+              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
+              # bypass_dns_verification: true
+              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
+              # bypass_tls_verification: true
+
+        - domain-name: "mdc1.usef-example.com"
+          mdc-role:
+              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
+              # bypass_dns_verification: true
+              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
+              # bypass_tls_verification: true

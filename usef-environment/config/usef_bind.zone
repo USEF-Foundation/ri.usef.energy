@@ -1,0 +1,12 @@
+$ORIGIN usef-example.com.                                       ; origin of the zone (top level domain name)
+$TTL 86400                                                      ; time to live for caching (1 day)
+@	IN SOA	usef-example.com. hostmaster.usef-example.com. (
+                               2015042203                       ; arbitrary serial number
+                               28800                            ; refresh (8 hours)
+                               7200                             ; retry (2 hours)
+                               2419200                          ; expire (4 weeks)
+                               86400                            ; minimum (1 day)
+                               )
+                       NS      ns1.usef-example.com.            ; name server record
+                       A       127.0.0.1                        ; address of the top level domain name
+ns1	IN A    127.0.0.1                                           ; name server address

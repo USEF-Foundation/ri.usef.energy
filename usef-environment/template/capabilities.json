@@ -1,0 +1,68 @@
+{
+  "PBCFeeder": {
+    "capabilities": [
+      {
+        "type": "IncreaseCapability",
+        "id": 1,
+        "maxDtus": 1,
+        "powerStep": 100,
+        "maxPower": 400,
+        "durationMultiplier": 1,
+        "consumptionProductionType": "CONSUMPTION"
+      },
+      {
+        "type": "ReduceCapability",
+        "id": 2,
+        "maxDtus": 1,
+        "powerStep": -100,
+        "minPower": -400,
+        "durationMultiplier": 1,
+        "consumptionProductionType": "CONSUMPTION"
+      },
+      {
+        "type": "InterruptCapability",
+        "id": 3,
+        "maxDtus": 1,
+        "type": "FULL"
+      },
+      {
+        "type": "ShiftCapability",
+        "id": 4
+      },
+      {
+        "type": "ReportCapability",
+        "id": 5
+      }
+    ]
+  },"ADS": {
+    "capabilities": [
+      {
+        "type": "IncreaseCapability",
+        "id": 1,
+        "maxDtus": 1,
+        "powerStep": 100,
+        "maxPower": 400,
+        "durationMultiplier": 1,
+        "consumptionProductionType": "CONSUMPTION"
+      },
+      {
+        "type": "ReduceCapability",
+        "id": 2,
+        "maxDtus": 1,
+        "powerStep": -100,
+        "minPower": -400,
+        "durationMultiplier": 1,
+        "consumptionProductionType": "CONSUMPTION"
+      }
+    ]
+  },"PV": {
+    "capabilities": [
+      {
+        "type": "InterruptCapability",
+        "id": 3,
+        "maxDtus": 1,
+        "type": "FULL"
+      }
+    ]
+  }
+}

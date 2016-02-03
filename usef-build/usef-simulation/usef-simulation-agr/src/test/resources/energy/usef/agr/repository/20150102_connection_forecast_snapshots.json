@@ -1,0 +1,13 @@
+[
+  {
+    "power": 30,
+    "ptuDate": [
+      2015,
+      1,
+      2
+    ],
+    "ptuIndex": 1,
+    "connectionEntityAddress": "ean.000000000002",
+    "changed": true
+  }
+]

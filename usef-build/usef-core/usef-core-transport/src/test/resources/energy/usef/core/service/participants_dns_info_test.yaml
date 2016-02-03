@@ -1,0 +1,32 @@
+---
+# This yaml file contains DNS information about USEF participants for demonstration purposes
+participants:
+    - domain-name: "example.com"
+      spec-version: "2014:I"
+      agr-role:
+        - public-keys: "cs1.pNUU96U5br6ZFTpyFs18N7wIveBl+rc5gHNYS473RKI="
+          url: "http://usef.energy/usef.energy_agr/Something"
+    - domain-name: "usef.energy"
+      spec-version: "2014:I"
+      dso-role:
+        - entity-address: "ea2.2014-09.energy.usef:dso.1"
+          public-keys: "cs1.pNUU96U5br6ZFTpyFs18N7wIveBl+rc5gHNYS473RKI="
+          url: "http://usef.energy/usef.energy_dso/Something"
+    - domain-name: "usef.energy"
+      spec-version: "2014:I"
+      cro-role:
+        - entity-address: "ea2.2014-09.energy.usef:cro.1"
+          public-keys: "cs1.pNUU96U5br6ZFTpyFs18N7wIveBl+rc5gHNYS473RKI="
+          url: "http://usef.energy/usef.energy_cro/Something"
+    - domain-name: "usef.energy"
+      spec-version: "2014:I"
+      brp-role:
+        - entity-address: "ea2.2014-09.energy.usef:brp.1"
+          public-keys: "cs1.pNUU96U5br6ZFTpyFs18N7wIveBl+rc5gHNYS473RKI="
+          url: "http://usef.energy/usef.energy_brp/Something"
+    - domain-name: "usef.energy"
+      spec-version: "2014:I"
+      mdc-role:
+        - entity-address: "ea2.2014-09.energy.usef:mdc.1"
+          public-keys: "cs1.pNUU96U5br6ZFTpyFs18N7wIveBl+rc5gHNYS473RKI="
+          url: "http://usef.energy/usef.energy_mdc/something"

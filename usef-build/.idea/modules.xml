@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/usef-workflow/usef-agr/usef-agr.iml" filepath="$PROJECT_DIR$/usef-workflow/usef-agr/usef-agr.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-workflow/usef-brp/usef-brp.iml" filepath="$PROJECT_DIR$/usef-workflow/usef-brp/usef-brp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-core/usef-core.iml" filepath="$PROJECT_DIR$/usef-core/usef-core.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-core/usef-core-api/usef-core-api.iml" filepath="$PROJECT_DIR$/usef-core/usef-core-api/usef-core-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-core/usef-core-commons/usef-core-commons.iml" filepath="$PROJECT_DIR$/usef-core/usef-core-commons/usef-core-commons.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-core/usef-core-planboard/usef-core-planboard.iml" filepath="$PROJECT_DIR$/usef-core/usef-core-planboard/usef-core-planboard.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-core/usef-core-transport/usef-core-transport.iml" filepath="$PROJECT_DIR$/usef-core/usef-core-transport/usef-core-transport.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-core/usef-core-workflow/usef-core-workflow.iml" filepath="$PROJECT_DIR$/usef-core/usef-core-workflow/usef-core-workflow.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-core/usef-core-workflow-api/usef-core-workflow-api.iml" filepath="$PROJECT_DIR$/usef-core/usef-core-workflow-api/usef-core-workflow-api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-workflow/usef-cro/usef-cro.iml" filepath="$PROJECT_DIR$/usef-workflow/usef-cro/usef-cro.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-deployments/usef-ddl-generate/usef-ddl-generate.iml" filepath="$PROJECT_DIR$/usef-deployments/usef-ddl-generate/usef-ddl-generate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-deployments/usef-deployment-agr/usef-deployment-agr.iml" filepath="$PROJECT_DIR$/usef-deployments/usef-deployment-agr/usef-deployment-agr.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-deployments/usef-deployment-brp/usef-deployment-brp.iml" filepath="$PROJECT_DIR$/usef-deployments/usef-deployment-brp/usef-deployment-brp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-deployments/usef-deployment-cro/usef-deployment-cro.iml" filepath="$PROJECT_DIR$/usef-deployments/usef-deployment-cro/usef-deployment-cro.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-deployments/usef-deployment-dso/usef-deployment-dso.iml" filepath="$PROJECT_DIR$/usef-deployments/usef-deployment-dso/usef-deployment-dso.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-deployments/usef-deployment-mdc/usef-deployment-mdc.iml" filepath="$PROJECT_DIR$/usef-deployments/usef-deployment-mdc/usef-deployment-mdc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-deployments/usef-deployment-pbcfeeder/usef-deployment-pbcfeeder.iml" filepath="$PROJECT_DIR$/usef-deployments/usef-deployment-pbcfeeder/usef-deployment-pbcfeeder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-deployments/usef-deployment-time/usef-deployment-time.iml" filepath="$PROJECT_DIR$/usef-deployments/usef-deployment-time/usef-deployment-time.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-deployments/usef-deployments.iml" filepath="$PROJECT_DIR$/usef-deployments/usef-deployments.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-workflow/usef-dso/usef-dso.iml" filepath="$PROJECT_DIR$/usef-workflow/usef-dso/usef-dso.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-endpoints/usef-endpoint.iml" filepath="$PROJECT_DIR$/usef-endpoints/usef-endpoint.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-endpoints/usef-endpoint-agr/usef-endpoint-agr.iml" filepath="$PROJECT_DIR$/usef-endpoints/usef-endpoint-agr/usef-endpoint-agr.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-endpoints/usef-endpoint-brp/usef-endpoint-brp.iml" filepath="$PROJECT_DIR$/usef-endpoints/usef-endpoint-brp/usef-endpoint-brp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-endpoints/usef-endpoint-cro/usef-endpoint-cro.iml" filepath="$PROJECT_DIR$/usef-endpoints/usef-endpoint-cro/usef-endpoint-cro.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-endpoints/usef-endpoint-dso/usef-endpoint-dso.iml" filepath="$PROJECT_DIR$/usef-endpoints/usef-endpoint-dso/usef-endpoint-dso.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-endpoints/usef-endpoint-mdc/usef-endpoint-mdc.iml" filepath="$PROJECT_DIR$/usef-endpoints/usef-endpoint-mdc/usef-endpoint-mdc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-workflow/usef-mdc/usef-mdc.iml" filepath="$PROJECT_DIR$/usef-workflow/usef-mdc/usef-mdc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-root-pom.iml" filepath="$PROJECT_DIR$/usef-root-pom.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-simulation/usef-simulation.iml" filepath="$PROJECT_DIR$/usef-simulation/usef-simulation.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-simulation/usef-simulation-agr/usef-simulation-agr.iml" filepath="$PROJECT_DIR$/usef-simulation/usef-simulation-agr/usef-simulation-agr.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-simulation/usef-simulation-brp/usef-simulation-brp.iml" filepath="$PROJECT_DIR$/usef-simulation/usef-simulation-brp/usef-simulation-brp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-simulation/usef-simulation-dso/usef-simulation-dso.iml" filepath="$PROJECT_DIR$/usef-simulation/usef-simulation-dso/usef-simulation-dso.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-simulation/usef-simulation-mdc/usef-simulation-mdc.iml" filepath="$PROJECT_DIR$/usef-simulation/usef-simulation-mdc/usef-simulation-mdc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-simulation/usef-simulation-pbcfeeder/usef-simulation-pbcfeeder.iml" filepath="$PROJECT_DIR$/usef-simulation/usef-simulation-pbcfeeder/usef-simulation-pbcfeeder.iml" />
+      <module fileurl="file://$PROJECT_DIR$/usef-workflow/usef-workflow.iml" filepath="$PROJECT_DIR$/usef-workflow/usef-workflow.iml" />
+    </modules>
+  </component>
+</project>

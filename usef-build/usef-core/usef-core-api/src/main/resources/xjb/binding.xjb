@@ -1,0 +1,126 @@
+<jaxb:bindings xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:inheritance="http://jaxb2-commons.dev.java.net/basic/inheritance"
+    jaxb:extensionBindingPrefixes="inheritance" jaxb:version="2.1">
+    <jaxb:globalBindings>
+        <jaxb:javaType name="org.joda.time.LocalDateTime"
+            xmlType="xs:dateTime"
+            printMethod="energy.usef.core.adapter.YodaTimeAdapter.printDateTime"
+            parseMethod="energy.usef.core.adapter.YodaTimeAdapter.parseDateTime" />
+        <jaxb:javaType name="org.joda.time.LocalTime"
+            xmlType="xs:time" printMethod="energy.usef.core.adapter.YodaTimeAdapter.printTime"
+            parseMethod="energy.usef.core.adapter.YodaTimeAdapter.parseTime" />
+        <jaxb:javaType name="org.joda.time.LocalDate"
+            xmlType="xs:date" printMethod="energy.usef.core.adapter.YodaTimeAdapter.printDate"
+            parseMethod="energy.usef.core.adapter.YodaTimeAdapter.parseDate" />
+        <jaxb:javaType name="org.joda.time.Period"
+            xmlType="xs:duration"
+            printMethod="energy.usef.core.adapter.YodaTimeAdapter.printDuration"
+            parseMethod="energy.usef.core.adapter.YodaTimeAdapter.parseDuration" />
+    </jaxb:globalBindings>
+    <jaxb:bindings schemaLocation="../xsd/messaging.xsd"
+        node="/xsd:schema">
+        <jaxb:bindings node="xsd:element[@name='CommonReferenceUpdate']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings
+            node="xsd:element[@name='CommonReferenceUpdateResponse']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='CommonReferenceQuery']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings
+            node="xsd:element[@name='CommonReferenceQueryResponse']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='FlexOffer']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='FlexOfferResponse']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='FlexOfferRevocation']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings
+            node="xsd:element[@name='FlexOfferRevocationResponse']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='FlexOrder']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='FlexOrderResponse']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='FlexRequest']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='FlexRequestResponse']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='Prognosis']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='PrognosisResponse']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='TestMessage']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='TestMessageResponse']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='SettlementMessage']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='SettlementMessageResponse']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='MeterDataQuery']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+        <jaxb:bindings node="xsd:element[@name='MeterDataQueryResponse']">
+            <jaxb:class />
+            <inheritance:implements>Message
+            </inheritance:implements>
+        </jaxb:bindings>
+    </jaxb:bindings>
+</jaxb:bindings>

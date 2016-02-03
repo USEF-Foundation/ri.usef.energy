@@ -1,0 +1,6 @@
+<included>
+ <logger name="DateTimeUtil" level="OFF" />
+ <logger name="energy.usef" level="INFO" />
+ <logger name="WorkItem" level="OFF" />
+ <logger name="energy.usef.CONFIDENTIAL" level="OFF" />
+</included>

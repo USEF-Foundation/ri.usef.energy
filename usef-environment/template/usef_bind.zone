@@ -1,0 +1,15 @@
+; This file contains zone information for configuring Bind9
+$TTL 1D
+$ORIGIN usef-example.com.
+@       IN              SOA         usef-example.com. hostmaster.usef-example.com. (
+                                        2015042201      ; serial, todays date + todays serial #
+                                        8H              ; refresh, seconds
+                                        2H              ; retry, seconds
+                                        4W              ; expire, seconds
+                                        1D )            ; minimum, seconds
+                        NS          ns1.usef-example.com.
+                        TXT         "Universal Smart Energy Framework"
+                        A	        127.0.0.1
+
+ns1                     IN	A	    127.0.0.1  ;name server definition
+

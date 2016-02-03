@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CommonReferenceQueryResponse Result="Success">
+    <MessageMetadata SenderDomain="cro1.usef-example.com" SenderRole="CRO" RecipientDomain="agr1.usef-example.com"
+                     RecipientRole="AGR" TimeStamp="2015-03-13T12:03:54.438" MessageID="11df69d6-1ee1-4b98-8279-be0cf910b0e1"
+                     ConversationID="4cfd90e0-550d-4a54-aff1-0c0660555c93" Precedence="Routine"/>
+    <Connection EntityAddress="ean.100000000001" BRP-Domain="brp1.usef-example.com" AGR-Domain="agr1.usef-example.com"/>
+    <Connection EntityAddress="ean.100000000002" BRP-Domain="brp1.usef-example.com" AGR-Domain="agr1.usef-example.com"/>
+    <Connection EntityAddress="ean.100000000003" BRP-Domain="brp2.usef-example.com" AGR-Domain="agr1.usef-example.com"/>
+    <Connection EntityAddress="ean.100000000004" BRP-Domain="brp2.usef-example.com" AGR-Domain="agr1.usef-example.com"/>
+    <Connection EntityAddress="ean.100000000005" BRP-Domain="brp2.usef-example.com" AGR-Domain="agr1.usef-example.com"/>
+</CommonReferenceQueryResponse>

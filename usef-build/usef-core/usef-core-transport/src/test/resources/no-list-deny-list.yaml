@@ -1,0 +1,5 @@
+---
+# This list does not have the expected format. It will return an empty list and generates an entry in the log file concerning this issue.
+deny-list:
+  - ict.nl
+  - ibm.com

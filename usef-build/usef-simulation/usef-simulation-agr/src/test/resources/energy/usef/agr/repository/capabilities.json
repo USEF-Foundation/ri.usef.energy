@@ -1,0 +1,74 @@
+{
+  "DemoFridge": {
+    "capabilities": [
+      {
+        "type": "IncreaseCapability",
+        "id": null,
+        "maxDtus": null,
+        "powerStep": null,
+        "maxPower": null,
+        "durationMultiplier": null,
+        "consumptionProductionType": null
+      },
+      {
+        "type": "ReduceCapability",
+        "id": null,
+        "maxDtus": null,
+        "powerStep": null,
+        "minPower": null,
+        "durationMultiplier": null,
+        "consumptionProductionType": null
+      },
+      {
+        "type": "InterruptCapability",
+        "id": null,
+        "maxDtus": null,
+        "type": null
+      },
+      {
+        "type": "ShiftCapability",
+        "id": null
+      },
+      {
+        "type": "ReportCapability",
+        "id": null
+      }
+    ]
+  },
+  "DemoFridge2": {
+    "capabilities": [
+      {
+        "type": "IncreaseCapability",
+        "id": null,
+        "maxDtus": null,
+        "powerStep": null,
+        "maxPower": null,
+        "durationMultiplier": null,
+        "consumptionProductionType": null
+      },
+      {
+        "type": "ReduceCapability",
+        "id": null,
+        "maxDtus": null,
+        "powerStep": null,
+        "minPower": null,
+        "durationMultiplier": null,
+        "consumptionProductionType": null
+      },
+      {
+        "type": "InterruptCapability",
+        "id": null,
+        "maxDtus": null,
+        "type": null
+      },
+      {
+        "type": "ShiftCapability",
+        "id": null
+      },
+      {
+        "type": "ReportCapability",
+        "id": null
+      }
+    ]
+  }
+}

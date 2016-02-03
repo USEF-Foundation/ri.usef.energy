@@ -1,0 +1,40 @@
+<?xml version="1.1" encoding="UTF-8"?>
+<jboss:ejb-jar xmlns:jboss="http://www.jboss.com/xml/ns/javaee" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:s="urn:security:1.1"
+	xsi:schemaLocation="http://www.jboss.com/xml/ns/javaee http://www.jboss.org/j2ee/schema/jboss-ejb3.xsd http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/ejb-jar_3_1.xsd"
+	version="3.1" impl-version="2.0">
+
+	<enterprise-beans>
+		<message-driven>
+			<ejb-name>IN_QUEUE_MDB</ejb-name>
+			<ejb-class>energy.usef.core.service.mdb.IncomingQueueMDB</ejb-class>
+			<activation-config>
+				<activation-config-property>
+					<activation-config-property-name>destination</activation-config-property-name>
+					<activation-config-property-value>java:jboss/exported/jms/usefInQueueBrp</activation-config-property-value>
+				</activation-config-property>
+			</activation-config>
+		</message-driven>
+		<message-driven>
+			<ejb-name>OUT_QUEUE_MDB</ejb-name>
+			<ejb-class>energy.usef.core.service.mdb.OutgoingQueueMDB</ejb-class>
+			<activation-config>
+				<activation-config-property>
+					<activation-config-property-name>destination</activation-config-property-name>
+					<activation-config-property-value>java:jboss/exported/jms/usefOutQueueBrp</activation-config-property-value>
+				</activation-config-property>
+			</activation-config>
+		</message-driven>
+		<message-driven>
+			<ejb-name>NOT_SENT_QUEUE_MDB</ejb-name>
+			<ejb-class>energy.usef.core.service.mdb.NotSentQueueMDB</ejb-class>
+			<activation-config>
+				<activation-config-property>
+					<activation-config-property-name>destination</activation-config-property-name>
+					<activation-config-property-value>java:jboss/exported/jms/usefNotSentQueueBrp</activation-config-property-value>
+				</activation-config-property>
+			</activation-config>
+		</message-driven>
+	</enterprise-beans>
+
+</jboss:ejb-jar>

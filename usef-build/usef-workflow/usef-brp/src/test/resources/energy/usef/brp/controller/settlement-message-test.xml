@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SettlementMessage TimeZone="Europe/Amsterdam" PeriodStart="2015-01-01" PeriodEnd="2015-01-31"
+                   Reference="TO_BE_DETERMINED" PTU-Duration="15" Currency="EUR">
+    <MessageMetadata SenderDomain="brp.usef-example.com" SenderRole="BRP" RecipientDomain="agr.usef-example.com"
+                     RecipientRole="AGR" TimeStamp="2015-01-27T14:45:25.025" MessageID="5d8ebfbf-5cc9-49bb-8cdb-9d11d3629418"
+                     ConversationID="a35a78bc-26c5-4bcc-98c0-31518e807627" Precedence="Transactional" />
+    <FlexOrderSettlement Period="2015-01-22" PrognosisOrigin="agr.usef-example.com" PrognosisSequence="20150122183000500"
+                         OrderReference="1" CongestionPoint="ean.123456789012345678">
+        <PTU-Settlement Start="1" Duration="1" PrognosisPower="1000" OrderedFlexPower="-200" Price="10.99"
+                        ActualPower="900" DeliveredFlexPower="-100" PowerDeficiency="100" Penalty="5.50" NetSettlement="5.49" />
+    </FlexOrderSettlement>
+    <FlexOrderSettlement Period="2015-01-22" PrognosisOrigin="agr.usef-example.com" PrognosisSequence="20150122183100500"
+                         OrderReference="2" CongestionPoint="ean.123456789012345678">
+        <PTU-Settlement Start="2" Duration="1" PrognosisPower="1000" OrderedFlexPower="-200" Price="10.99"
+                        ActualPower="900" DeliveredFlexPower="-100" PowerDeficiency="100" Penalty="5.50" NetSettlement="5.49" />
+    </FlexOrderSettlement>
+</SettlementMessage>

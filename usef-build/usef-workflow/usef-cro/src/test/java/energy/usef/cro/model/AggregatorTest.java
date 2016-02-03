@@ -1,0 +1,39 @@
+/*
+ * Copyright 2015 USEF Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package energy.usef.cro.model;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+public class AggregatorTest {
+
+    /***
+     * This tests the equals and hashcode methods of the entity Aggregator.
+     */
+    @Test
+    public void testEquals() {
+        Aggregator aggregator1 = new Aggregator("domain1");
+        Aggregator aggregator2 = new Aggregator("domain2");
+        Aggregator aggregator3 = new Aggregator("domain1");
+
+        Assert.assertTrue(aggregator1.equals(aggregator1));
+        Assert.assertTrue(!aggregator1.equals(null));
+        Assert.assertTrue(!aggregator1.equals(aggregator2));
+        Assert.assertTrue(aggregator1.equals(aggregator3));
+    }
+
+}

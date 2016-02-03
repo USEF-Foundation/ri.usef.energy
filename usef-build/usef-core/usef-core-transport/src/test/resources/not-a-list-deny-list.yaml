@@ -1,0 +1,5 @@
+---
+# This list does not have the expected format. It will return an empty list and generates an entry in the log file concerning this issue.
+
+# Currently this list is empty
+intraday_gate_closure_ptus: 1

@@ -1,0 +1,25 @@
+<configuration scan="true" scanPeriod="10 seconds">
+    <appender name="DEFAULT_FILE"
+        class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${jboss.server.log.dir}/time/default-messages.log</file>
+        <rollingPolicy
+            class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>${jboss.server.log.dir}/time/default%d{yyyy-MM-dd_HH}.log
+            </fileNamePattern>
+            <!-- keep 72 hours worth of history -->
+            <maxHistory>72</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%d [%thread] %-5level %logger{35} - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="DEFAULT_FILE" />
+    </root>
+
+    <include optional="true" file="${jboss.server.config.dir}/LogBackTimeServer.xml"/>
+
+</configuration>
