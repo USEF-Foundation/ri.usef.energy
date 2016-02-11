@@ -16,10 +16,11 @@
 
 package energy.usef.agr.workflow.operate.identifychangeforecast;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_IDENTIFY_CHANGE_IN_FORECAST;
+
 import energy.usef.agr.service.business.AgrPortfolioBusinessService;
 import energy.usef.agr.workflow.operate.deviation.DetectDeviationEvent;
 import energy.usef.agr.workflow.operate.reoptimize.ReOptimizePortfolioEvent;
-import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.dto.PtuContainerDto;
@@ -116,7 +117,7 @@ public class AgrIdentifyChangeInForecastCoordinatorTest {
     public void testHandleEventTriggerReoptimize() {
         Mockito.when(agrPortfolioBusinessService.findConnectionPortfolioDto(Matchers.any(LocalDate.class)))
                 .thenReturn(new ArrayList<>());
-        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AgrWorkflowStep.AGR_IDENTIFY_CHANGE_IN_FORECAST.name()), Mockito.any()))
+        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AGR_IDENTIFY_CHANGE_IN_FORECAST.name()), Mockito.any()))
                 .then(call -> parseContext((WorkflowContext) call.getArguments()[1]));
 
         PowerMockito.mockStatic(PtuUtil.class);
@@ -134,7 +135,7 @@ public class AgrIdentifyChangeInForecastCoordinatorTest {
     public void testHandleEventTriggerDetectDeviations() {
         Mockito.when(agrPortfolioBusinessService.findConnectionPortfolioDto(Matchers.any(LocalDate.class)))
                 .thenReturn(new ArrayList<>());
-        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AgrWorkflowStep.AGR_IDENTIFY_CHANGE_IN_FORECAST.name()), Mockito.any()))
+        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AGR_IDENTIFY_CHANGE_IN_FORECAST.name()), Mockito.any()))
                 .then(call -> parseContext((WorkflowContext) call.getArguments()[1]));
         PowerMockito
                 .when(corePlanboardValidatorService.isPtuContainerWithinIntradayGateClosureTime(Mockito.any(PtuContainer.class)))

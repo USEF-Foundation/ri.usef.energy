@@ -23,7 +23,8 @@ import energy.usef.core.workflow.dto.FlexOrderSettlementDto;
 import energy.usef.core.workflow.dto.PtuSettlementDto;
 import energy.usef.core.workflow.dto.SettlementDto;
 import energy.usef.dso.pbcfeederimpl.PbcFeederService;
-import energy.usef.dso.workflow.settlement.initiate.RequestPenaltyDataParameter;
+import energy.usef.dso.workflow.settlement.initiate.RequestPenaltyDataParameter.IN;
+import energy.usef.dso.workflow.settlement.initiate.RequestPenaltyDataParameter.OUT;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -64,8 +65,8 @@ public class DsoRequestPenaltyDataStub implements WorkflowStep {
     public WorkflowContext invoke(WorkflowContext context) {
         LOGGER.info("Started assigning penalties to settlements with arguments: {}", context);
 
-        SettlementDto settlementDto = context.get(RequestPenaltyDataParameter.IN.SETTLEMENT_DTO.name(), SettlementDto.class);
-        Integer ptuDuration = context.get(RequestPenaltyDataParameter.IN.PTU_DURATION.name(), Integer.class);
+        SettlementDto settlementDto = context.get(IN.SETTLEMENT_DTO.name(), SettlementDto.class);
+        Integer ptuDuration = context.get(IN.PTU_DURATION.name(), Integer.class);
 
         // determine the first day of the month for settlement
         LocalDate firstDayOfMonth = settlementDto.getStartDate();
@@ -103,7 +104,7 @@ public class DsoRequestPenaltyDataStub implements WorkflowStep {
         }
 
         // store the updated ptu settlement list in the context
-        context.setValue(RequestPenaltyDataParameter.OUT.UPDATED_SETTLEMENT_DTO.name(), settlementDto);
+        context.setValue(OUT.UPDATED_SETTLEMENT_DTO.name(), settlementDto);
 
         LOGGER.info("Ended assigning penalties to settlements");
         return context;

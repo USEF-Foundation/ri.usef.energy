@@ -94,7 +94,7 @@ public class FlexOfferTransformer {
     }
 
     /**
-     * Transforms {@link PtuFlexOfferDto} to a {@link energy.usef.core.data.xml.bean.message.PTU}.
+     * Transforms {@link PtuFlexOfferDto} to a {@link PTU}.
      *
      * @param ptuFlexOfferDto
      * @return

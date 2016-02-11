@@ -19,8 +19,8 @@ package energy.usef.dso.workflow.transformer;
 import energy.usef.core.model.CongestionPointConnectionGroup;
 import energy.usef.core.model.ConnectionGroup;
 import energy.usef.core.model.PtuContainer;
-import energy.usef.dso.workflow.dto.GridMonitoringDto;
 import energy.usef.dso.model.PtuGridMonitor;
+import energy.usef.dso.workflow.dto.GridMonitoringDto;
 
 import java.math.BigInteger;
 import java.util.List;

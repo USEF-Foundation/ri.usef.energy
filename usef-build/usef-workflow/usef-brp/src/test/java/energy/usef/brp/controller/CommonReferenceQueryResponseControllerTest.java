@@ -24,7 +24,6 @@ import energy.usef.core.data.xml.bean.message.CommonReferenceEntityType;
 import energy.usef.core.data.xml.bean.message.CommonReferenceQueryResponse;
 import energy.usef.core.data.xml.bean.message.DispositionSuccessFailure;
 import energy.usef.core.data.xml.bean.message.USEFRole;
-
 import energy.usef.core.exception.BusinessException;
 import energy.usef.core.model.Message;
 import energy.usef.core.service.business.CorePlanboardBusinessService;

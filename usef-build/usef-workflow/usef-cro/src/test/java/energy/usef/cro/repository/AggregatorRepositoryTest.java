@@ -20,8 +20,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import energy.usef.cro.model.Aggregator;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
@@ -33,6 +31,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import energy.usef.cro.model.Aggregator;
 
 /**
  * JUnit test for the IngoingMessageRepository class.

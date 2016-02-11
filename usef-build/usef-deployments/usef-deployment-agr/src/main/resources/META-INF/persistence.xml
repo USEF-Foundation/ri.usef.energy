@@ -40,7 +40,6 @@
 
         <class>energy.usef.agr.model.PowerContainer</class>
         <class>energy.usef.agr.model.PowerData</class>
-        <class>energy.usef.agr.model.MeteredPowerData</class>
         <class>energy.usef.agr.model.ConnectionGroupPowerContainer</class>
         <class>energy.usef.agr.model.ConnectionPowerContainer</class>
         <class>energy.usef.agr.model.UdiPowerContainer</class>

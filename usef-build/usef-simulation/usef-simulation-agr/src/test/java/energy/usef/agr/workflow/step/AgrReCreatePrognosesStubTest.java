@@ -18,10 +18,9 @@ package energy.usef.agr.workflow.step;
 
 import energy.usef.agr.PortfolioBuilder;
 import energy.usef.agr.dto.ConnectionPortfolioDto;
-
+import energy.usef.agr.workflow.operate.recreate.prognoses.ReCreatePrognosesWorkflowParameter.IN;
+import energy.usef.agr.workflow.operate.recreate.prognoses.ReCreatePrognosesWorkflowParameter.OUT;
 import energy.usef.core.data.xml.bean.message.USEFRole;
-
-import energy.usef.agr.workflow.operate.recreate.prognoses.ReCreatePrognosesWorkflowParameter;
 import energy.usef.core.util.DateTimeUtil;
 import energy.usef.core.workflow.DefaultWorkflowContext;
 import energy.usef.core.workflow.WorkflowContext;
@@ -68,8 +67,8 @@ public class AgrReCreatePrognosesStubTest {
         // 128 bigger than 84 +- floor(4.2) --> expect recreation
         WorkflowContext context = buildContext(USEFRole.DSO, BigInteger.valueOf(128), null);
         context = stub.invoke(context);
-        List<Long> dPrognosisSequencesList = (List<Long>) context.getValue(ReCreatePrognosesWorkflowParameter.OUT.REQUIRES_NEW_D_PROGNOSIS_SEQUENCES_LIST.name());
-        List<Long> aPlanSequencesList = (List<Long>) context.getValue(ReCreatePrognosesWorkflowParameter.OUT.REQUIRES_NEW_A_PLAN_SEQUENCES_LIST.name());
+        List<Long> dPrognosisSequencesList = (List<Long>) context.getValue(OUT.REQUIRES_NEW_D_PROGNOSIS_SEQUENCES_LIST.name());
+        List<Long> aPlanSequencesList = (List<Long>) context.getValue(OUT.REQUIRES_NEW_A_PLAN_SEQUENCES_LIST.name());
         Assert.assertNotNull(dPrognosisSequencesList);
         Assert.assertNotNull(aPlanSequencesList);
         dPrognosisSequencesList.sort(Long::compareTo);
@@ -85,8 +84,8 @@ public class AgrReCreatePrognosesStubTest {
         // 1085 > 84 + 1000 which is the max threshold
         WorkflowContext context = buildContext(USEFRole.BRP, null, BigInteger.valueOf(1085));
         context = stub.invoke(context);
-        List<Long> dPrognosisSequencesList = (List<Long>) context.getValue(ReCreatePrognosesWorkflowParameter.OUT.REQUIRES_NEW_D_PROGNOSIS_SEQUENCES_LIST.name());
-        List<Long> aPlanSequencesList = (List<Long>) context.getValue(ReCreatePrognosesWorkflowParameter.OUT.REQUIRES_NEW_A_PLAN_SEQUENCES_LIST.name());
+        List<Long> dPrognosisSequencesList = (List<Long>) context.getValue(OUT.REQUIRES_NEW_D_PROGNOSIS_SEQUENCES_LIST.name());
+        List<Long> aPlanSequencesList = (List<Long>) context.getValue(OUT.REQUIRES_NEW_A_PLAN_SEQUENCES_LIST.name());
         Assert.assertNotNull(dPrognosisSequencesList);
         Assert.assertNotNull(aPlanSequencesList);
         aPlanSequencesList.sort(Long::compareTo);
@@ -103,8 +102,8 @@ public class AgrReCreatePrognosesStubTest {
         // Prognosis power limit: 84 +- floor(4.2) to stay within 5% difference
         WorkflowContext context = buildContext(USEFRole.DSO, BigInteger.valueOf(80), BigInteger.valueOf(88));
         context = stub.invoke(context);
-        List<Long> dPrognosisSequencesList = (List<Long>) context.getValue(ReCreatePrognosesWorkflowParameter.OUT.REQUIRES_NEW_D_PROGNOSIS_SEQUENCES_LIST.name());
-        List<Long> aPlanSequencesList = (List<Long>) context.getValue(ReCreatePrognosesWorkflowParameter.OUT.REQUIRES_NEW_A_PLAN_SEQUENCES_LIST.name());
+        List<Long> dPrognosisSequencesList = (List<Long>) context.getValue(OUT.REQUIRES_NEW_D_PROGNOSIS_SEQUENCES_LIST.name());
+        List<Long> aPlanSequencesList = (List<Long>) context.getValue(OUT.REQUIRES_NEW_A_PLAN_SEQUENCES_LIST.name());
         Assert.assertNotNull(dPrognosisSequencesList);
         Assert.assertNotNull(aPlanSequencesList);
         Assert.assertTrue(dPrognosisSequencesList.isEmpty());
@@ -114,27 +113,27 @@ public class AgrReCreatePrognosesStubTest {
     private WorkflowContext buildContext(USEFRole usefRole, BigInteger dprognosisPower, BigInteger aplanPower) {
         WorkflowContext context = new DefaultWorkflowContext();
         if (usefRole == USEFRole.DSO) {
-            context.setValue(ReCreatePrognosesWorkflowParameter.IN.LATEST_D_PROGNOSES_DTO_LIST.name(),
+            context.setValue(IN.LATEST_D_PROGNOSES_DTO_LIST.name(),
                     buildLatestPrognoses(PrognosisTypeDto.D_PROGNOSIS, "ean.123456789012345678", dprognosisPower, 4l, 5l));
-            context.setValue(ReCreatePrognosesWorkflowParameter.IN.CURRENT_PORTFOLIO.name(), buildConnectionPortfolio2());
-            context.setValue(ReCreatePrognosesWorkflowParameter.IN.CONNECTION_GROUPS_TO_CONNECTIONS_MAP.name(),
+            context.setValue(IN.CURRENT_PORTFOLIO.name(), buildConnectionPortfolio2());
+            context.setValue(IN.CONNECTION_GROUPS_TO_CONNECTIONS_MAP.name(),
                     buildConnectionGroupsToConnectionsMap("ean.123456789012345678",
-                            context.get(ReCreatePrognosesWorkflowParameter.IN.CURRENT_PORTFOLIO.name(), List.class)));
-            context.setValue(ReCreatePrognosesWorkflowParameter.IN.LATEST_A_PLANS_DTO_LIST.name(), new ArrayList<PrognosisDto>());
+                            context.get(IN.CURRENT_PORTFOLIO.name(), List.class)));
+            context.setValue(IN.LATEST_A_PLANS_DTO_LIST.name(), new ArrayList<PrognosisDto>());
 
         }
         if (usefRole == USEFRole.BRP) {
-            context.setValue(ReCreatePrognosesWorkflowParameter.IN.LATEST_A_PLANS_DTO_LIST.name(),
+            context.setValue(IN.LATEST_A_PLANS_DTO_LIST.name(),
                     buildLatestPrognoses(PrognosisTypeDto.A_PLAN, "brp.usef-example.com", aplanPower, 1l, 2l, 3l));
-            context.setValue(ReCreatePrognosesWorkflowParameter.IN.CURRENT_PORTFOLIO.name(), buildConnectionPortfolio2());
-            context.setValue(ReCreatePrognosesWorkflowParameter.IN.CONNECTION_GROUPS_TO_CONNECTIONS_MAP.name(),
+            context.setValue(IN.CURRENT_PORTFOLIO.name(), buildConnectionPortfolio2());
+            context.setValue(IN.CONNECTION_GROUPS_TO_CONNECTIONS_MAP.name(),
                     buildConnectionGroupsToConnectionsMap("brp.usef-example.com",
-                            context.get(ReCreatePrognosesWorkflowParameter.IN.CURRENT_PORTFOLIO.name(), List.class)));
-            context.setValue(ReCreatePrognosesWorkflowParameter.IN.LATEST_D_PROGNOSES_DTO_LIST.name(), new ArrayList<PrognosisDto>());
+                            context.get(IN.CURRENT_PORTFOLIO.name(), List.class)));
+            context.setValue(IN.LATEST_D_PROGNOSES_DTO_LIST.name(), new ArrayList<PrognosisDto>());
 
         }
-        context.setValue(ReCreatePrognosesWorkflowParameter.IN.PERIOD.name(), CURRENT_DATE);
-        context.setValue(ReCreatePrognosesWorkflowParameter.IN.PTU_DURATION.name(), PTU_SIZE);
+        context.setValue(IN.PERIOD.name(), CURRENT_DATE);
+        context.setValue(IN.PTU_DURATION.name(), PTU_SIZE);
         return context;
     }
 

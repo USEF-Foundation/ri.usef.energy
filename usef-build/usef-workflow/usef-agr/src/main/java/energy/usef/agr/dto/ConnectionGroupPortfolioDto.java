@@ -17,7 +17,6 @@
 package energy.usef.agr.dto;
 
 import energy.usef.core.data.xml.bean.message.USEFRole;
-
 import energy.usef.core.model.ConnectionGroup;
 import energy.usef.core.workflow.dto.USEFRoleDto;
 

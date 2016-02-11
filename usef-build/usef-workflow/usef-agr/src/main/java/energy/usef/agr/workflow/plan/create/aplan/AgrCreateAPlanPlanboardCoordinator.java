@@ -30,11 +30,11 @@ import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.MessageMetadata;
 import energy.usef.core.data.xml.bean.message.PTU;
 import energy.usef.core.data.xml.bean.message.Prognosis;
+import energy.usef.core.data.xml.bean.message.PrognosisType;
 import energy.usef.core.data.xml.bean.message.USEFRole;
 import energy.usef.core.model.ConnectionGroup;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
-import energy.usef.core.model.PrognosisType;
 import energy.usef.core.model.PtuContainer;
 import energy.usef.core.model.PtuPrognosis;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
@@ -119,7 +119,7 @@ public class AgrCreateAPlanPlanboardCoordinator {
         // Fetch latest A-Plan
         // Map: Ptu Index -> PtuPrognosis
         Map<Integer, PtuPrognosis> latestAPlans = corePlanboardBusinessService
-                .findLastPrognoses(period, PrognosisType.A_PLAN, connectionGroup.getUsefIdentifier()).stream()
+                .findLastPrognoses(period, energy.usef.core.model.PrognosisType.A_PLAN, connectionGroup.getUsefIdentifier()).stream()
                 .collect(Collectors.toMap(ptuPrognosis -> ptuPrognosis.getPtuContainer().getPtuIndex(), Function.identity()));
 
         // Initialize prognosis message for BRP
@@ -181,7 +181,7 @@ public class AgrCreateAPlanPlanboardCoordinator {
         aPlan.setSequence(sequenceGeneratorService.next());
         aPlan.setMessageMetadata(buildMessageMetadata(brpDomain));
         aPlan.setTimeZone(config.getProperty(ConfigParam.TIME_ZONE));
-        aPlan.setType(energy.usef.core.data.xml.bean.message.PrognosisType.A_PLAN);
+        aPlan.setType(PrognosisType.A_PLAN);
         return aPlan;
     }
 

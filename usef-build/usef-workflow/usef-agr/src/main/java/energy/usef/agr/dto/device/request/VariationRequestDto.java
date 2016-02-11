@@ -26,8 +26,7 @@ public class VariationRequestDto extends DeviceRequestDto {
     private BigInteger startDTU;
     private BigInteger endDTU;
     private BigInteger power;
-
-
+    private ConsumptionProductionTypeDto consumptionProductionType;
 
     public String getEventID() {
         return eventID;
@@ -59,5 +58,13 @@ public class VariationRequestDto extends DeviceRequestDto {
 
     public void setPower(BigInteger power) {
         this.power = power;
+    }
+
+    public ConsumptionProductionTypeDto getConsumptionProductionType() {
+        return consumptionProductionType;
+    }
+
+    public void setConsumptionProductionType(ConsumptionProductionTypeDto consumptionProductionType) {
+        this.consumptionProductionType = consumptionProductionType;
     }
 }

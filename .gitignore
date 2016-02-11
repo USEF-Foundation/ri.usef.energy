@@ -8,12 +8,25 @@
 *.war
 *.ear
 
+#IntelliJ
+.idea
+*.iml
+
+#Maven
+target/
+
+#Eclipse
+.project
+.classpath
+.settings/
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-.project
 .svn
 *.stackdump
 license.tcl
-usef-ca
-usef-integration-tests
-usef-integration-test-tool
+
+#Usef specific
+usef-ddl-generate/
+*.dir_IS_UNDEFINED
+test_keystore

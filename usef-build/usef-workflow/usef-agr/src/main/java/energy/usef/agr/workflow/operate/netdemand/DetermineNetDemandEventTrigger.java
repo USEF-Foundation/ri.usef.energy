@@ -16,9 +16,9 @@
 
 package energy.usef.agr.workflow.operate.netdemand;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_DETERMINE_NET_DEMANDS;
 import energy.usef.agr.config.ConfigAgr;
 import energy.usef.agr.config.ConfigAgrParam;
-import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.service.helper.AbstractTriggerRegisterHelperService;
 
 import java.util.concurrent.TimeUnit;
@@ -53,7 +53,7 @@ public class DetermineNetDemandEventTrigger extends AbstractTriggerRegisterHelpe
             return;
         }
 
-        getSchedulerHelperService().registerScheduledCall(AgrWorkflowStep.AGR_DETERMINE_NET_DEMANDS.name(),
+        getSchedulerHelperService().registerScheduledCall(AGR_DETERMINE_NET_DEMANDS.name(),
                 () -> determineNetDemandEvents.fire(new DetermineNetDemandEvent()),
                 createInitialDelay(), createIntervalPeriod());
     }

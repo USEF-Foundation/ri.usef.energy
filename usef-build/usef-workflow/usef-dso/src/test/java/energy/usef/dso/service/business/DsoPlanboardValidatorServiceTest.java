@@ -19,18 +19,6 @@ package energy.usef.dso.service.business;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import energy.usef.core.config.Config;
-import energy.usef.core.config.ConfigParam;
-import energy.usef.core.data.xml.bean.message.Prognosis;
-import energy.usef.core.exception.BusinessValidationException;
-import energy.usef.core.model.CongestionPointConnectionGroup;
-import energy.usef.core.repository.CongestionPointConnectionGroupRepository;
-import energy.usef.core.repository.PlanboardMessageRepository;
-import energy.usef.core.util.XMLUtil;
-import energy.usef.dso.exception.DsoBusinessError;
-import energy.usef.dso.model.Aggregator;
-import energy.usef.dso.repository.AggregatorOnConnectionGroupStateRepository;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.math.BigInteger;
@@ -49,6 +37,18 @@ import org.mockito.Mock;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+
+import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
+import energy.usef.core.data.xml.bean.message.Prognosis;
+import energy.usef.core.exception.BusinessValidationException;
+import energy.usef.core.model.CongestionPointConnectionGroup;
+import energy.usef.core.repository.CongestionPointConnectionGroupRepository;
+import energy.usef.core.repository.PlanboardMessageRepository;
+import energy.usef.core.util.XMLUtil;
+import energy.usef.dso.exception.DsoBusinessError;
+import energy.usef.dso.model.Aggregator;
+import energy.usef.dso.repository.AggregatorOnConnectionGroupStateRepository;
 
 /**
  * Test class in charge of the unit tests related to the {@link DsoPlanboardValidatorService}.

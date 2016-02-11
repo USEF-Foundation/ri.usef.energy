@@ -30,7 +30,6 @@ import energy.usef.core.data.xml.bean.message.FlexOrderResponse;
 import energy.usef.core.data.xml.bean.message.MessageMetadata;
 import energy.usef.core.data.xml.bean.message.PTU;
 import energy.usef.core.data.xml.bean.message.USEFRole;
-
 import energy.usef.core.exception.BusinessException;
 import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.AcknowledgementStatus;

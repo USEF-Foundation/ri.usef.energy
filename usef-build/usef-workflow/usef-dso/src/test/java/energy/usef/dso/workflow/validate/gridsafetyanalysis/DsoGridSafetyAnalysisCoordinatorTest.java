@@ -48,6 +48,7 @@ import energy.usef.dso.workflow.coloring.ColoringProcessEvent;
 import energy.usef.dso.workflow.dto.GridSafetyAnalysisDto;
 import energy.usef.dso.workflow.dto.PtuGridSafetyAnalysisDto;
 import energy.usef.dso.workflow.validate.create.flexrequest.CreateFlexRequestEvent;
+import energy.usef.dso.workflow.validate.gridsafetyanalysis.CreateGridSafetyAnalysisStepParameter.IN;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

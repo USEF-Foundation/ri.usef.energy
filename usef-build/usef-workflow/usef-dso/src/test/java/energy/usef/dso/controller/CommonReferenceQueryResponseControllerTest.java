@@ -16,25 +16,6 @@
 
 package energy.usef.dso.controller;
 
-import energy.usef.core.data.xml.bean.message.CommonReferenceEntityType;
-import energy.usef.core.data.xml.bean.message.CommonReferenceQueryResponse;
-import energy.usef.core.data.xml.bean.message.CongestionPoint;
-import energy.usef.core.data.xml.bean.message.DispositionSuccessFailure;
-import energy.usef.core.exception.BusinessException;
-import energy.usef.core.model.CongestionPointConnectionGroup;
-import energy.usef.core.model.ConnectionGroup;
-import energy.usef.core.model.ConnectionGroupState;
-import energy.usef.core.model.Message;
-import energy.usef.core.model.PtuContainer;
-import energy.usef.core.model.PtuState;
-import energy.usef.core.service.business.CorePlanboardBusinessService;
-import energy.usef.core.service.business.MessageService;
-import energy.usef.core.service.business.SequenceGeneratorService;
-import energy.usef.core.service.helper.MessageMetadataBuilder;
-import energy.usef.dso.config.ConfigDso;
-import energy.usef.dso.service.business.DsoPlanboardBusinessService;
-import energy.usef.dso.config.ConfigDsoParam;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -54,6 +35,25 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+
+import energy.usef.core.data.xml.bean.message.CommonReferenceEntityType;
+import energy.usef.core.data.xml.bean.message.CommonReferenceQueryResponse;
+import energy.usef.core.data.xml.bean.message.CongestionPoint;
+import energy.usef.core.data.xml.bean.message.DispositionSuccessFailure;
+import energy.usef.core.exception.BusinessException;
+import energy.usef.core.model.CongestionPointConnectionGroup;
+import energy.usef.core.model.ConnectionGroup;
+import energy.usef.core.model.ConnectionGroupState;
+import energy.usef.core.model.Message;
+import energy.usef.core.model.PtuContainer;
+import energy.usef.core.model.PtuState;
+import energy.usef.core.service.business.CorePlanboardBusinessService;
+import energy.usef.core.service.business.MessageService;
+import energy.usef.core.service.business.SequenceGeneratorService;
+import energy.usef.core.service.helper.MessageMetadataBuilder;
+import energy.usef.dso.config.ConfigDso;
+import energy.usef.dso.config.ConfigDsoParam;
+import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 
 /**
  * Text class for CommonReferenceQueryController.

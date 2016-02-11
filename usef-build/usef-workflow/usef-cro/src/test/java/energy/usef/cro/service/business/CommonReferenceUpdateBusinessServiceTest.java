@@ -19,23 +19,6 @@ package energy.usef.cro.service.business;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import energy.usef.core.data.xml.bean.message.CommonReferenceEntityType;
-import energy.usef.core.data.xml.bean.message.CommonReferenceUpdate;
-import energy.usef.core.data.xml.bean.message.MessageMetadata;
-import energy.usef.cro.config.ConfigCro;
-import energy.usef.cro.config.ConfigCroParam;
-import energy.usef.cro.model.Aggregator;
-import energy.usef.cro.model.BalanceResponsibleParty;
-import energy.usef.cro.model.CongestionPoint;
-import energy.usef.cro.model.Connection;
-import energy.usef.cro.model.DistributionSystemOperator;
-import energy.usef.cro.repository.AggregatorRepository;
-import energy.usef.cro.repository.BalanceResponsiblePartyRepository;
-import energy.usef.cro.repository.CongestionPointRepository;
-import energy.usef.cro.repository.ConnectionRepository;
-import energy.usef.cro.repository.DistributionSystemOperatorRepository;
-import energy.usef.cro.repository.MeterDataCompanyRepository;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +36,23 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import energy.usef.core.data.xml.bean.message.CommonReferenceEntityType;
+import energy.usef.core.data.xml.bean.message.CommonReferenceUpdate;
+import energy.usef.core.data.xml.bean.message.MessageMetadata;
+import energy.usef.cro.config.ConfigCro;
+import energy.usef.cro.config.ConfigCroParam;
+import energy.usef.cro.model.Aggregator;
+import energy.usef.cro.model.BalanceResponsibleParty;
+import energy.usef.cro.model.CongestionPoint;
+import energy.usef.cro.model.Connection;
+import energy.usef.cro.model.DistributionSystemOperator;
+import energy.usef.cro.repository.AggregatorRepository;
+import energy.usef.cro.repository.BalanceResponsiblePartyRepository;
+import energy.usef.cro.repository.CongestionPointRepository;
+import energy.usef.cro.repository.ConnectionRepository;
+import energy.usef.cro.repository.DistributionSystemOperatorRepository;
+import energy.usef.cro.repository.MeterDataCompanyRepository;
 
 /**
  * JUnit test for the CommonReferenceUpdateBusinessService class.

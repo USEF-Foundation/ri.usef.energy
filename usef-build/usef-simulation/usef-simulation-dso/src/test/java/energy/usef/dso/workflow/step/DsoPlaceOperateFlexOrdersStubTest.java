@@ -20,9 +20,9 @@ import energy.usef.core.workflow.DefaultWorkflowContext;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.dto.FlexOfferDto;
 import energy.usef.core.workflow.dto.PtuFlexOfferDto;
-import energy.usef.dso.workflow.operate.PlaceOperateFlexOrdersStepParameter;
 import energy.usef.dso.workflow.dto.GridSafetyAnalysisDto;
 import energy.usef.dso.workflow.dto.PtuGridSafetyAnalysisDto;
+import energy.usef.dso.workflow.operate.PlaceOperateFlexOrdersStepParameter;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

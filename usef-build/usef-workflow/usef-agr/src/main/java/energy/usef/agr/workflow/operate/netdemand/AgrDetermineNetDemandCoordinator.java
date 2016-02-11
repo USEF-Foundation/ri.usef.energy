@@ -16,6 +16,7 @@
 
 package energy.usef.agr.workflow.operate.netdemand;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_DETERMINE_NET_DEMANDS;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 import static java.util.stream.Collectors.groupingBy;
@@ -29,7 +30,6 @@ import energy.usef.agr.service.business.AgrPortfolioBusinessService;
 import energy.usef.agr.transformer.UdiEventTransformer;
 import energy.usef.agr.workflow.operate.netdemand.DetermineNetDemandStepParameter.IN;
 import energy.usef.agr.workflow.operate.netdemand.DetermineNetDemandStepParameter.OUT;
-import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
@@ -130,8 +130,8 @@ public class AgrDetermineNetDemandCoordinator {
         inContext.setValue(IN.UDI_EVENT_DTO_MAP.name(), buildUdiEventDtoMap(period));
         inContext.setValue(IN.PERIOD.name(), period);
 
-        WorkflowContext outContext = workflowStepExecuter.invoke(AgrWorkflowStep.AGR_DETERMINE_NET_DEMANDS.name(), inContext);
-        WorkflowUtil.validateContext(AgrWorkflowStep.AGR_DETERMINE_NET_DEMANDS.name(), outContext, OUT.values());
+        WorkflowContext outContext = workflowStepExecuter.invoke(AGR_DETERMINE_NET_DEMANDS.name(), inContext);
+        WorkflowUtil.validateContext(AGR_DETERMINE_NET_DEMANDS.name(), outContext, OUT.values());
         return outContext;
     }
 

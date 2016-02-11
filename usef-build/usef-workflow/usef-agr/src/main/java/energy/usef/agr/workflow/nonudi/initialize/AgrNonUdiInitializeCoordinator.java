@@ -16,13 +16,13 @@
 
 package energy.usef.agr.workflow.nonudi.initialize;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_INITIALIZE_NON_UDI_CLUSTERS;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 
 import energy.usef.agr.config.ConfigAgr;
 import energy.usef.agr.config.ConfigAgrParam;
 import energy.usef.agr.workflow.nonudi.initialize.AgrInitializeNonUdiClustersParameter.IN;
-import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.model.BrpConnectionGroup;
 import energy.usef.core.model.CongestionPointConnectionGroup;
 import energy.usef.core.model.Connection;
@@ -97,7 +97,7 @@ public class AgrNonUdiInitializeCoordinator {
         inputContext.setValue(IN.BRP_CONNECTION_LIST_MAP.name(), brpConnectionListMap);
         inputContext.setValue(IN.CP_CONNECTION_LIST_MAP.name(), cpConnectionListMap);
 
-        workflowStepExecuter.invoke(AgrWorkflowStep.AGR_INITIALIZE_NON_UDI_CLUSTERS.name(), inputContext);
+        workflowStepExecuter.invoke(AGR_INITIALIZE_NON_UDI_CLUSTERS.name(), inputContext);
 
         LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }

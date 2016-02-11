@@ -16,6 +16,9 @@
 
 package energy.usef.agr.workflow.operate.reoptimize;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_NON_UDI_REOPTIMIZE_PORTFOLIO;
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_REOPTIMIZE_PORTFOLIO;
+
 import energy.usef.agr.config.ConfigAgr;
 import energy.usef.agr.config.ConfigAgrParam;
 import energy.usef.agr.dto.ConnectionPortfolioDto;
@@ -26,7 +29,6 @@ import energy.usef.agr.dto.device.request.ReduceRequestDto;
 import energy.usef.agr.service.business.AgrPlanboardBusinessService;
 import energy.usef.agr.service.business.AgrPortfolioBusinessService;
 import energy.usef.agr.workflow.operate.recreate.prognoses.ReCreatePrognosesEvent;
-import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.model.AcknowledgementStatus;
@@ -144,7 +146,7 @@ public class AgrReOptimizePortfolioCoordinatorTest {
         Mockito.when(corePlanboardBusinessService.findFlexOffersWithOrderInPeriod(period))
                 .thenReturn(buildPtuFlexOfferList(period));
 
-        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AgrWorkflowStep.AGR_REOPTIMIZE_PORTFOLIO.name()), Mockito.any()))
+        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AGR_REOPTIMIZE_PORTFOLIO.name()), Mockito.any()))
                 .thenReturn(buildWorkflowContextUdiOut());
 
         Mockito.when(corePlanboardBusinessService.findActiveConnectionGroupsWithConnections(Matchers.any(LocalDate.class)))
@@ -188,7 +190,7 @@ public class AgrReOptimizePortfolioCoordinatorTest {
         Mockito.when(corePlanboardBusinessService.findFlexOffersWithOrderInPeriod(period))
                 .thenReturn(buildPtuFlexOfferList(period));
 
-        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AgrWorkflowStep.AGR_NON_UDI_REOPTIMIZE_PORTFOLIO.name()), Mockito.any()))
+        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AGR_NON_UDI_REOPTIMIZE_PORTFOLIO.name()), Mockito.any()))
                 .thenReturn(buildWorkflowContextOut());
 
         Mockito.when(corePlanboardBusinessService.findActiveConnectionGroupsWithConnections(Matchers.any(LocalDate.class)))

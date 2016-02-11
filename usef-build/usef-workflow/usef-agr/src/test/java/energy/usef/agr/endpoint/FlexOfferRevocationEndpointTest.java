@@ -20,7 +20,6 @@ import static org.junit.Assert.assertEquals;
 
 import energy.usef.agr.workflow.validate.flexoffer.FlexOfferRevocationEvent;
 import energy.usef.core.data.xml.bean.message.USEFRole;
-
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
 import energy.usef.core.model.PlanboardMessage;

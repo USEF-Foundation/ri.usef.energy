@@ -16,18 +16,16 @@
 
 package energy.usef.agr.workflow.operate.recreate.prognoses;
 
-import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_RECREATE_PROGNOSES;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 
 import energy.usef.agr.dto.ConnectionPortfolioDto;
 import energy.usef.agr.service.business.AgrPlanboardBusinessService;
 import energy.usef.agr.service.business.AgrPortfolioBusinessService;
-import energy.usef.agr.workflow.operate.recreate.prognoses.ReCreatePrognosesWorkflowParameter.IN;
-import energy.usef.agr.workflow.operate.recreate.prognoses.ReCreatePrognosesWorkflowParameter.OUT;
 import energy.usef.agr.workflow.plan.create.aplan.CreateAPlanEvent;
 import energy.usef.agr.workflow.plan.recreate.aplan.ReCreateAPlanEvent;
 import energy.usef.agr.workflow.validate.create.dprognosis.ReCreateDPrognosisEvent;
+import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.event.RequestMoveToValidateEvent;
@@ -135,18 +133,18 @@ public class AgrReCreatePrognosesCoordinator {
         // create a context with the latest A-Plans, D-Prognoses and current portfolio as input.
         WorkflowContext context = new DefaultWorkflowContext();
 
-        context.setValue(IN.LATEST_A_PLANS_DTO_LIST.name(), aPlans);
-        context.setValue(IN.LATEST_D_PROGNOSES_DTO_LIST.name(), dPrognoses);
-        context.setValue(IN.CURRENT_PORTFOLIO.name(), connectionPortfolioDtos);
-        context.setValue(IN.CONNECTION_GROUPS_TO_CONNECTIONS_MAP.name(),
+        context.setValue(ReCreatePrognosesWorkflowParameter.IN.LATEST_A_PLANS_DTO_LIST.name(), aPlans);
+        context.setValue(ReCreatePrognosesWorkflowParameter.IN.LATEST_D_PROGNOSES_DTO_LIST.name(), dPrognoses);
+        context.setValue(ReCreatePrognosesWorkflowParameter.IN.CURRENT_PORTFOLIO.name(), connectionPortfolioDtos);
+        context.setValue(ReCreatePrognosesWorkflowParameter.IN.CONNECTION_GROUPS_TO_CONNECTIONS_MAP.name(),
                 corePlanboardBusinessService.buildConnectionGroupsToConnectionsMap(period));
-        context.setValue(IN.PERIOD.name(), period);
-        context.setValue(IN.PTU_DURATION.name(), config.getIntegerProperty(ConfigParam.PTU_DURATION));
+        context.setValue(ReCreatePrognosesWorkflowParameter.IN.PERIOD.name(), period);
+        context.setValue(ReCreatePrognosesWorkflowParameter.IN.PTU_DURATION.name(), config.getIntegerProperty(ConfigParam.PTU_DURATION));
         // call the PBC with context and validate the returned context .
-        context = workflowStepExecuter.invoke(AGR_RECREATE_PROGNOSES.name(), context);
-        WorkflowUtil.validateContext(AGR_RECREATE_PROGNOSES.name(), context, OUT.values());
+        context = workflowStepExecuter.invoke(AgrWorkflowStep.AGR_RECREATE_PROGNOSES.name(), context);
+        WorkflowUtil.validateContext(AgrWorkflowStep.AGR_RECREATE_PROGNOSES.name(), context, ReCreatePrognosesWorkflowParameter.OUT.values());
 
-        List<Long> aPlanSequences = (List<Long>) context.getValue(OUT.REQUIRES_NEW_A_PLAN_SEQUENCES_LIST.name());
+        List<Long> aPlanSequences = (List<Long>) context.getValue(ReCreatePrognosesWorkflowParameter.OUT.REQUIRES_NEW_A_PLAN_SEQUENCES_LIST.name());
         if (!aPlanSequences.isEmpty()) {
             moveToValidate = false;
         }
@@ -182,8 +180,8 @@ public class AgrReCreatePrognosesCoordinator {
     private void handlePrognosesToBeReCreated(LocalDate period, WorkflowContext workflowContext,
             List<PrognosisDto> dPrognoses,
             List<PrognosisDto> aPlans) {
-        List<Long> dPrognosisSequences = (List<Long>) workflowContext.getValue(OUT.REQUIRES_NEW_D_PROGNOSIS_SEQUENCES_LIST.name());
-        List<Long> aPlanSequences = (List<Long>) workflowContext.getValue(OUT.REQUIRES_NEW_A_PLAN_SEQUENCES_LIST.name());
+        List<Long> dPrognosisSequences = (List<Long>) workflowContext.getValue(ReCreatePrognosesWorkflowParameter.OUT.REQUIRES_NEW_D_PROGNOSIS_SEQUENCES_LIST.name());
+        List<Long> aPlanSequences = (List<Long>) workflowContext.getValue(ReCreatePrognosesWorkflowParameter.OUT.REQUIRES_NEW_A_PLAN_SEQUENCES_LIST.name());
         handleAPlansToBeRecreated(aPlans, aPlanSequences);
         handleDPrognosesToBeRecreated(dPrognoses, dPrognosisSequences);
 

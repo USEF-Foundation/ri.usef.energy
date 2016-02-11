@@ -20,7 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import energy.usef.agr.workflow.plan.commonreferenceupdate.CommonReferenceUpdateResponseEvent;
 import energy.usef.core.data.xml.bean.message.CommonReferenceUpdateResponse;
-
 import energy.usef.core.exception.BusinessException;
 
 import javax.enterprise.event.Event;

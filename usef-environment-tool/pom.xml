@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>energy.usef</groupId>
 	<artifactId>usef-environment-tool</artifactId>
-	<version>1.3.0</version>
+	<version>1.3.1</version>
 	<name>USEF environment tooling</name>
 
 	<dependencies>

@@ -35,12 +35,12 @@ import energy.usef.core.service.helper.JMSHelperService;
 import energy.usef.core.service.helper.MessageMetadataBuilder;
 import energy.usef.core.util.DateTimeUtil;
 import energy.usef.core.util.XMLUtil;
-import energy.usef.cro.config.ConfigCroParam;
 import energy.usef.cro.config.ConfigCro;
+import energy.usef.cro.config.ConfigCroParam;
 import energy.usef.cro.model.Connection;
 import energy.usef.cro.service.business.CommonReferenceMode;
-import energy.usef.cro.service.business.CommonReferenceQueryBusinessService;
 import energy.usef.cro.service.business.CommonReferenceUpdateBusinessService;
+import energy.usef.cro.service.business.CommonReferenceQueryBusinessService;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -236,8 +236,7 @@ public class CommonReferenceQueryController extends BaseIncomingMessageControlle
             congestionPointDTO.setDSODomain(congestionPointEntry.getKey().getDistributionSystemOperator().getDomain());
 
             for (Connection connection : congestionPointEntry.getKey().getConnections()) {
-                energy.usef.core.data.xml.bean.message.Connection dtoConnection = new energy.usef.core.data.xml.bean.message
-                        .Connection();
+                energy.usef.core.data.xml.bean.message.Connection dtoConnection = new energy.usef.core.data.xml.bean.message.Connection();
                 dtoConnection.setEntityAddress(connection.getEntityAddress());
                 congestionPointDTO.getConnection().add(dtoConnection);
             }
@@ -269,8 +268,7 @@ public class CommonReferenceQueryController extends BaseIncomingMessageControlle
 
             for (Connection connection : congestionPointEntry.getValue()) {
                 // loop over connections for every congestion point
-                energy.usef.core.data.xml.bean.message.Connection connectionDto = new energy.usef.core.data.xml.bean.message
-                        .Connection();
+                energy.usef.core.data.xml.bean.message.Connection connectionDto = new energy.usef.core.data.xml.bean.message.Connection();
                 connectionDto.setEntityAddress(connection.getEntityAddress());
                 congestionPointDTO.getConnection().add(connectionDto);
             }

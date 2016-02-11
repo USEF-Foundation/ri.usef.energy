@@ -24,7 +24,8 @@ import energy.usef.core.workflow.dto.FlexRequestDto;
 import energy.usef.core.workflow.dto.PtuFlexRequestDto;
 import energy.usef.dso.workflow.dto.GridSafetyAnalysisDto;
 import energy.usef.dso.workflow.dto.PtuGridSafetyAnalysisDto;
-import energy.usef.dso.workflow.validate.create.flexrequest.CreateFlexRequestStepParameter;
+import energy.usef.dso.workflow.validate.create.flexrequest.CreateFlexRequestStepParameter.IN;
+import energy.usef.dso.workflow.validate.create.flexrequest.CreateFlexRequestStepParameter.OUT;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -61,10 +62,10 @@ public class DsoCreateFlexRequestStub implements WorkflowStep {
      */
     @Override
     public WorkflowContext invoke(WorkflowContext context) {
-        String entityAddress = context.get(CreateFlexRequestStepParameter.IN.CONGESTION_POINT_ENTITY_ADDRESS.name(), String.class);
-        LocalDate period = context.get(CreateFlexRequestStepParameter.IN.PERIOD.name(), LocalDate.class);
+        String entityAddress = context.get(IN.CONGESTION_POINT_ENTITY_ADDRESS.name(), String.class);
+        LocalDate period = context.get(IN.PERIOD.name(), LocalDate.class);
 
-        GridSafetyAnalysisDto gridSafetyAnalysis = context.get(CreateFlexRequestStepParameter.IN.GRID_SAFETY_ANALYSIS_DTO.name(), GridSafetyAnalysisDto.class);
+        GridSafetyAnalysisDto gridSafetyAnalysis = context.get(IN.GRID_SAFETY_ANALYSIS_DTO.name(), GridSafetyAnalysisDto.class);
 
         long numberOfRequestedPtus = gridSafetyAnalysis.getPtus().stream()
                 .filter(ptu -> DispositionTypeDto.REQUESTED.equals(ptu.getDisposition()))
@@ -77,7 +78,7 @@ public class DsoCreateFlexRequestStub implements WorkflowStep {
             LOGGER.debug(" No Flex Requests needed, number of REQUESTED ptus is {}", numberOfRequestedPtus);
         }
 
-        context.setValue(CreateFlexRequestStepParameter.OUT.FLEX_REQUESTS_DTO_LIST.name(), flexRequestDtos);
+        context.setValue(OUT.FLEX_REQUESTS_DTO_LIST.name(), flexRequestDtos);
         return context;
     }
 

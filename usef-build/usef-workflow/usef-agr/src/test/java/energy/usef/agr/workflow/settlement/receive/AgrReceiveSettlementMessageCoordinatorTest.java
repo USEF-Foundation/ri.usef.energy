@@ -43,7 +43,6 @@ import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
@@ -90,7 +89,7 @@ public class AgrReceiveSettlementMessageCoordinatorTest {
         when(corePlanboardBusinessService.findPlanboardMessages(DocumentType.FLEX_ORDER_SETTLEMENT, startDate, endDate,
                 DocumentStatus.RECEIVED)).thenReturn(Collections.singletonList(buildFlexOrderSettlementMessage()));
         when(workflowStepExecuter
-                .invoke(Matchers.eq(AgrWorkflowStep.AGR_VALIDATE_SETTLEMENT_ITEMS.name()), any(WorkflowContext.class))).then(
+                .invoke(eq(AgrWorkflowStep.AGR_VALIDATE_SETTLEMENT_ITEMS.name()), any(WorkflowContext.class))).then(
                 call -> {
                     WorkflowContext context = (WorkflowContext) call.getArguments()[1];
                     context.setValue(AgrReceiveSettlementMessageWorkflowParameter.OUT.FLEX_ORDER_SETTLEMENT_DISPOSITION.name(),

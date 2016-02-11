@@ -16,6 +16,8 @@
 
 package energy.usef.agr.workflow.plan.connection.forecast;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_CREATE_N_DAY_AHEAD_FORECAST;
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_NON_UDI_CREATE_N_DAY_AHEAD_FORECAST;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 
@@ -26,7 +28,6 @@ import energy.usef.agr.service.business.AgrPortfolioBusinessService;
 import energy.usef.agr.workflow.operate.reoptimize.ReOptimizePortfolioEvent;
 import energy.usef.agr.workflow.plan.connection.forecast.ConnectionForecastStepParameter.IN;
 import energy.usef.agr.workflow.plan.connection.forecast.ConnectionForecastStepParameter.OUT;
-import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.util.DateTimeUtil;
@@ -34,8 +35,6 @@ import energy.usef.core.workflow.DefaultWorkflowContext;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.step.WorkflowStepExecuter;
 import energy.usef.core.workflow.util.WorkflowUtil;
-
-import java.util.List;
 
 import javax.ejb.Asynchronous;
 import javax.ejb.Lock;
@@ -46,6 +45,7 @@ import javax.enterprise.event.Observes;
 import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import java.util.List;
 
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
@@ -113,12 +113,12 @@ public class AgrConnectionForecastPlanboardCoordinator {
 
         WorkflowContext outContext;
         if (configAgr.getBooleanProperty(ConfigAgrParam.AGR_IS_NON_UDI_AGGREGATOR)) {
-            outContext = workflowStepExecuter.invoke(AgrWorkflowStep.AGR_NON_UDI_CREATE_N_DAY_AHEAD_FORECAST.name(), inContext);
+            outContext = workflowStepExecuter.invoke(AGR_NON_UDI_CREATE_N_DAY_AHEAD_FORECAST.name(), inContext);
         } else {
-            outContext = workflowStepExecuter.invoke(AgrWorkflowStep.AGR_CREATE_N_DAY_AHEAD_FORECAST.name(), inContext);
+            outContext = workflowStepExecuter.invoke(AGR_CREATE_N_DAY_AHEAD_FORECAST.name(), inContext);
         }
         // Validating out context
-        WorkflowUtil.validateContext(AgrWorkflowStep.AGR_CREATE_N_DAY_AHEAD_FORECAST.name(), outContext, OUT.values());
+        WorkflowUtil.validateContext(AGR_CREATE_N_DAY_AHEAD_FORECAST.name(), outContext, OUT.values());
 
         return outContext.get(OUT.CONNECTION_PORTFOLIO.name(), List.class);
     }

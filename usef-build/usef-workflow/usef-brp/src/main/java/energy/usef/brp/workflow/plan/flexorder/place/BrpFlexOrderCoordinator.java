@@ -286,8 +286,8 @@ public class BrpFlexOrderCoordinator {
     /**
      * Categorizes a list of planboard messages per USEF identifier of the connection group.
      *
-     * @param acceptedOffers {@link java.util.List} of {@link PlanboardMessage} of type {@link energy.usef
-     * .core.model.DocumentType#FLEX_OFFER} with the status {@link DocumentStatus#ACCEPTED}.
+     * @param acceptedOffers {@link java.util.List} of {@link PlanboardMessage} of type
+     * {@link energy.usef.core.model.DocumentType#FLEX_OFFER} with the status {@link DocumentStatus#ACCEPTED}.
      * @return {@link java.util.Map} with the USEF identifier of the connection group as key ({@link String}) and a {@link List} of
      * {@link PlanboardMessage} as value.
      */

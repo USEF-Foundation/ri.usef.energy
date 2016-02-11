@@ -16,8 +16,7 @@
 
 package energy.usef.agr.workflow.step;
 
-import energy.usef.agr.workflow.settlement.receive.AgrReceiveSettlementMessageWorkflowParameter.IN;
-import energy.usef.agr.workflow.settlement.receive.AgrReceiveSettlementMessageWorkflowParameter.OUT;
+import energy.usef.agr.workflow.settlement.receive.AgrReceiveSettlementMessageWorkflowParameter;
 import energy.usef.core.exception.TechnicalException;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.WorkflowStep;
@@ -49,13 +48,13 @@ public class AgrValidateSettlementItemsStub implements WorkflowStep {
         // 1. Basic check
         FlexOrderSettlementDto actualPreparedFlexSettlementOrder = checkReceivedSettlementIsPrepared(context);
         if (actualPreparedFlexSettlementOrder == null) {
-            context.setValue(OUT.FLEX_ORDER_SETTLEMENT_DISPOSITION.name(), DispositionAcceptedDisputedDto.DISPUTED);
+            context.setValue(AgrReceiveSettlementMessageWorkflowParameter.OUT.FLEX_ORDER_SETTLEMENT_DISPOSITION.name(), DispositionAcceptedDisputedDto.DISPUTED);
             return context;
         }
 
         // 2. Check values for the flex
         FlexOrderSettlementDto receivedSettlementDto = (FlexOrderSettlementDto) context.getValue(
-                IN.RECEIVED_FLEX_ORDER_SETTLEMENT.name());
+                AgrReceiveSettlementMessageWorkflowParameter.IN.RECEIVED_FLEX_ORDER_SETTLEMENT.name());
         Long orderSequence = receivedSettlementDto.getFlexOrder().getSequenceNumber();
         if (receivedSettlementDto.getPtuSettlementDtos().size() !=
                 actualPreparedFlexSettlementOrder.getPtuSettlementDtos().size()) {
@@ -71,7 +70,7 @@ public class AgrValidateSettlementItemsStub implements WorkflowStep {
                     actualPreparedFlexSettlementOrder, resultingDisposition, i);
 
         }
-        context.setValue(OUT.FLEX_ORDER_SETTLEMENT_DISPOSITION.name(), resultingDisposition);
+        context.setValue(AgrReceiveSettlementMessageWorkflowParameter.OUT.FLEX_ORDER_SETTLEMENT_DISPOSITION.name(), resultingDisposition);
         return context;
     }
 
@@ -124,9 +123,9 @@ public class AgrValidateSettlementItemsStub implements WorkflowStep {
     private FlexOrderSettlementDto checkReceivedSettlementIsPrepared(WorkflowContext context) {
         // loop over the prepared settlement to find at least one which matches the received flex order settlement.
         for (FlexOrderSettlementDto flexOrderSettlementDto : (List<FlexOrderSettlementDto>) context.getValue(
-                IN.PREPARED_FLEX_ORDER_SETTLEMENTS.name())) {
+                AgrReceiveSettlementMessageWorkflowParameter.IN.PREPARED_FLEX_ORDER_SETTLEMENTS.name())) {
             if (flexOrderSettlementDto.getFlexOrder().getSequenceNumber()
-                    .equals(context.get(IN.ORDER_REFERENCE.name(), Long.class))) {
+                    .equals(context.get(AgrReceiveSettlementMessageWorkflowParameter.IN.ORDER_REFERENCE.name(), Long.class))) {
                 LOGGER.info("PTU settlement were prepared for order {} (Counter-party: {})",
                         flexOrderSettlementDto.getFlexOrder().getSequenceNumber(),
                         flexOrderSettlementDto.getFlexOrder().getParticipantDomain());
@@ -134,8 +133,8 @@ public class AgrValidateSettlementItemsStub implements WorkflowStep {
             }
         }
         LOGGER.warn("PTU settlement were NOT prepared for order {} (Counter-party: {})",
-                context.getValue(IN.ORDER_REFERENCE.name()),
-                context.getValue(IN.COUNTER_PARTY_ROLE.name()));
+                context.getValue(AgrReceiveSettlementMessageWorkflowParameter.IN.ORDER_REFERENCE.name()),
+                context.getValue(AgrReceiveSettlementMessageWorkflowParameter.IN.COUNTER_PARTY_ROLE.name()));
         return null;
     }
 

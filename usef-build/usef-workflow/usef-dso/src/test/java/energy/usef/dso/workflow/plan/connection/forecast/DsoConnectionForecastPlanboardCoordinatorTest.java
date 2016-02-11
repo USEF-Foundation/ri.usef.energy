@@ -21,22 +21,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import energy.usef.core.config.Config;
-import energy.usef.core.config.ConfigParam;
-import energy.usef.core.event.RequestMoveToValidateEvent;
-import energy.usef.core.model.CongestionPointConnectionGroup;
-import energy.usef.core.model.Connection;
-import energy.usef.core.service.business.CorePlanboardBusinessService;
-import energy.usef.core.workflow.DefaultWorkflowContext;
-import energy.usef.core.workflow.WorkflowContext;
-import energy.usef.core.workflow.step.WorkflowStepExecuter;
-import energy.usef.dso.config.ConfigDso;
-import energy.usef.dso.model.Aggregator;
-import energy.usef.dso.service.business.DsoPlanboardBusinessService;
-import energy.usef.dso.util.ReflectionUtil;
-import energy.usef.dso.config.ConfigDsoParam;
-import energy.usef.dso.model.AggregatorOnConnectionGroupState;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,6 +40,22 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
+
+import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
+import energy.usef.core.event.RequestMoveToValidateEvent;
+import energy.usef.core.model.CongestionPointConnectionGroup;
+import energy.usef.core.model.Connection;
+import energy.usef.core.service.business.CorePlanboardBusinessService;
+import energy.usef.core.workflow.DefaultWorkflowContext;
+import energy.usef.core.workflow.WorkflowContext;
+import energy.usef.core.workflow.step.WorkflowStepExecuter;
+import energy.usef.dso.config.ConfigDso;
+import energy.usef.dso.config.ConfigDsoParam;
+import energy.usef.dso.model.Aggregator;
+import energy.usef.dso.model.AggregatorOnConnectionGroupState;
+import energy.usef.dso.service.business.DsoPlanboardBusinessService;
+import energy.usef.dso.util.ReflectionUtil;
 
 /**
  * Test class in charge of the unit tests related to the {@link DsoConnectionForecastPlanboardCoordinator}.

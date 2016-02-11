@@ -35,7 +35,6 @@ import energy.usef.core.workflow.dto.DispositionTypeDto;
 import energy.usef.core.workflow.dto.FlexOfferDto;
 import energy.usef.core.workflow.dto.FlexRequestDto;
 import energy.usef.core.workflow.dto.PtuFlexOfferDto;
-import energy.usef.core.workflow.dto.PrognosisDto;
 import energy.usef.core.workflow.dto.PtuFlexRequestDto;
 import energy.usef.core.workflow.dto.USEFRoleDto;
 
@@ -57,6 +56,8 @@ import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import energy.usef.core.workflow.dto.PrognosisDto;
 
 /**
  * Implementation of a workflow step "AGRFlexOfferDetermineFlexibility".

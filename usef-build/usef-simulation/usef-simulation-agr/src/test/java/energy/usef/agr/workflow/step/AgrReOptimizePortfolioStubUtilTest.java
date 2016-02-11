@@ -16,13 +16,6 @@
 
 package energy.usef.agr.workflow.step;
 
-import static energy.usef.agr.workflow.step.AgrReOptimizePortfolioStubUtil.fetchFlexFactorPerPtuPerConnectionGroup;
-import static energy.usef.agr.workflow.step.AgrReOptimizePortfolioStubUtil.fetchTargetPowerPerPtuPerConnectionGroup;
-import static energy.usef.agr.workflow.step.AgrReOptimizePortfolioStubUtil.mapConnectionPortfolioPerConnectionGroup;
-import static energy.usef.agr.workflow.step.AgrReOptimizePortfolioStubUtil.mapPrognosisPowerPerPtuPerConnectionGroup;
-import static energy.usef.agr.workflow.step.AgrReOptimizePortfolioStubUtil.sumForecastPowerPerPtuPerConnectionGroup;
-import static energy.usef.agr.workflow.step.AgrReOptimizePortfolioStubUtil.sumOrderedPowerPerPtuPerConnectionGroup;
-import static energy.usef.agr.workflow.step.AgrReOptimizePortfolioStubUtil.sumPotentialFlexPerPtuPerConnectionGroup;
 import static energy.usef.core.util.DateTimeUtil.getCurrentDate;
 
 import energy.usef.agr.dto.ConnectionPortfolioDto;
@@ -57,7 +50,8 @@ public class AgrReOptimizePortfolioStubUtilTest {
 
     @Test
     public void testMapConnectionPortfolioPerConnectionGroup() throws Exception {
-        Map<String, List<ConnectionPortfolioDto>> connectionPortfolioPerConnectionGroup = mapConnectionPortfolioPerConnectionGroup(
+        Map<String, List<ConnectionPortfolioDto>> connectionPortfolioPerConnectionGroup = AgrReOptimizePortfolioStubUtil
+                .mapConnectionPortfolioPerConnectionGroup(
                 buildConnectionPortfolio(), buildConnectionGroupToConnections());
 
         Assert.assertEquals(2, connectionPortfolioPerConnectionGroup.size());
@@ -67,7 +61,8 @@ public class AgrReOptimizePortfolioStubUtilTest {
 
     @Test
     public void testMapPrognosisPowerPerPtuPerConnectionGroup() throws Exception {
-        Map<String, Map<Integer, BigInteger>> prognosisPowerPerPtuPerConnectionGroup = mapPrognosisPowerPerPtuPerConnectionGroup(
+        Map<String, Map<Integer, BigInteger>> prognosisPowerPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
+                .mapPrognosisPowerPerPtuPerConnectionGroup(
                 buildAPlans(), buildDPrognosis());
 
         Assert.assertEquals(2, prognosisPowerPerPtuPerConnectionGroup.size());
@@ -81,7 +76,8 @@ public class AgrReOptimizePortfolioStubUtilTest {
 
     @Test
     public void testSumOrderedPowerPerPtuPerConnectionGroup() throws Exception {
-        Map<String, Map<Integer, BigInteger>> orderedPowerPerPtuPerConnectionGroup = sumOrderedPowerPerPtuPerConnectionGroup(
+        Map<String, Map<Integer, BigInteger>> orderedPowerPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
+                .sumOrderedPowerPerPtuPerConnectionGroup(
                 buildFlexOrders());
 
         Assert.assertEquals(2, orderedPowerPerPtuPerConnectionGroup.size());
@@ -97,8 +93,10 @@ public class AgrReOptimizePortfolioStubUtilTest {
 
     @Test
     public void testSumForecastPowerPerPtuPerConnectionGroup() throws Exception {
-        Map<String, Map<Integer, BigInteger>> forecastPowerPerPtuPerConnectionGroup = sumForecastPowerPerPtuPerConnectionGroup(
-                mapConnectionPortfolioPerConnectionGroup(buildConnectionPortfolio(), buildConnectionGroupToConnections()),
+        Map<String, Map<Integer, BigInteger>> forecastPowerPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
+                .sumForecastPowerPerPtuPerConnectionGroup(
+                AgrReOptimizePortfolioStubUtil
+                        .mapConnectionPortfolioPerConnectionGroup(buildConnectionPortfolio(), buildConnectionGroupToConnections()),
                 getCurrentDate(), 120);
 
         Assert.assertEquals(2, forecastPowerPerPtuPerConnectionGroup.size());
@@ -113,10 +111,12 @@ public class AgrReOptimizePortfolioStubUtilTest {
 
     @Test
     public void testFetchTargetPowerPerPtuPerConnectionGroup() throws Exception {
-        Map<String, Map<Integer, BigInteger>> targetPowerPerPtuPerConnectionGroup = fetchTargetPowerPerPtuPerConnectionGroup(
-                mapPrognosisPowerPerPtuPerConnectionGroup(buildAPlans(), buildDPrognosis()),
-                sumOrderedPowerPerPtuPerConnectionGroup(buildFlexOrders()), sumForecastPowerPerPtuPerConnectionGroup(
-                        mapConnectionPortfolioPerConnectionGroup(buildConnectionPortfolio(), buildConnectionGroupToConnections()),
+        Map<String, Map<Integer, BigInteger>> targetPowerPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
+                .fetchTargetPowerPerPtuPerConnectionGroup(
+                AgrReOptimizePortfolioStubUtil.mapPrognosisPowerPerPtuPerConnectionGroup(buildAPlans(), buildDPrognosis()),
+                AgrReOptimizePortfolioStubUtil.sumOrderedPowerPerPtuPerConnectionGroup(buildFlexOrders()), AgrReOptimizePortfolioStubUtil
+                                .sumForecastPowerPerPtuPerConnectionGroup(
+                        AgrReOptimizePortfolioStubUtil.mapConnectionPortfolioPerConnectionGroup(buildConnectionPortfolio(), buildConnectionGroupToConnections()),
                         getCurrentDate(), 120));
 
         Assert.assertEquals(2, targetPowerPerPtuPerConnectionGroup.size());
@@ -133,8 +133,10 @@ public class AgrReOptimizePortfolioStubUtilTest {
 
     @Test
     public void testSumPotentialFlexPerPtuPerConnectionGroup() throws Exception {
-        Map<String, Map<Integer, BigInteger>> potentialFlexPerPtuPerConnectionGroup = sumPotentialFlexPerPtuPerConnectionGroup(
-                mapConnectionPortfolioPerConnectionGroup(buildConnectionPortfolio(), buildConnectionGroupToConnections()),
+        Map<String, Map<Integer, BigInteger>> potentialFlexPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
+                .sumPotentialFlexConsumptionPerPtuPerConnectionGroup(
+                AgrReOptimizePortfolioStubUtil
+                        .mapConnectionPortfolioPerConnectionGroup(buildConnectionPortfolio(), buildConnectionGroupToConnections()),
                 getCurrentDate(), 120);
 
         Assert.assertEquals(2, potentialFlexPerPtuPerConnectionGroup.size());
@@ -152,12 +154,21 @@ public class AgrReOptimizePortfolioStubUtilTest {
     @Test
     public void testFetchFlexFactorPerPtuPerConnectionGroup() throws Exception {
         Map<String, Map<Integer, BigInteger>> targetPowerPerPtuPerConnectionGroup = buildTargetPowerPerPtuPerConnectionGroup();
-        Map<String, Map<Integer, BigInteger>> potentialFlexPerPtuPerConnectionGroup = sumPotentialFlexPerPtuPerConnectionGroup(
-                mapConnectionPortfolioPerConnectionGroup(buildConnectionPortfolio(), buildConnectionGroupToConnections()),
+        Map<String, Map<Integer, BigInteger>> potentialFlexConsumptionPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
+                .sumPotentialFlexConsumptionPerPtuPerConnectionGroup(
+                AgrReOptimizePortfolioStubUtil
+                        .mapConnectionPortfolioPerConnectionGroup(buildConnectionPortfolio(), buildConnectionGroupToConnections()),
+                getCurrentDate(), 120);
+        Map<String, Map<Integer, BigInteger>> potentialFlexProductionPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
+                .sumPotentialFlexProductionPerPtuPerConnectionGroup(
+                AgrReOptimizePortfolioStubUtil
+                        .mapConnectionPortfolioPerConnectionGroup(buildConnectionPortfolio(), buildConnectionGroupToConnections()),
                 getCurrentDate(), 120);
 
-        Map<String, Map<Integer, BigDecimal>> factorPerPtuPerConnectionGroup = fetchFlexFactorPerPtuPerConnectionGroup(
-                targetPowerPerPtuPerConnectionGroup, potentialFlexPerPtuPerConnectionGroup);
+        Map<String, Map<Integer, BigDecimal>> factorPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
+                .fetchFlexFactorPerPtuPerConnectionGroup(
+                targetPowerPerPtuPerConnectionGroup, potentialFlexConsumptionPerPtuPerConnectionGroup,
+                potentialFlexProductionPerPtuPerConnectionGroup);
 
         Assert.assertEquals(2, factorPerPtuPerConnectionGroup.size());
         Assert.assertEquals(12, factorPerPtuPerConnectionGroup.get("brp").size());
@@ -165,14 +176,14 @@ public class AgrReOptimizePortfolioStubUtilTest {
         for (int ptuIndex = 1; ptuIndex <= 12; ptuIndex++) {
             // assert that the factor == target / flex (0 when factor < 0 and 1 when factor > 1)
             BigDecimal target = new BigDecimal(targetPowerPerPtuPerConnectionGroup.get("brp").get(ptuIndex));
-            BigDecimal flex = new BigDecimal(potentialFlexPerPtuPerConnectionGroup.get("brp").get(ptuIndex));
+            BigDecimal flex = new BigDecimal(potentialFlexConsumptionPerPtuPerConnectionGroup.get("brp").get(ptuIndex));
             BigDecimal factor = target.divide(flex, 5, RoundingMode.HALF_UP);
             if (factor.compareTo(BigDecimal.ONE) > 0) {
                 factor = BigDecimal.valueOf(1);
             } else if (factor.compareTo(BigDecimal.ZERO) < 0) {
                 factor = BigDecimal.ZERO;
             }
-            Assert.assertEquals(factor, factorPerPtuPerConnectionGroup.get("brp").get(ptuIndex));
+            Assert.assertEquals(factor.setScale(5), factorPerPtuPerConnectionGroup.get("brp").get(ptuIndex).setScale(5));
         }
     }
 

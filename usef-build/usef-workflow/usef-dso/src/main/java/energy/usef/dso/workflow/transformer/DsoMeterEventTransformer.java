@@ -16,16 +16,16 @@
 
 package energy.usef.dso.workflow.transformer;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import energy.usef.core.data.xml.bean.message.MeterEventType;
 import energy.usef.core.workflow.dto.ConnectionMeterEventDto;
 import energy.usef.core.workflow.dto.MeterEventTypeDto;
-import energy.usef.dso.workflow.dto.ConnectionCapacityLimitationPeriodDto;
 import energy.usef.dso.model.ConnectionCapacityLimitationPeriod;
 import energy.usef.dso.model.ConnectionMeterEvent;
 import energy.usef.dso.model.EventType;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import energy.usef.dso.workflow.dto.ConnectionCapacityLimitationPeriodDto;
 
 /**
  * Transformer class for transforming between different MeterEvent types.

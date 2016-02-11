@@ -20,12 +20,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import energy.usef.agr.dto.device.request.ConsumptionProductionTypeDto;
 import energy.usef.agr.dto.device.request.DeviceMessageDto;
 import energy.usef.agr.dto.device.request.IncreaseRequestDto;
 import energy.usef.agr.dto.device.request.InterruptRequestDto;
 import energy.usef.agr.dto.device.request.ReduceRequestDto;
 import energy.usef.agr.dto.device.request.ReportRequestDto;
 import energy.usef.agr.dto.device.request.ShiftRequestDto;
+import energy.usef.agr.model.ConsumptionProductionType;
 import energy.usef.agr.model.DeviceMessage;
 import energy.usef.agr.model.DeviceMessageStatus;
 import energy.usef.agr.model.IncreaseRequest;
@@ -121,6 +123,7 @@ public class DeviceMessageTransformerTest {
         Assert.assertEquals(1, reduceRequestDto.getStartDTU().intValue());
         Assert.assertEquals(5, reduceRequestDto.getEndDTU().intValue());
         Assert.assertEquals(-1000, reduceRequestDto.getPower().intValue());
+        Assert.assertEquals(ConsumptionProductionTypeDto.CONSUMPTION, reduceRequestDto.getConsumptionProductionType());
     }
 
     private void assertIncreaseRequestDto(IncreaseRequestDto increaseRequestDto) {
@@ -131,6 +134,7 @@ public class DeviceMessageTransformerTest {
         Assert.assertEquals(1, increaseRequestDto.getStartDTU().intValue());
         Assert.assertEquals(5, increaseRequestDto.getEndDTU().intValue());
         Assert.assertEquals(1000, increaseRequestDto.getPower().intValue());
+        Assert.assertEquals(ConsumptionProductionTypeDto.PRODUCTION, increaseRequestDto.getConsumptionProductionType());
     }
 
     private void assertInterruptRequestDto(InterruptRequestDto interruptRequestDto) {
@@ -181,6 +185,7 @@ public class DeviceMessageTransformerTest {
             reduceRequest.setId("" + index);
             reduceRequest.setEndDTU(BigInteger.valueOf(index).add(BigInteger.valueOf(2)));
             reduceRequest.setPower(BigInteger.TEN);
+            reduceRequest.setConsumptionProductionType(ConsumptionProductionTypeDto.CONSUMPTION);
             return reduceRequest;
         }).forEach(o -> deviceMessage.getReduceRequestDtos().add(o));
     }
@@ -194,6 +199,7 @@ public class DeviceMessageTransformerTest {
             increaseRequest.setId("" + index);
             increaseRequest.setEndDTU(BigInteger.valueOf(index).add(BigInteger.valueOf(2)));
             increaseRequest.setPower(BigInteger.TEN);
+            increaseRequest.setConsumptionProductionType(ConsumptionProductionTypeDto.PRODUCTION);
             return increaseRequest;
         }).forEach(o -> deviceMessage.getIncreaseRequestDtos().add(o));
     }
@@ -260,6 +266,7 @@ public class DeviceMessageTransformerTest {
         increaseRequest.setEventId(EVENT_ID);
         increaseRequest.setPeriod(PERIOD);
         increaseRequest.setId(uuid());
+        increaseRequest.setConsumptionProductionType(ConsumptionProductionType.PRODUCTION);
         return increaseRequest;
     }
 
@@ -271,6 +278,7 @@ public class DeviceMessageTransformerTest {
         reduceRequest.setPeriod(PERIOD);
         reduceRequest.setEndDtu(5);
         reduceRequest.setPower(BigInteger.valueOf(-1000));
+        reduceRequest.setConsumptionProductionType(ConsumptionProductionType.CONSUMPTION);
         return reduceRequest;
     }
 

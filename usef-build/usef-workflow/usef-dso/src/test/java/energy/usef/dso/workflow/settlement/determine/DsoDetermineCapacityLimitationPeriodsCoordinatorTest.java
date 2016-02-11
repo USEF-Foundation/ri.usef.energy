@@ -16,15 +16,6 @@
 
 package energy.usef.dso.workflow.settlement.determine;
 
-import energy.usef.core.workflow.DefaultWorkflowContext;
-import energy.usef.core.workflow.WorkflowContext;
-import energy.usef.core.workflow.step.WorkflowStepExecuter;
-import energy.usef.dso.service.business.DsoPlanboardBusinessService;
-import energy.usef.dso.workflow.DsoWorkflowStep;
-import energy.usef.dso.workflow.dto.ConnectionCapacityLimitationPeriodDto;
-import energy.usef.dso.model.ConnectionCapacityLimitationPeriod;
-import energy.usef.dso.model.ConnectionMeterEvent;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +27,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+
+import energy.usef.core.workflow.DefaultWorkflowContext;
+import energy.usef.core.workflow.WorkflowContext;
+import energy.usef.core.workflow.step.WorkflowStepExecuter;
+import energy.usef.dso.model.ConnectionCapacityLimitationPeriod;
+import energy.usef.dso.model.ConnectionMeterEvent;
+import energy.usef.dso.service.business.DsoPlanboardBusinessService;
+import energy.usef.dso.workflow.DsoWorkflowStep;
+import energy.usef.dso.workflow.dto.ConnectionCapacityLimitationPeriodDto;
 
 @RunWith(PowerMockRunner.class)
 public class DsoDetermineCapacityLimitationPeriodsCoordinatorTest {

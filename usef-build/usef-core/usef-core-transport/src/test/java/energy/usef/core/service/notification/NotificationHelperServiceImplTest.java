@@ -16,6 +16,7 @@
 
 package energy.usef.core.service.notification;
 
+import static energy.usef.core.util.ReflectionUtil.setFinalStatic;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,6 +25,7 @@ import static org.powermock.reflect.Whitebox.setInternalState;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.CommonReferenceQuery;
+import energy.usef.core.data.xml.bean.message.Message;
 import energy.usef.core.data.xml.bean.message.MessageMetadata;
 import energy.usef.core.data.xml.bean.message.MessagePrecedence;
 import energy.usef.core.model.MessageType;
@@ -41,8 +43,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.slf4j.Logger;
-
-import energy.usef.core.util.ReflectionUtil;
 
 /**
  * JUnit test for the NotificationHelperServiceImpl class.
@@ -75,7 +75,7 @@ public class NotificationHelperServiceImplTest {
     @Before
     public void init() throws Exception {
         service = new NotificationHelperServiceImpl();
-        ReflectionUtil.setFinalStatic(NotificationHelperServiceImpl.class.getDeclaredField("LOGGER"), LOGGER);
+        setFinalStatic(NotificationHelperServiceImpl.class.getDeclaredField("LOGGER"), LOGGER);
         setInternalState(service, "timerService", timerService);
         setInternalState(service, "ingoingMessageService", ingoingMessageService);
         setInternalState(service, "config", config);
@@ -91,7 +91,7 @@ public class NotificationHelperServiceImplTest {
     public void notifyNoMessageResponseCriticalTest() throws Exception {
         Mockito.when(config.getProperty(ConfigParam.PTU_DURATION)).thenReturn("15");
 
-        energy.usef.core.data.xml.bean.message.Message message = new CommonReferenceQuery();
+        Message message = new CommonReferenceQuery();
         MessageMetadata messageMetadata = new MessageMetadata();
         messageMetadata.setPrecedence(MessagePrecedence.CRITICAL);
         message.setMessageMetadata(messageMetadata);
@@ -107,7 +107,7 @@ public class NotificationHelperServiceImplTest {
     public void notifyNoMessageResponseTransactionalTest() throws Exception {
         Mockito.when(config.getProperty(ConfigParam.PTU_DURATION)).thenReturn("15");
 
-        energy.usef.core.data.xml.bean.message.Message message = new CommonReferenceQuery();
+        Message message = new CommonReferenceQuery();
         MessageMetadata messageMetadata = new MessageMetadata();
         messageMetadata.setPrecedence(MessagePrecedence.TRANSACTIONAL);
         message.setMessageMetadata(messageMetadata);
@@ -120,7 +120,7 @@ public class NotificationHelperServiceImplTest {
      */
     @Test
     public void notifyMessageNotSentTest() throws Exception {
-        energy.usef.core.data.xml.bean.message.Message message = new CommonReferenceQuery();
+        Message message = new CommonReferenceQuery();
         MessageMetadata messageMetadata = new MessageMetadata();
         messageMetadata.setPrecedence(MessagePrecedence.CRITICAL);
         message.setMessageMetadata(messageMetadata);

@@ -27,8 +27,8 @@ import energy.usef.core.model.DocumentType;
 import energy.usef.core.model.Message;
 import energy.usef.core.model.PlanboardMessage;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
-import energy.usef.dso.workflow.settlement.initiate.FinalizeInitiateSettlementEvent;
 import energy.usef.dso.workflow.settlement.collect.FinalizeCollectOrangeRegimeDataEvent;
+import energy.usef.dso.workflow.settlement.initiate.FinalizeInitiateSettlementEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Controller class handling the reception of a {@link energy.usef.core.data.xml.bean.message.MeterDataQueryResponse} message.
+ * Controller class handling the reception of a {@link MeterDataQueryResponse} message.
  */
 @Stateless
 public class MeterDataQueryResponseController extends BaseIncomingResponseMessageController<MeterDataQueryResponse> {

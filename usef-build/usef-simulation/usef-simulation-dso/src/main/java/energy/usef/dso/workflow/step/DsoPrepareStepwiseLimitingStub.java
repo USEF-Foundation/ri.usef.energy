@@ -18,7 +18,7 @@ package energy.usef.dso.workflow.step;
 
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.WorkflowStep;
-import energy.usef.dso.workflow.operate.PrepareStepwiseLimitingStepParameter;
+import energy.usef.dso.workflow.operate.PrepareStepwiseLimitingStepParameter.IN;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,10 +36,10 @@ public class DsoPrepareStepwiseLimitingStub implements WorkflowStep {
     public WorkflowContext invoke(WorkflowContext context) {
         LOGGER.debug("Starting workflow step 'Prepare Stepwise Limiting'.");
         LOGGER.debug("Parameters given in the context:\n # congestion point: {}\n",
-                context.getValue(PrepareStepwiseLimitingStepParameter.IN.CONGESTION_POINT_ENTITY_ADDRESS.name()));
+                context.getValue(IN.CONGESTION_POINT_ENTITY_ADDRESS.name()));
 
         // Get list of PTU containers, and do something with it.
-        context.getValue(PrepareStepwiseLimitingStepParameter.IN.PTU_CONTAINERS.name());
+        context.getValue(IN.PTU_CONTAINERS.name());
         LOGGER.debug("Ending successfully workflow step 'Prepare Stepwise Limiting'.");
 
         return context;

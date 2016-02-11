@@ -19,7 +19,8 @@ package energy.usef.agr.workflow.step;
 import energy.usef.agr.dto.ConnectionPortfolioDto;
 import energy.usef.agr.dto.ElementDto;
 import energy.usef.agr.pbcfeederimpl.PbcFeederService;
-import energy.usef.agr.workflow.plan.connection.profile.AgrUpdateElementDataStoreParameter;
+import energy.usef.agr.workflow.plan.connection.profile.AgrUpdateElementDataStoreParameter.IN;
+import energy.usef.agr.workflow.plan.connection.profile.AgrUpdateElementDataStoreParameter.OUT;
 import energy.usef.core.util.PtuUtil;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.WorkflowStep;
@@ -53,10 +54,10 @@ public class AgrUpdateElementDataStoreStub implements WorkflowStep {
     public WorkflowContext invoke(WorkflowContext context) {
 
         // get the input parameters
-        LocalDate period = context.get(AgrUpdateElementDataStoreParameter.IN.PERIOD.name(), LocalDate.class);
-        int ptuDuration = context.get(AgrUpdateElementDataStoreParameter.IN.PTU_DURATION.name(), Integer.class);
+        LocalDate period = context.get(IN.PERIOD.name(), LocalDate.class);
+        int ptuDuration = context.get(IN.PTU_DURATION.name(), Integer.class);
         @SuppressWarnings("unchecked")
-        List<ConnectionPortfolioDto> connectionPortfolioDtoList = context.get(AgrUpdateElementDataStoreParameter.IN.CONNECTION_PORTFOLIO_LIST.name(), List.class);
+        List<ConnectionPortfolioDto> connectionPortfolioDtoList = context.get(IN.CONNECTION_PORTFOLIO_LIST.name(), List.class);
 
         int ptusPerDay = PtuUtil.getNumberOfPtusPerDay(period, ptuDuration);
 
@@ -64,7 +65,7 @@ public class AgrUpdateElementDataStoreStub implements WorkflowStep {
         List<ElementDto> elementDtoList = pbcFeederService
                 .fillElementsFromPBCFeeder(connectionPortfolioDtoList, period, ptusPerDay, ptuDuration);
 
-        context.setValue(AgrUpdateElementDataStoreParameter.OUT.ELEMENT_LIST.name(), elementDtoList);
+        context.setValue(OUT.ELEMENT_LIST.name(), elementDtoList);
 
         return context;
     }

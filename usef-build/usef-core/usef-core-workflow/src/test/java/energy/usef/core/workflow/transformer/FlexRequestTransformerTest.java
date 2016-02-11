@@ -16,9 +16,9 @@
 
 package energy.usef.core.workflow.transformer;
 
+import energy.usef.core.data.xml.bean.message.DispositionAvailableRequested;
 import energy.usef.core.data.xml.bean.message.PTU;
 import energy.usef.core.model.CongestionPointConnectionGroup;
-import energy.usef.core.model.DispositionAvailableRequested;
 import energy.usef.core.model.PtuContainer;
 import energy.usef.core.model.PtuFlexRequest;
 import energy.usef.core.util.DateTimeUtil;
@@ -88,7 +88,7 @@ public class FlexRequestTransformerTest {
         Assert.assertNotNull(ptu);
 
         Assert.assertEquals(BigInteger.valueOf(120L), ptu.getPower());
-        Assert.assertEquals(energy.usef.core.data.xml.bean.message.DispositionAvailableRequested.AVAILABLE, ptu.getDisposition());
+        Assert.assertEquals(DispositionAvailableRequested.AVAILABLE, ptu.getDisposition());
 
         Assert.assertNull(FlexRequestTransformer.transformPtuToXml(null));
     }
@@ -122,7 +122,7 @@ public class FlexRequestTransformerTest {
             PtuFlexRequest ptuFlexRequest = new PtuFlexRequest();
             ptuFlexRequest.setPtuContainer(ptuContainer);
             ptuFlexRequest.setPower(BigInteger.valueOf(999));
-            ptuFlexRequest.setDisposition(DispositionAvailableRequested.AVAILABLE);
+            ptuFlexRequest.setDisposition(energy.usef.core.model.DispositionAvailableRequested.AVAILABLE);
             ptuFlexRequest.setParticipantDomain("agr.usef-example.com");
             ptuFlexRequest.setPrognosisSequence(1l);
             ptuFlexRequest.setConnectionGroup(congestionPointConnectionGroup);
@@ -138,7 +138,7 @@ public class FlexRequestTransformerTest {
         PtuFlexRequest ptuFlexRequest = new PtuFlexRequest();
         ptuFlexRequest.setPower(BigInteger.TEN);
         ptuFlexRequest.setPtuContainer(ptuContainer);
-        ptuFlexRequest.setDisposition(DispositionAvailableRequested.AVAILABLE);
+        ptuFlexRequest.setDisposition(energy.usef.core.model.DispositionAvailableRequested.AVAILABLE);
         return ptuFlexRequest;
     }
 

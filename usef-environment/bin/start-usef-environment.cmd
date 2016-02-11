@@ -1,4 +1,19 @@
 @echo off
+rem
+rem Copyright 2015 USEF Foundation
+rem
+rem Licensed under the Apache License, Version 2.0 (the "License");
+rem you may not use this file except in compliance with the License.
+rem You may obtain a copy of the License at
+rem
+rem http://www.apache.org/licenses/LICENSE-2.0
+rem
+rem Unless required by applicable law or agreed to in writing, software
+rem distributed under the License is distributed on an "AS IS" BASIS,
+rem WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+rem See the License for the specific language governing permissions and
+rem limitations under the License.
+rem
 
 echo.
 echo ====================================================================================================
@@ -80,7 +95,7 @@ call java -version > nul 2> nul || set JAVA_ERROR=1
 if defined JAVA_ERROR (
   echo Java can not be started. It can not be found on the Windows PATH. It looks like it is not installed.
   echo.
-  echo If not installed, download and install Java JDK 7 from the website:
+  echo If not installed, download and install Java JDK 8 from the website:
   echo.
   echo    http://www.oracle.com/technetwork/java/javase/downloads/index-jsp-138363.html#javasejdk
   echo.

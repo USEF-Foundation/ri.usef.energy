@@ -26,7 +26,6 @@ import energy.usef.core.data.xml.bean.message.FlexOrderSettlementStatus;
 import energy.usef.core.data.xml.bean.message.MessageMetadata;
 import energy.usef.core.data.xml.bean.message.SettlementMessageResponse;
 import energy.usef.core.data.xml.bean.message.USEFRole;
-
 import energy.usef.core.model.Message;
 import energy.usef.core.service.business.MessageService;
 import energy.usef.core.service.helper.MessageMetadataBuilder;

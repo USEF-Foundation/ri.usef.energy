@@ -20,9 +20,9 @@ import energy.usef.core.util.PtuUtil;
 import energy.usef.core.workflow.DefaultWorkflowContext;
 import energy.usef.core.workflow.dto.DispositionTypeDto;
 import energy.usef.core.workflow.dto.FlexRequestDto;
-import energy.usef.dso.workflow.validate.create.flexrequest.CreateFlexRequestStepParameter;
 import energy.usef.dso.workflow.dto.GridSafetyAnalysisDto;
 import energy.usef.dso.workflow.dto.PtuGridSafetyAnalysisDto;
+import energy.usef.dso.workflow.validate.create.flexrequest.CreateFlexRequestStepParameter;
 
 import java.util.List;
 

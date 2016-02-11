@@ -16,18 +16,6 @@
 
 package energy.usef.dso.workflow.plan.connection.forecast;
 
-import energy.usef.core.data.xml.bean.message.Prognosis;
-import energy.usef.core.model.DocumentStatus;
-import energy.usef.core.model.DocumentType;
-import energy.usef.core.model.Message;
-import energy.usef.core.model.PlanboardMessage;
-import energy.usef.core.model.PrognosisType;
-import energy.usef.core.model.PtuPrognosis;
-import energy.usef.core.service.business.CorePlanboardBusinessService;
-import energy.usef.dso.model.Aggregator;
-import energy.usef.dso.service.business.DsoPlanboardBusinessService;
-import energy.usef.dso.workflow.validate.gridsafetyanalysis.GridSafetyAnalysisEvent;
-
 import java.util.List;
 
 import javax.ejb.Lock;
@@ -39,6 +27,18 @@ import javax.inject.Inject;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import energy.usef.core.data.xml.bean.message.Prognosis;
+import energy.usef.core.model.DocumentStatus;
+import energy.usef.core.model.DocumentType;
+import energy.usef.core.model.Message;
+import energy.usef.core.model.PlanboardMessage;
+import energy.usef.core.model.PrognosisType;
+import energy.usef.core.model.PtuPrognosis;
+import energy.usef.core.service.business.CorePlanboardBusinessService;
+import energy.usef.dso.model.Aggregator;
+import energy.usef.dso.service.business.DsoPlanboardBusinessService;
+import energy.usef.dso.workflow.validate.gridsafetyanalysis.GridSafetyAnalysisEvent;
 
 /**
  * DSO Non Aggreagator Connection Forecast workflow, Plan board sub-flow workflow coordinator.

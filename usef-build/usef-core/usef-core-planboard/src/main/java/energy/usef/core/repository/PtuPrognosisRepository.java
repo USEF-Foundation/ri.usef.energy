@@ -94,8 +94,6 @@ public class PtuPrognosisRepository extends BaseRepository<PtuPrognosis> {
             query.setParameter("documentStatus", documentStatus.get());
         }
 
-        //query = getEntityManager().createQuery("SELECT p FROM PtuPrognosis p, PlanboardMessage pm");
-
         return query.getResultList();
     }
 

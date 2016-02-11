@@ -24,7 +24,8 @@ import energy.usef.agr.dto.device.capability.IncreaseCapabilityDto;
 import energy.usef.agr.dto.device.capability.ReportCapabilityDto;
 import energy.usef.agr.dto.device.capability.UdiEventDto;
 import energy.usef.agr.pbcfeederimpl.PbcFeederService;
-import energy.usef.agr.workflow.operate.netdemand.DetermineNetDemandStepParameter;
+import energy.usef.agr.workflow.operate.netdemand.DetermineNetDemandStepParameter.IN;
+import energy.usef.agr.workflow.operate.netdemand.DetermineNetDemandStepParameter.OUT;
 import energy.usef.core.util.DateTimeUtil;
 import energy.usef.core.util.PtuUtil;
 import energy.usef.core.workflow.WorkflowContext;
@@ -78,16 +79,16 @@ public class AgrDetermineNetDemandsStub implements WorkflowStep {
     @Override
     public WorkflowContext invoke(WorkflowContext context) {
 
-        Integer ptuDuration = context.get(DetermineNetDemandStepParameter.IN.PTU_DURATION.name(), Integer.class);
-        List<ConnectionPortfolioDto> connectionDtosToProcess = context.get(DetermineNetDemandStepParameter.IN.CONNECTION_PORTFOLIO_DTO_LIST.name(), List.class);
+        Integer ptuDuration = context.get(IN.PTU_DURATION.name(), Integer.class);
+        List<ConnectionPortfolioDto> connectionDtosToProcess = context.get(IN.CONNECTION_PORTFOLIO_DTO_LIST.name(), List.class);
 
         LOGGER.debug("Started Determine Net Demands for {} connections", connectionDtosToProcess.size());
 
-        LocalDate period = context.get(DetermineNetDemandStepParameter.IN.PERIOD.name(), LocalDate.class);
+        LocalDate period = context.get(IN.PERIOD.name(), LocalDate.class);
 
         if (connectionDtosToProcess.isEmpty()) {
             LOGGER.warn("No connection DTOs to process");
-            context.setValue(DetermineNetDemandStepParameter.OUT.CONNECTION_PORTFOLIO_DTO_LIST.name(), new ArrayList<>());
+            context.setValue(OUT.CONNECTION_PORTFOLIO_DTO_LIST.name(), new ArrayList<>());
         } else {
             List<ConnectionPortfolioDto> connectionDtos = pbcFeederService.retrieveUDIListWithPvLoadAveragePower(period,
                     connectionDtosToProcess, ptuDuration);
@@ -95,20 +96,20 @@ public class AgrDetermineNetDemandsStub implements WorkflowStep {
             // set the uncontrolled load at connection level with the same value as the forecast
             setObservedLoadForConnectionLevel(connectionDtos, ptuDuration);
 
-            randomizeForecasts(connectionDtos, context.get(DetermineNetDemandStepParameter.IN.PTU_DURATION.name(), Integer.class));
+            randomizeForecasts(connectionDtos, context.get(IN.PTU_DURATION.name(), Integer.class));
 
             // Although this data will not be generated or consumed at this stage, the PBC should be designed to be able
             // to insert ADS events in the database as well. Given the complexity of the event data, this will most likely be
             // accomplished by inserting XML in the database.
-            context.setValue(DetermineNetDemandStepParameter.OUT.CONNECTION_PORTFOLIO_DTO_LIST.name(), connectionDtos);
+            context.setValue(OUT.CONNECTION_PORTFOLIO_DTO_LIST.name(), connectionDtos);
 
             LOGGER.debug("Ended with {} connectionDtos", connectionDtos.size());
         }
 
         // update UdiEvents and capabilities
-        Map<String, Map<String, List<UdiEventDto>>> udiEventDtoMap = context.get(DetermineNetDemandStepParameter.IN.UDI_EVENT_DTO_MAP.name(), Map.class);
+        Map<String, Map<String, List<UdiEventDto>>> udiEventDtoMap = context.get(IN.UDI_EVENT_DTO_MAP.name(), Map.class);
         updateUdiEvents(udiEventDtoMap);
-        context.setValue(DetermineNetDemandStepParameter.OUT.UPDATED_UDI_EVENT_DTO_LIST.name(), udiEventDtoMap.values().stream()
+        context.setValue(OUT.UPDATED_UDI_EVENT_DTO_LIST.name(), udiEventDtoMap.values().stream()
                 .flatMap(map -> map.values().stream())
                 .flatMap(Collection::stream).collect(Collectors.toList()));
         return context;

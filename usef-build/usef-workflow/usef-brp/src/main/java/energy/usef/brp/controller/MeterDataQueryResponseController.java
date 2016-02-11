@@ -39,7 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Controller class handling the reception of a {@link energy.usef.core.data.xml.bean.message.MeterDataQueryResponse} message.
+ * Controller class handling the reception of a {@link MeterDataQueryResponse} message.
  */
 @Stateless
 public class MeterDataQueryResponseController extends BaseIncomingResponseMessageController<MeterDataQueryResponse> {

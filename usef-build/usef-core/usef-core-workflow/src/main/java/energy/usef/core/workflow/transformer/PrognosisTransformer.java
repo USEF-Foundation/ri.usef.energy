@@ -16,8 +16,8 @@
 
 package energy.usef.core.workflow.transformer;
 
-import energy.usef.core.model.PrognosisType;
 import energy.usef.core.model.PtuPrognosis;
+import energy.usef.core.model.PrognosisType;
 import energy.usef.core.workflow.dto.PrognosisDto;
 import energy.usef.core.workflow.dto.PrognosisTypeDto;
 import energy.usef.core.workflow.dto.PtuPrognosisDto;

@@ -20,18 +20,27 @@
         "consumptionProductionType": "CONSUMPTION"
       },
       {
-        "type": "InterruptCapability",
+        "type": "ReduceCapability",
         "id": 3,
+        "maxDtus": 1,
+        "powerStep": -100,
+        "minPower": -400,
+        "durationMultiplier": 1,
+        "consumptionProductionType": "PRODUCTION"
+      },
+      {
+        "type": "InterruptCapability",
+        "id": 4,
         "maxDtus": 1,
         "type": "FULL"
       },
       {
         "type": "ShiftCapability",
-        "id": 4
+        "id": 5
       },
       {
         "type": "ReportCapability",
-        "id": 5
+        "id": 6
       }
     ]
   },"ADS": {
@@ -53,6 +62,15 @@
         "minPower": -400,
         "durationMultiplier": 1,
         "consumptionProductionType": "CONSUMPTION"
+      },
+      {
+        "type": "ReduceCapability",
+        "id": 3,
+        "maxDtus": 1,
+        "powerStep": -100,
+        "minPower": -400,
+        "durationMultiplier": 1,
+        "consumptionProductionType": "PRODUCTION"
       }
     ]
   },"PV": {

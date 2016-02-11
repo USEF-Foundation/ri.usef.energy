@@ -17,7 +17,7 @@
 package energy.usef.core.workflow.dto;
 
 /**
- * Data Transfer Object for the {@link energy.usef.core.model.AcknowledgementStatus}.
+ * Data Transfer Object for the AcknowledgementStatus.
  */
 public enum AcknowledgementStatusDto {
     SENT,

@@ -18,6 +18,21 @@ package energy.usef.dso.workflow.settlement.send;
 
 import static energy.usef.core.data.xml.bean.message.MessagePrecedence.TRANSACTIONAL;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.ejb.Stateless;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+
+import org.joda.time.LocalDate;
+import org.joda.time.Months;
+import org.joda.time.Period;
+
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.FlexOrderSettlement;
@@ -34,26 +49,11 @@ import energy.usef.core.util.XMLUtil;
 import energy.usef.core.workflow.settlement.CoreSettlementBusinessService;
 import energy.usef.core.workflow.transformer.SettlementTransformer;
 import energy.usef.dso.config.ConfigDso;
+import energy.usef.dso.config.ConfigDsoParam;
 import energy.usef.dso.model.Aggregator;
+import energy.usef.dso.model.AggregatorOnConnectionGroupState;
 import energy.usef.dso.service.business.DsoDefaultSettlementMessageContent;
 import energy.usef.dso.service.business.DsoPlanboardBusinessService;
-import energy.usef.dso.config.ConfigDsoParam;
-import energy.usef.dso.model.AggregatorOnConnectionGroupState;
-
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.ejb.Stateless;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-
-import org.joda.time.LocalDate;
-import org.joda.time.Months;
-import org.joda.time.Period;
 
 /**
  * This coordinator class is in charge of the workflow sending Settlement messages to aggregators.

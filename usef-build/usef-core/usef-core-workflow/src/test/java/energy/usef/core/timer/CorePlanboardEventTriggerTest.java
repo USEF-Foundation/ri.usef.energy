@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- package energy.usef.core.timer;
+package energy.usef.core.timer;
 
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;

@@ -16,6 +16,7 @@
 
 package energy.usef.agr.workflow.operate.control.ads;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_CONTROL_ACTIVE_DEMAND_SUPPLY;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 
@@ -28,7 +29,6 @@ import energy.usef.agr.service.business.AgrPortfolioBusinessService;
 import energy.usef.agr.transformer.DeviceMessageTransformer;
 import energy.usef.agr.workflow.operate.control.ads.ControlActiveDemandSupplyStepParameter.IN;
 import energy.usef.agr.workflow.operate.control.ads.ControlActiveDemandSupplyStepParameter.OUT;
-import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.exception.TechnicalException;
 import energy.usef.core.workflow.DefaultWorkflowContext;
 import energy.usef.core.workflow.WorkflowContext;
@@ -104,7 +104,7 @@ public class AgrControlActiveDemandSupplyCoordinator {
         WorkflowContext context = new DefaultWorkflowContext();
         context.setValue(IN.DEVICE_MESSAGE_DTO.name(), DeviceMessageTransformer.transformToDto(deviceMessage));
 
-        WorkflowContext returnedContext = workflowStepExecuter.invoke(AgrWorkflowStep.AGR_CONTROL_ACTIVE_DEMAND_SUPPLY.name(), context);
+        WorkflowContext returnedContext = workflowStepExecuter.invoke(AGR_CONTROL_ACTIVE_DEMAND_SUPPLY.name(), context);
         DeviceMessageDto returnedDeviceMessage = returnedContext.get(OUT.FAILED_DEVICE_MESSAGE_DTO.name(), DeviceMessageDto.class);
 
         if (returnedDeviceMessage != null) {

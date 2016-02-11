@@ -19,6 +19,21 @@ package energy.usef.dso.workflow.validate.gridsafetyanalysis;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.ejb.Stateless;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.enterprise.event.TransactionPhase;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+
+import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.PTU;
@@ -37,24 +52,9 @@ import energy.usef.core.workflow.dto.PrognosisDto;
 import energy.usef.core.workflow.dto.PtuPrognosisDto;
 import energy.usef.core.workflow.step.WorkflowStepExecuter;
 import energy.usef.core.workflow.util.WorkflowUtil;
+import energy.usef.dso.model.AggregatorOnConnectionGroupState;
 import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 import energy.usef.dso.workflow.DsoWorkflowStep;
-import energy.usef.dso.model.AggregatorOnConnectionGroupState;
-
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.ejb.Stateless;
-import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
-import javax.enterprise.event.TransactionPhase;
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-
-import org.joda.time.LocalDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Grid Safety Analysis workflow coordinator.
@@ -166,7 +166,7 @@ public class DsoCreateMissingDPrognosisCoordinator {
 
     private Map<String, List<PtuPrognosis>> createDPrognosisPerAggregatorMap(String congestionPoint, LocalDate analysisDay) {
         Map<String, List<PtuPrognosis>> results = corePlanboardBusinessService
-                .findLastPrognoses(analysisDay,  energy.usef.core.model.PrognosisType.D_PROGNOSIS, congestionPoint)
+                .findLastPrognoses(analysisDay, energy.usef.core.model.PrognosisType.D_PROGNOSIS, congestionPoint)
                 .stream()
                 .collect(Collectors.groupingBy(PtuPrognosis::getParticipantDomain));
         LOGGER.debug("Got D-Prognosis: {}", results.entrySet()

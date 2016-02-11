@@ -43,7 +43,6 @@ import energy.usef.core.model.PtuContainerState;
 import energy.usef.core.model.PtuFlexOffer;
 import energy.usef.core.model.PtuFlexOrder;
 import energy.usef.core.model.PtuFlexRequest;
-import energy.usef.core.model.FlexOrderSettlement;
 import energy.usef.core.model.PtuPrognosis;
 import energy.usef.core.model.PtuState;
 import energy.usef.core.model.RegimeType;
@@ -94,6 +93,8 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+
+import energy.usef.core.model.FlexOrderSettlement;
 
 @RunWith(PowerMockRunner.class)
 public class CorePlanboardBusinessServiceTest {
@@ -265,7 +266,7 @@ public class CorePlanboardBusinessServiceTest {
         }).collect(Collectors.toList()));
         prognosis.setPeriod(new LocalDate());
         prognosis.setSequence(random.nextLong());
-        prognosis.setType(energy.usef.core.data.xml.bean.message.PrognosisType.A_PLAN);
+        prognosis.setType(PrognosisType.A_PLAN);
 
         PowerMockito.when(connectionGroupRepository.find(Matchers.anyString()))
                 .thenReturn(PowerMockito.mock(ConnectionGroup.class));

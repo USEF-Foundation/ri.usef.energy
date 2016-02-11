@@ -16,6 +16,8 @@
 
 package energy.usef.agr.workflow.plan.connection.forecast;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_CREATE_N_DAY_AHEAD_FORECAST;
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_NON_UDI_CREATE_N_DAY_AHEAD_FORECAST;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -25,7 +27,6 @@ import energy.usef.agr.dto.ConnectionPortfolioDto;
 import energy.usef.agr.service.business.AgrPortfolioBusinessService;
 import energy.usef.agr.util.ReflectionUtil;
 import energy.usef.agr.workflow.operate.reoptimize.ReOptimizePortfolioEvent;
-import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.step.WorkflowStepExecuter;
@@ -101,7 +102,7 @@ public class AgrConnectionForecastPlanboardCoordinatorTest {
     public void testHandleEvent() {
         ArgumentCaptor<WorkflowContext> inContextCaptor = ArgumentCaptor.forClass(WorkflowContext.class);
         Mockito.when(configAgr.getIntegerProperty(ConfigAgrParam.AGR_CONNECTION_FORECAST_DAYS_INTERVAL)).thenReturn(1);
-        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AgrWorkflowStep.AGR_CREATE_N_DAY_AHEAD_FORECAST.name()), inContextCaptor.capture()))
+        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AGR_CREATE_N_DAY_AHEAD_FORECAST.name()), inContextCaptor.capture()))
                 .then(call -> buildContext((WorkflowContext) call.getArguments()[1]));
 
         coordinator.handleEvent(new CreateConnectionForecastEvent());
@@ -121,7 +122,7 @@ public class AgrConnectionForecastPlanboardCoordinatorTest {
         Mockito.when(configAgr.getIntegerProperty(ConfigAgrParam.AGR_CONNECTION_FORECAST_DAYS_INTERVAL)).thenReturn(1);
         Mockito.when(configAgr.getBooleanProperty(ConfigAgrParam.AGR_IS_NON_UDI_AGGREGATOR)).thenReturn(true);
         Mockito.when(
-                workflowStepExecuter.invoke(Mockito.eq(AgrWorkflowStep.AGR_NON_UDI_CREATE_N_DAY_AHEAD_FORECAST.name()), inContextCaptor.capture()))
+                workflowStepExecuter.invoke(Mockito.eq(AGR_NON_UDI_CREATE_N_DAY_AHEAD_FORECAST.name()), inContextCaptor.capture()))
                 .then(call -> buildContext((WorkflowContext) call.getArguments()[1]));
 
         // invocation

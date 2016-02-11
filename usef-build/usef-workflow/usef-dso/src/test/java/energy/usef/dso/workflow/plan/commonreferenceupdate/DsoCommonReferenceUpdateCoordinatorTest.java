@@ -16,16 +16,6 @@
 
 package energy.usef.dso.workflow.plan.commonreferenceupdate;
 
-import energy.usef.core.config.Config;
-import energy.usef.core.config.ConfigParam;
-import energy.usef.core.service.helper.JMSHelperService;
-import energy.usef.dso.service.business.DsoPlanboardBusinessService;
-import energy.usef.dso.model.CommonReferenceOperator;
-import energy.usef.dso.model.SynchronisationCongestionPoint;
-import energy.usef.dso.model.SynchronisationCongestionPointStatus;
-import energy.usef.dso.model.SynchronisationConnection;
-import energy.usef.dso.model.SynchronisationConnectionStatusType;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,6 +30,16 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+
+import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
+import energy.usef.core.service.helper.JMSHelperService;
+import energy.usef.dso.model.CommonReferenceOperator;
+import energy.usef.dso.model.SynchronisationCongestionPoint;
+import energy.usef.dso.model.SynchronisationCongestionPointStatus;
+import energy.usef.dso.model.SynchronisationConnection;
+import energy.usef.dso.model.SynchronisationConnectionStatusType;
+import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 
 @RunWith(PowerMockRunner.class)
 public class DsoCommonReferenceUpdateCoordinatorTest {

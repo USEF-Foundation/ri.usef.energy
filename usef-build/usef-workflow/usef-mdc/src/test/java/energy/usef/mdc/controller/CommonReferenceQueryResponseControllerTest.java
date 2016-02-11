@@ -20,9 +20,9 @@ import energy.usef.core.data.xml.bean.message.CommonReferenceQueryResponse;
 import energy.usef.core.data.xml.bean.message.DispositionSuccessFailure;
 import energy.usef.core.data.xml.bean.message.USEFRole;
 import energy.usef.core.service.helper.MessageMetadataBuilder;
-import energy.usef.mdc.model.CommonReferenceQueryStatus;
 import energy.usef.mdc.service.business.MdcCoreBusinessService;
 import energy.usef.mdc.model.CommonReferenceQueryState;
+import energy.usef.mdc.model.CommonReferenceQueryStatus;
 
 import java.util.List;
 

@@ -78,7 +78,7 @@ public class MdcCommonReferenceQueryCoordinator {
      *
      * @param croDomain {@link String} CRO domain name.
      * @param connectionEntityAddresses {@link java.util.List} of {@link String} containing the connection entity addresses.
-     * @return a {@link energy.usef.core.data.xml.bean.message.CommonReferenceQuery} message ready to be sent.
+     * @return a {@link CommonReferenceQuery} message ready to be sent.
      */
     private CommonReferenceQuery buildCommonReferenceQuery(String croDomain, List<String> connectionEntityAddresses) {
         LOGGER.debug("Building Common Reference Query for CRO [{}].", croDomain);

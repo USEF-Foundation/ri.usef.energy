@@ -21,6 +21,7 @@ import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.CommonReferenceEntityType;
 import energy.usef.core.data.xml.bean.message.CommonReferenceQueryResponse;
 import energy.usef.core.data.xml.bean.message.CongestionPoint;
+import energy.usef.core.data.xml.bean.message.Connection;
 import energy.usef.core.data.xml.bean.message.DispositionSuccessFailure;
 import energy.usef.core.data.xml.bean.message.FlexOffer;
 import energy.usef.core.data.xml.bean.message.FlexOrder;
@@ -35,10 +36,10 @@ import energy.usef.core.model.AcknowledgementStatus;
 import energy.usef.core.model.AgrConnectionGroup;
 import energy.usef.core.model.BrpConnectionGroup;
 import energy.usef.core.model.CongestionPointConnectionGroup;
-import energy.usef.core.model.Connection;
 import energy.usef.core.model.ConnectionGroup;
 import energy.usef.core.model.ConnectionGroupState;
 import energy.usef.core.model.DocumentStatus;
+import energy.usef.core.model.DispositionAvailableRequested;
 import energy.usef.core.model.DocumentType;
 import energy.usef.core.model.Message;
 import energy.usef.core.model.PhaseType;
@@ -47,7 +48,6 @@ import energy.usef.core.model.PrognosisType;
 import energy.usef.core.model.PtuContainer;
 import energy.usef.core.model.PtuContainerState;
 import energy.usef.core.model.PtuFlexOffer;
-import energy.usef.core.model.DispositionAvailableRequested;
 import energy.usef.core.model.PtuFlexOrder;
 import energy.usef.core.model.PtuFlexRequest;
 import energy.usef.core.model.PtuPrognosis;
@@ -369,7 +369,7 @@ public class CorePlanboardBusinessService {
         if (daysBeforeExpiration != null) {
             validUntil = DateTimeUtil.getCurrentDateTime().plusDays(daysBeforeExpiration);
         }
-        for (energy.usef.core.data.xml.bean.message.FlexOrderSettlement flexOrderSettlement : settlementMessage.getFlexOrderSettlement()) {
+        for (FlexOrderSettlement flexOrderSettlement : settlementMessage.getFlexOrderSettlement()) {
             String usefIdentifier;
             if (USEFRole.BRP == settlementMessage.getMessageMetadata().getSenderRole()) {
                 usefIdentifier = participantDomain;
@@ -398,20 +398,20 @@ public class CorePlanboardBusinessService {
      *
      * @param usefIdentifier the connection group entity address
      * @param date period ({@link LocalDate})
-     * @return A {@link List} of {@link Connection} objects
+     * @return A {@link List} of {@link energy.usef.core.model.Connection} objects
      */
-    public List<Connection> findConnectionsForConnectionGroup(String usefIdentifier, LocalDate date) {
+    public List<energy.usef.core.model.Connection> findConnectionsForConnectionGroup(String usefIdentifier, LocalDate date) {
         return connectionRepository.findConnectionsForConnectionGroup(usefIdentifier, date);
     }
 
     /**
-     * Find all {@link Connection} at a given point in time.
+     * Find all {@link energy.usef.core.model.Connection} at a given point in time.
      *
      * @param date period ({@link LocalDate})
      * @param connectionEntityList
-     * @return A {@link List} of {@link Connection} objects
+     * @return A {@link List} of {@link energy.usef.core.model.Connection} objects
      */
-    public List<Connection> findActiveConnections(LocalDate date, Optional<List<String>> connectionEntityList) {
+    public List<energy.usef.core.model.Connection> findActiveConnections(LocalDate date, Optional<List<String>> connectionEntityList) {
         return connectionRepository.findActiveConnections(date, connectionEntityList);
     }
 
@@ -423,7 +423,7 @@ public class CorePlanboardBusinessService {
      * @param regimes regimes
      * @return connection entity address list
      */
-    public Map<ConnectionGroup, List<Connection>> findConnections(LocalDate startDate, LocalDate endDate, RegimeType... regimes) {
+    public Map<ConnectionGroup, List<energy.usef.core.model.Connection>> findConnections(LocalDate startDate, LocalDate endDate, RegimeType... regimes) {
         List<PtuState> ptuStates = ptuStateRepository.findPtuStates(startDate, endDate, regimes);
         List<ConnectionGroupState> connectionGroupStates = connectionGroupStateRepository
                 .findActiveConnectionGroupStates(startDate, endDate);
@@ -453,11 +453,11 @@ public class CorePlanboardBusinessService {
      * @param endDate {@link LocalDate} end date of the period (inclusive).
      * @return a {@link Map} of Connection Groups and their Connection per day (for each day of the period).
      */
-    public Map<LocalDate, Map<ConnectionGroup, List<Connection>>> findConnectionGroupWithConnectionsWithOverlappingValidity(
+    public Map<LocalDate, Map<ConnectionGroup, List<energy.usef.core.model.Connection>>> findConnectionGroupWithConnectionsWithOverlappingValidity(
             LocalDate startDate, LocalDate endDate) {
         List<ConnectionGroupState> connectionGroupStates = connectionGroupStateRepository
                 .findConnectionGroupStatesWithOverlappingValidity(startDate, endDate);
-        Map<LocalDate, Map<ConnectionGroup, List<Connection>>> result = new HashMap<>();
+        Map<LocalDate, Map<ConnectionGroup, List<energy.usef.core.model.Connection>>> result = new HashMap<>();
         DateTimeUtil.generateDatesOfInterval(startDate, endDate).stream()
                 .forEach(day -> result.put(day, connectionGroupStates.stream()
                         .filter(cgs -> !cgs.getValidFrom().isAfter(day) && cgs.getValidUntil().isAfter(day))
@@ -773,9 +773,9 @@ public class CorePlanboardBusinessService {
      *
      * @param connectionGroupIdentifiers {@link List} of {@link String} which are the USEF identifiers of the ConnectionGroups.
      * @param period {@link LocalDate} period of validity of the relationship between the connection and the connection group.
-     * @return a {@link Map} with {@link ConnectionGroup} as key and a {@link List} of {@link Connection} as value.
+     * @return a {@link Map} with {@link ConnectionGroup} as key and a {@link List} of {@link energy.usef.core.model.Connection} as value.
      */
-    public Map<ConnectionGroup, List<Connection>> findConnectionsWithConnectionGroups(List<String> connectionGroupIdentifiers,
+    public Map<ConnectionGroup, List<energy.usef.core.model.Connection>> findConnectionsWithConnectionGroups(List<String> connectionGroupIdentifiers,
             LocalDate period) {
         return connectionGroupStateRepository.findConnectionsWithConnectionGroups(connectionGroupIdentifiers, period);
     }
@@ -784,10 +784,10 @@ public class CorePlanboardBusinessService {
      * Finds the active connection groups and their connections.
      *
      * @param period {@link LocalDate} period of validity.
-     * @return a {@link Map} with the connection group as key ({@link ConnectionGroup}) and a {@link List} of {@link Connection} as
+     * @return a {@link Map} with the connection group as key ({@link ConnectionGroup}) and a {@link List} of {@link energy.usef.core.model.Connection} as
      * value.
      */
-    public Map<ConnectionGroup, List<Connection>> findActiveConnectionGroupsWithConnections(LocalDate period) {
+    public Map<ConnectionGroup, List<energy.usef.core.model.Connection>> findActiveConnectionGroupsWithConnections(LocalDate period) {
         return findActiveConnectionGroupsWithConnections(period, period);
     }
 
@@ -804,7 +804,7 @@ public class CorePlanboardBusinessService {
 
         findActiveConnectionGroupsWithConnections(period).forEach(
                 (connectionGroup, connectionList) -> connectionGroupToConnectionsMap.put(connectionGroup.getUsefIdentifier(),
-                        connectionList.stream().map(Connection::getEntityAddress).collect(Collectors.toList())));
+                        connectionList.stream().map(energy.usef.core.model.Connection::getEntityAddress).collect(Collectors.toList())));
 
         return connectionGroupToConnectionsMap;
     }
@@ -814,10 +814,10 @@ public class CorePlanboardBusinessService {
      *
      * @param startDate {@link LocalDate} start date of validity.
      * @param endDate {{@link LocalDate} end date of validity (inclusive).
-     * @return a {@link Map} with the connection group as key ({@link ConnectionGroup}) and a {@link List} of {@link Connection} as
+     * @return a {@link Map} with the connection group as key ({@link ConnectionGroup}) and a {@link List} of {@link energy.usef.core.model.Connection} as
      * value.
      */
-    public Map<ConnectionGroup, List<Connection>> findActiveConnectionGroupsWithConnections(LocalDate startDate,
+    public Map<ConnectionGroup, List<energy.usef.core.model.Connection>> findActiveConnectionGroupsWithConnections(LocalDate startDate,
             LocalDate endDate) {
         return connectionGroupStateRepository.findActiveConnectionGroupsWithConnections(startDate, endDate);
     }
@@ -1043,7 +1043,7 @@ public class CorePlanboardBusinessService {
                 .stream()
                 .collect(Collectors.toMap(CongestionPoint::getEntityAddress, cp -> cp.getConnection()
                         .stream()
-                        .map(energy.usef.core.data.xml.bean.message.Connection::getEntityAddress)
+                        .map(Connection::getEntityAddress)
                         .collect(Collectors.toList())));
 
         List<ConnectionGroupState> activeConnectionGroupStates = connectionGroupStateRepository
@@ -1110,8 +1110,8 @@ public class CorePlanboardBusinessService {
         // declaration of the function which uses the AGR domain or the BRP domain of the connection to determine the usef
         // identifier of the ConnectionGroup.
         final Function<energy.usef.core.data.xml.bean.message.Connection, String> usefIdentifierProvider = USEFRole.AGR == selfRole ?
-                energy.usef.core.data.xml.bean.message.Connection::getBRPDomain :
-                energy.usef.core.data.xml.bean.message.Connection::getAGRDomain;
+                Connection::getBRPDomain :
+                Connection::getAGRDomain;
 
         List<ConnectionGroupState> currentConnectionGroupStates = connectionGroupStateRepository
                 .findActiveConnectionGroupStatesOfType(
@@ -1119,7 +1119,7 @@ public class CorePlanboardBusinessService {
 
         Map<String, energy.usef.core.data.xml.bean.message.Connection> messageConnections = message.getConnection()
                 .stream()
-                .collect(Collectors.toMap(energy.usef.core.data.xml.bean.message.Connection::getEntityAddress, Function.identity()));
+                .collect(Collectors.toMap(Connection::getEntityAddress, Function.identity()));
 
         List<ConnectionGroupState> connectionGroupStatesToExtend = connectionGroupStateRepository
                 .findEndingConnectionGroupStates(
@@ -1162,7 +1162,7 @@ public class CorePlanboardBusinessService {
     private void createGroupState(ConnectionGroup connectionGroup, String connectionEntityAddress, LocalDate modificationDate,
             Integer validityDuration) {
         // find or create Connection.
-        Connection connection = connectionRepository.findOrCreate(connectionEntityAddress);
+        energy.usef.core.model.Connection connection = connectionRepository.findOrCreate(connectionEntityAddress);
 
         // create new state
         ConnectionGroupState newConnectionGroupState = new ConnectionGroupState();
@@ -1310,7 +1310,7 @@ public class CorePlanboardBusinessService {
      * @param entityAddress the entity address on the connection
      * @return Connection
      */
-    public Connection findConnection(String entityAddress) {
+    public energy.usef.core.model.Connection findConnection(String entityAddress) {
         return connectionRepository.find(entityAddress);
     }
 

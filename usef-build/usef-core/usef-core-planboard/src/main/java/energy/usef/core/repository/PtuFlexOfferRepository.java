@@ -65,8 +65,8 @@ public class PtuFlexOfferRepository extends BaseRepository<PtuFlexOffer> {
     }
 
     /**
-     * Finds the {@link PtuFlexOffer} entities linked to each {@link AcknowledgementStatus#ACCEPTED} {@link energy.usef.core.model
-     * .PtuFlexOrder} for the given period.
+     * Finds the {@link PtuFlexOffer} entities linked to each {@link AcknowledgementStatus#ACCEPTED}
+     * {@link energy.usef.core.model.PtuFlexOrder} for the given period.
      *
      * @param startDate {@link LocalDate} starting date of the period.
      * @param endDate   {@link LocalDate} ending date of the period.
@@ -102,8 +102,8 @@ public class PtuFlexOfferRepository extends BaseRepository<PtuFlexOffer> {
     }
 
     /**
-     * Finds the {@link PtuFlexOffer} entities linked to each {@link AcknowledgementStatus#ACCEPTED} {@link energy.usef.core.model
-     * .PtuFlexOrder} for the given period.
+     * Finds the {@link PtuFlexOffer} entities linked to each {@link AcknowledgementStatus#ACCEPTED}
+     * {@link energy.usef.core.model.PtuFlexOrder} for the given period.
      *
      * @param startDate {@link LocalDate} starting date of the period.
      * @param endDate   {@link LocalDate} ending date of the period.

@@ -22,6 +22,25 @@ import static energy.usef.dso.workflow.DsoWorkflowStep.DSO_CREATE_GRID_SAFETY_AN
 import static energy.usef.dso.workflow.validate.gridsafetyanalysis.CreateGridSafetyAnalysisStepParameter.IN;
 import static energy.usef.dso.workflow.validate.gridsafetyanalysis.CreateGridSafetyAnalysisStepParameter.OUT;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import javax.ejb.Asynchronous;
+import javax.ejb.Stateless;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.enterprise.event.TransactionPhase;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+
+import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.model.ConnectionGroup;
@@ -50,25 +69,6 @@ import energy.usef.dso.workflow.dto.NonAggregatorForecastDto;
 import energy.usef.dso.workflow.dto.PtuGridSafetyAnalysisDto;
 import energy.usef.dso.workflow.transformer.NonAggregatorForecastDtoTransformer;
 import energy.usef.dso.workflow.validate.create.flexrequest.CreateFlexRequestEvent;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import javax.ejb.Asynchronous;
-import javax.ejb.Stateless;
-import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
-import javax.enterprise.event.TransactionPhase;
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-
-import org.joda.time.LocalDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Grid Safety Analysis workflow coordinator.

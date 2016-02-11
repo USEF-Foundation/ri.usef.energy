@@ -16,19 +16,6 @@
 
 package energy.usef.agr.controller;
 
-import energy.usef.agr.config.ConfigAgr;
-import energy.usef.agr.config.ConfigAgrParam;
-import energy.usef.agr.workflow.plan.connection.profile.AgrUpdateElementDataStoreEvent;
-import energy.usef.core.data.xml.bean.message.CommonReferenceEntityType;
-import energy.usef.core.data.xml.bean.message.CommonReferenceQueryResponse;
-import energy.usef.core.data.xml.bean.message.DispositionSuccessFailure;
-
-import energy.usef.core.exception.BusinessException;
-import energy.usef.core.model.Message;
-import energy.usef.core.service.business.CorePlanboardBusinessService;
-import energy.usef.core.service.business.MessageService;
-import energy.usef.core.service.helper.MessageMetadataBuilder;
-
 import java.io.IOException;
 import java.io.StringWriter;
 
@@ -46,6 +33,18 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+
+import energy.usef.agr.config.ConfigAgr;
+import energy.usef.agr.config.ConfigAgrParam;
+import energy.usef.agr.workflow.plan.connection.profile.AgrUpdateElementDataStoreEvent;
+import energy.usef.core.data.xml.bean.message.CommonReferenceEntityType;
+import energy.usef.core.data.xml.bean.message.CommonReferenceQueryResponse;
+import energy.usef.core.data.xml.bean.message.DispositionSuccessFailure;
+import energy.usef.core.exception.BusinessException;
+import energy.usef.core.model.Message;
+import energy.usef.core.service.business.CorePlanboardBusinessService;
+import energy.usef.core.service.business.MessageService;
+import energy.usef.core.service.helper.MessageMetadataBuilder;
 
 /**
  * Text class for CommonReferenceQueryController.

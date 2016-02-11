@@ -16,12 +16,12 @@
 
 package energy.usef.agr.workflow.nonudi.goals;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_NON_UDI_SET_ADS_GOALS;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 
 import energy.usef.agr.config.ConfigAgr;
 import energy.usef.agr.config.ConfigAgrParam;
-import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.model.PtuPrognosis;
@@ -108,7 +108,7 @@ public class AgrNonUdiSetAdsGoalsCoordinator {
                 config.getIntegerProperty(ConfigParam.PTU_DURATION));
         context.setValue(AgrNonUdiSetAdsGoalsParameter.IN.PROGNOSIS_DTO.name(), PrognosisTransformer.mapToPrognosis(lastPrognoses));
 
-        workflowStepExecuter.invoke(AgrWorkflowStep.AGR_NON_UDI_SET_ADS_GOALS.name(), context);
+        workflowStepExecuter.invoke(AGR_NON_UDI_SET_ADS_GOALS.name(), context);
 
         LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }

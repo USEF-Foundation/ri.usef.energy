@@ -16,12 +16,14 @@
 
 package energy.usef.agr.transformer;
 
+import energy.usef.agr.dto.device.request.ConsumptionProductionTypeDto;
 import energy.usef.agr.dto.device.request.DeviceMessageDto;
 import energy.usef.agr.dto.device.request.IncreaseRequestDto;
 import energy.usef.agr.dto.device.request.InterruptRequestDto;
 import energy.usef.agr.dto.device.request.ReduceRequestDto;
 import energy.usef.agr.dto.device.request.ReportRequestDto;
 import energy.usef.agr.dto.device.request.ShiftRequestDto;
+import energy.usef.agr.model.ConsumptionProductionType;
 import energy.usef.agr.model.DeviceMessage;
 import energy.usef.agr.model.DeviceMessageStatus;
 import energy.usef.agr.model.DeviceRequest;
@@ -76,8 +78,8 @@ public class DeviceMessageTransformer {
             Map<String, Udi> udis) {
         List<DeviceMessage> deviceMessageList = new ArrayList<>();
 
-        deviceMessageDtos.forEach(deviceMessageDto -> deviceMessageList
-                .add(transform(deviceMessageDto, udis.get(deviceMessageDto.getEndpoint()))));
+        deviceMessageDtos.forEach(
+                deviceMessageDto -> deviceMessageList.add(transform(deviceMessageDto, udis.get(deviceMessageDto.getEndpoint()))));
 
         return deviceMessageList;
     }
@@ -152,7 +154,31 @@ public class DeviceMessageTransformer {
         reduceRequest.setStartDtu(reduceRequestDto.getStartDTU().intValue());
         reduceRequest.setEndDtu(reduceRequestDto.getEndDTU().intValue());
         reduceRequest.setPower(reduceRequestDto.getPower());
+        reduceRequest
+                .setConsumptionProductionType(transformConsumptionProductionType(reduceRequestDto.getConsumptionProductionType()));
         return reduceRequest;
+    }
+
+    private static ConsumptionProductionType transformConsumptionProductionType(
+            ConsumptionProductionTypeDto consumptionProductionType) {
+        if (consumptionProductionType == ConsumptionProductionTypeDto.CONSUMPTION) {
+            return ConsumptionProductionType.CONSUMPTION;
+        } else if (consumptionProductionType == ConsumptionProductionTypeDto.PRODUCTION) {
+            return ConsumptionProductionType.PRODUCTION;
+        } else {
+            return null;
+        }
+    }
+
+    private static ConsumptionProductionTypeDto transformConsumptionProductionType(
+            ConsumptionProductionType consumptionProductionType) {
+        if (consumptionProductionType == ConsumptionProductionType.CONSUMPTION) {
+            return ConsumptionProductionTypeDto.CONSUMPTION;
+        } else if (consumptionProductionType == ConsumptionProductionType.PRODUCTION) {
+            return ConsumptionProductionTypeDto.PRODUCTION;
+        } else {
+            return null;
+        }
     }
 
     private static IncreaseRequest transformIncreaseRequest(IncreaseRequestDto increaseRequestDto) {
@@ -166,6 +192,8 @@ public class DeviceMessageTransformer {
         increaseRequest.setStartDtu(increaseRequestDto.getStartDTU().intValue());
         increaseRequest.setEndDtu(increaseRequestDto.getEndDTU().intValue());
         increaseRequest.setPower(increaseRequestDto.getPower());
+        increaseRequest.setConsumptionProductionType(
+                transformConsumptionProductionType(increaseRequestDto.getConsumptionProductionType()));
         return increaseRequest;
     }
 
@@ -252,6 +280,8 @@ public class DeviceMessageTransformer {
         reduceRequestDto.setStartDTU(BigInteger.valueOf(reduceRequest.getStartDtu()));
         reduceRequestDto.setEndDTU(BigInteger.valueOf(reduceRequest.getEndDtu()));
         reduceRequestDto.setPower(reduceRequest.getPower());
+        reduceRequestDto
+                .setConsumptionProductionType(transformConsumptionProductionType(reduceRequest.getConsumptionProductionType()));
         return reduceRequestDto;
     }
 
@@ -266,6 +296,8 @@ public class DeviceMessageTransformer {
         increaseRequestDto.setStartDTU(BigInteger.valueOf(increaseRequest.getStartDtu()));
         increaseRequestDto.setEndDTU(BigInteger.valueOf(increaseRequest.getEndDtu()));
         increaseRequestDto.setPower(increaseRequest.getPower());
+        increaseRequestDto
+                .setConsumptionProductionType(transformConsumptionProductionType(increaseRequest.getConsumptionProductionType()));
         return increaseRequestDto;
     }
 }

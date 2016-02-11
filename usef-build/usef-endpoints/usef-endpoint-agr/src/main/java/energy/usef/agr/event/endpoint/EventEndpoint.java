@@ -320,7 +320,7 @@ public class EventEndpoint {
 
     /**
      * Fires the {@link ReCreatePrognosesEvent} with the specified usef
-     * identifier. No {@link energy.usef.agr.portfolio.dto.DeviceMessage} will be supplied to the ControlActiveDemandSupply workflow.
+     * identifier.
      *
      * @param periodString {@link String} Period for which one wants to trigger the workflow (yyyy-MM-dd).
      * @return a HTTP {@link javax.ws.rs.core.Response}.

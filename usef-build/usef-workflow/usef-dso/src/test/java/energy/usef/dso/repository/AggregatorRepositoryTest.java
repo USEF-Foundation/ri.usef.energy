@@ -19,8 +19,6 @@ package energy.usef.dso.repository;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.powermock.reflect.Whitebox.setInternalState;
-import energy.usef.core.repository.ConnectionGroupRepository;
-import energy.usef.dso.model.Aggregator;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -36,7 +34,9 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
+
+import energy.usef.core.repository.ConnectionGroupRepository;
+import energy.usef.dso.model.Aggregator;
 
 /**
  * JUnit test for the AggregatorRepository class.
@@ -94,7 +94,7 @@ public class AggregatorRepositoryTest {
     @Test
     public void testFindOrCreate() {
         EntityManager mockedEntityManager = PowerMockito.mock(EntityManager.class);
-        Whitebox.setInternalState(repository, "entityManager", mockedEntityManager);
+        setInternalState(repository, "entityManager", mockedEntityManager);
         final String DOMAIN_NAME = "agr999.usef-example.com";
         PowerMockito.when(mockedEntityManager.find(Aggregator.class, DOMAIN_NAME)).thenReturn(null);
 

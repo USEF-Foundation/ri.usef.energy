@@ -49,7 +49,8 @@ public class ReduceRequest extends VariationRequest {
     /**
      * {@inheritDoc}
      */
-    public ReduceRequest(LocalDate period, String eventId, Integer startDtu, Integer endDtu, BigInteger power) {
-        super(period, eventId, startDtu, endDtu, power);
+    public ReduceRequest(LocalDate period, String eventId, Integer startDtu, Integer endDtu, BigInteger power,
+            ConsumptionProductionType consumptionProductionType) {
+        super(period, eventId, startDtu, endDtu, power, consumptionProductionType);
     }
 }

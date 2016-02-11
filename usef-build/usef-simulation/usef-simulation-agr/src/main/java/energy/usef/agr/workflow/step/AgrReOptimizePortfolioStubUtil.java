@@ -202,7 +202,7 @@ public class AgrReOptimizePortfolioStubUtil {
     }
 
     /**
-     * Aggregates the potential flexibility of the connection portfolio per connection group and PTU index.
+     * Aggregates the potential flexibility of consumption of the connection portfolio per connection group and PTU index.
      *
      * @param connectionsPerConnectionGroup
      * {@link Map} of {@link String} connection group identifier as key and {@link List} of {@link ConnectionPortfolioDto} as
@@ -214,35 +214,83 @@ public class AgrReOptimizePortfolioStubUtil {
      * @return the potential flex of the portfolio aggregated in a {@link Map} as <code>connection_group_identifier > ptu_index >
      * sum_of_the_potential_flex</code>.
      */
-    public static Map<String, Map<Integer, BigInteger>> sumPotentialFlexPerPtuPerConnectionGroup(
+    public static Map<String, Map<Integer, BigInteger>> sumPotentialFlexConsumptionPerPtuPerConnectionGroup(
             Map<String, List<ConnectionPortfolioDto>> connectionsPerConnectionGroup, LocalDate period, Integer ptuDuration) {
         Function<List<ConnectionPortfolioDto>, Map<Integer, BigInteger>> sumPotentialFlexConsumptionPerPtu =
                 connectionPortfolioDTOs -> connectionPortfolioDTOs.stream()
                         .flatMap(connectionPortfolioDTO -> connectionPortfolioDTO.getConnectionPowerPerPTU().values().stream())
                         .collect(groupingBy(PowerContainerDto::getTimeIndex, reducing(ZERO, powerContainerDto -> {
-                            BigInteger potentialFlexConsumption = powerContainerDto.getForecast().getPotentialFlexConsumption();
-                            if (potentialFlexConsumption == null) {
-                                potentialFlexConsumption = ZERO;
-                            }
-                            return potentialFlexConsumption;
+                            BigInteger allocatedFlexConsumption = value(
+                                    powerContainerDto.getForecast().getAllocatedFlexConsumption());
+                            BigInteger potentialFlexConsumption = value(
+                                    powerContainerDto.getForecast().getPotentialFlexConsumption());
+                            return potentialFlexConsumption.subtract(allocatedFlexConsumption);
                         }, BigInteger::add)));
 
-        // sum potential flex from connection level
+        // sum potential flex consumption from connection level
         Map<String, Map<Integer, BigInteger>> connectionsPotentialFlex = connectionsPerConnectionGroup.entrySet()
                 .stream()
                 .collect(toMap(Map.Entry::getKey, connectionsForConnectionGroup -> sumPotentialFlexConsumptionPerPtu.apply(
                         connectionsForConnectionGroup.getValue())));
-        // add potential flex from UDI level
+        // add potential flex consumption from UDI level
         connectionsPerConnectionGroup.forEach((connectionGroupId, connectionDtos) -> connectionDtos.stream()
                 .flatMap(connectionPortfolioDTO -> connectionPortfolioDTO.getUdis().stream())
                 .map(udi -> PowerContainerDtoUtil.average(udi, period, ptuDuration))
                 .forEach(powerContainerDtoPerPtu -> powerContainerDtoPerPtu.forEach((ptuIndex, powerContainerDto) -> {
                     BigInteger potentialFlex = connectionsPotentialFlex.get(connectionGroupId).getOrDefault(ptuIndex, ZERO);
-                    connectionsPotentialFlex.get(connectionGroupId)
-                            .put(ptuIndex, potentialFlex.add(powerContainerDto.getForecast().getPotentialFlexConsumption()));
+                    BigInteger powercontainerFlex = value(powerContainerDto.getForecast().getPotentialFlexConsumption()).
+                            subtract(value(powerContainerDto.getForecast().getAllocatedFlexConsumption()));
+                    connectionsPotentialFlex.get(connectionGroupId).put(ptuIndex, potentialFlex.add(powercontainerFlex));
                 })));
         return connectionsPotentialFlex;
+    }
 
+    /**
+     * Aggregates the potential flexibility of production of the connection portfolio per connection group and PTU index.
+     *
+     * @param connectionsPerConnectionGroup {@link Map} of {@link String} connection group identifier as key and {@link List} of {@link ConnectionPortfolioDto} as
+     * value; the connection portfolio already grouped per connection group identifier.
+     * @param period {@link LocalDate} the period for which the method is called (needed to know the amount of PTUs for that
+     * period).
+     * @param ptuDuration {@link Integer} the duration of a PTU in minutes (needed to know the amount of PTUs for the period and
+     * to know the amount of DTUs per PTU).
+     * @return the potential flex of the portfolio aggregated in a {@link Map} as <code>connection_group_identifier > ptu_index >
+     * sum_of_the_potential_flex</code>.
+     */
+    public static Map<String, Map<Integer, BigInteger>> sumPotentialFlexProductionPerPtuPerConnectionGroup(
+            Map<String, List<ConnectionPortfolioDto>> connectionsPerConnectionGroup, LocalDate period, Integer ptuDuration) {
+        Function<List<ConnectionPortfolioDto>, Map<Integer, BigInteger>> sumPotentialFlexProductionPerPtu = connectionPortfolioDTOs -> connectionPortfolioDTOs
+                .stream().flatMap(connectionPortfolioDTO -> connectionPortfolioDTO.getConnectionPowerPerPTU().values().stream())
+                .collect(groupingBy(PowerContainerDto::getTimeIndex, reducing(ZERO, powerContainerDto -> {
+                    BigInteger allocatedFlexProduction = value(powerContainerDto.getForecast().getAllocatedFlexProduction());
+                    BigInteger potentialFlexProduction = value(powerContainerDto.getForecast().getPotentialFlexProduction());
+                    return potentialFlexProduction.subtract(allocatedFlexProduction);
+                }, BigInteger::add)));
+
+        // sum potential flex production from connection level
+        Map<String, Map<Integer, BigInteger>> connectionsPotentialFlex = connectionsPerConnectionGroup.entrySet().stream().collect(
+                toMap(Map.Entry::getKey, connectionsForConnectionGroup -> sumPotentialFlexProductionPerPtu
+                        .apply(connectionsForConnectionGroup.getValue())));
+        // add potential flex production from UDI level
+        connectionsPerConnectionGroup.forEach((connectionGroupId, connectionDtos) -> connectionDtos.stream()
+                .flatMap(connectionPortfolioDTO -> connectionPortfolioDTO.getUdis().stream())
+                .map(udi -> PowerContainerDtoUtil.average(udi, period, ptuDuration))
+                .forEach(powerContainerDtoPerPtu -> powerContainerDtoPerPtu.forEach((ptuIndex, powerContainerDto) -> {
+                    BigInteger potentialFlex = connectionsPotentialFlex.get(connectionGroupId).getOrDefault(ptuIndex, ZERO);
+                    BigInteger powercontainerFlex = value(powerContainerDto.getForecast().getPotentialFlexProduction()).
+                            subtract(value(powerContainerDto.getForecast().getAllocatedFlexProduction()));
+                    connectionsPotentialFlex.get(connectionGroupId).put(ptuIndex, potentialFlex.add(powercontainerFlex));
+                })));
+        return connectionsPotentialFlex;
+    }
+
+    // returns the value or zero is the value is null
+    private static BigInteger value(BigInteger theValue) {
+        if (theValue == null) {
+            return ZERO;
+        } else {
+            return theValue;
+        }
     }
 
     /**
@@ -250,34 +298,55 @@ public class AgrReOptimizePortfolioStubUtil {
      *
      * @param targetPowerPerPtuPerConnectionGroup {@link Map} with the target power aggregated as
      * <code>connection_group_identifier > ptu_index > sum_of_the_power</code>.
-     * @param summedPotentialFlexPerPtuPerConnectionGroup {@link Map} with the potential flex aggregated as
+     * @param summedPotentialFlexConsumptionPerPtuPerConnectionGroup {@link Map} with the potential flex consumption aggregated as
+     * <code>connection_group_identifier > ptu_index > sum_of_potential_flex</code>.
+     * @param summedPotentialFlexProductionPerPtuPerConnectionGroup {@link Map} with the potential flex production aggregated as
      * <code>connection_group_identifier > ptu_index > sum_of_potential_flex</code>.
      * @return the flex factor (target_power / potential_flex, bounded to [0,1]) in a {@link Map} as
      * <code>connection_group_identifier > ptu_index > flex_factor</code>.
      */
     public static Map<String, Map<Integer, BigDecimal>> fetchFlexFactorPerPtuPerConnectionGroup(
             Map<String, Map<Integer, BigInteger>> targetPowerPerPtuPerConnectionGroup,
-            Map<String, Map<Integer, BigInteger>> summedPotentialFlexPerPtuPerConnectionGroup) {
+            Map<String, Map<Integer, BigInteger>> summedPotentialFlexConsumptionPerPtuPerConnectionGroup,
+            Map<String, Map<Integer, BigInteger>> summedPotentialFlexProductionPerPtuPerConnectionGroup) {
         Map<String, Map<Integer, BigDecimal>> flexFactorPerPtuPerConnectionGroup = new HashMap<>();
 
-        summedPotentialFlexPerPtuPerConnectionGroup.forEach((connectionGroupId, potentialFlexPerPtu) -> {
+        targetPowerPerPtuPerConnectionGroup.forEach((connectionGroupId, targetPowerPerPtu) -> {
             flexFactorPerPtuPerConnectionGroup.put(connectionGroupId, new HashMap<>());
-            potentialFlexPerPtu.forEach((ptuIndex, potentialFlex) -> {
+            targetPowerPerPtu.forEach((ptuIndex, targetPower) -> {
+                BigInteger potentialFlex = ZERO;
+                // since we only support reduction of consumption and reduction of production we solve negative targetPowers by
+                // reducing the consumption and positive targetPowers by reducing the production.
+                if (targetPower.compareTo(BigInteger.ZERO) < 0) {
+                    potentialFlex = summedPotentialFlexConsumptionPerPtuPerConnectionGroup
+                            .getOrDefault(connectionGroupId, new HashMap<>()).getOrDefault(ptuIndex, ZERO);
+                } else if (targetPower.compareTo(BigInteger.ZERO) > 0) {
+                    potentialFlex = summedPotentialFlexProductionPerPtuPerConnectionGroup
+                            .getOrDefault(connectionGroupId, new HashMap<>()).getOrDefault(ptuIndex, ZERO);
+                }
+
                 if (potentialFlex.equals(ZERO)) {
-                    flexFactorPerPtuPerConnectionGroup.get(connectionGroupId).put(ptuIndex, BigDecimal.ONE);
+                    // there is no flex available, so do not flex (factor = ZERO)
+                    flexFactorPerPtuPerConnectionGroup.get(connectionGroupId).put(ptuIndex, BigDecimal.ZERO);
                 } else {
-                    BigInteger targetPower = targetPowerPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
-                            .getOrDefault(ptuIndex, ZERO);
                     BigDecimal factor = calculateFactor(ptuIndex, potentialFlex, targetPower);
 
                     flexFactorPerPtuPerConnectionGroup.get(connectionGroupId).put(ptuIndex, factor);
                 }
             });
         });
+
         return flexFactorPerPtuPerConnectionGroup;
     }
 
     private static BigDecimal calculateFactor(Integer ptuIndex, BigInteger potentialFlex, BigInteger targetPower) {
+
+        // since we only support reduction of consumption or production, the potential flex should always be negative
+        // return ZERO if we only have positive potential flex (increase is not supported)
+        if (potentialFlex.compareTo(BigInteger.ZERO) >= 0) {
+            return BigDecimal.ZERO;
+        }
+
         BigDecimal summedPotentialFlex = new BigDecimal(potentialFlex);
         BigDecimal factor = new BigDecimal(targetPower).divide(summedPotentialFlex, 5, BigDecimal.ROUND_CEILING);
         // never exceed factor of 1 to avoid using more flex than available later in the process
@@ -285,9 +354,10 @@ public class AgrReOptimizePortfolioStubUtil {
             LOGGER.warn("Potential flex factor for ptu {} is capped to 1, this will cause the target power to be out of reach",
                     ptuIndex);
             factor = BigDecimal.ONE;
-        } else if (factor.compareTo(BigDecimal.ZERO) < 0) {
-            LOGGER.warn("Potential flex factor for ptu {} is set to 0 because negative factor is not supported", ptuIndex);
-            factor = BigDecimal.ZERO;
+        } else if (factor.compareTo(BigDecimal.ONE.negate()) < 0) {
+            LOGGER.warn("Potential flex factor for ptu {} is capped to -1, this will cause the target power to be out of reach",
+                    ptuIndex);
+            factor = BigDecimal.ONE.negate();
         }
         return factor;
     }

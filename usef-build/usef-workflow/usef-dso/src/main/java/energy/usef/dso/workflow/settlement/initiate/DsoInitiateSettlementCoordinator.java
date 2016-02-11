@@ -27,6 +27,28 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.ejb.Asynchronous;
+import javax.ejb.LocalBean;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.enterprise.event.TransactionPhase;
+import javax.inject.Inject;
+
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.constant.USEFConstants;
@@ -65,32 +87,10 @@ import energy.usef.dso.workflow.dto.GridMonitoringDto;
 import energy.usef.dso.workflow.settlement.send.SendSettlementMessageEvent;
 import energy.usef.dso.workflow.transformer.GridMonitoringTransformer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.ejb.Asynchronous;
-import javax.ejb.LocalBean;
-import javax.ejb.Lock;
-import javax.ejb.LockType;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
-import javax.enterprise.event.TransactionPhase;
-import javax.inject.Inject;
-
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * DSO Initiate Settlement workflow coordinator. This workflow is cut into two parts:
  * <p>
- * <li>1. prepare initiate settlement sends a {@link energy.usef.core.data.xml.bean.message.MeterDataQuery} <li>2. finalise initiate
+ * <li>1. prepare initiate settlement sends a {@link MeterDataQuery} <li>2. finalise initiate
  * settlement triggered by the {@link MeterDataQueryResponseController} workflow.
  */
 @Stateless

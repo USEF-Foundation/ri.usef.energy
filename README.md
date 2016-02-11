@@ -1,5 +1,16 @@
 # Release notes USEF Reference Implementation
 
+## Release v 1.3.1 , 12 February 2016 ##
+
+###Important Notes###
+
+	*	This release is based on "Release v 1.3.0 , 3 February  2016".
+
+###Delivered items###
+	*	To support flex orders requesting an increase in consumption, the PBC implementation of the aggregator's re-optmize portfolio process 
+		now includes the increase capability and adjustment of power production values.
+			
+
 ## Release v 1.3.0 , 3 February 2016 ##
 
 ###Important Notes###

@@ -19,6 +19,31 @@ package energy.usef.dso.service.business;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import javax.persistence.EntityManager;
+
+import org.joda.time.LocalDate;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.internal.util.reflection.Whitebox;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.modules.junit4.PowerMockRunner;
+
 import energy.usef.core.config.Config;
 import energy.usef.core.data.xml.bean.message.Aggregator;
 import energy.usef.core.data.xml.bean.message.CongestionPoint;
@@ -74,31 +99,6 @@ import energy.usef.dso.repository.SynchronisationCongestionPointRepository;
 import energy.usef.dso.repository.SynchronisationCongestionPointStatusRepository;
 import energy.usef.dso.repository.SynchronisationConnectionRepository;
 import energy.usef.dso.workflow.dto.GridSafetyAnalysisDto;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import javax.persistence.EntityManager;
-
-import org.joda.time.LocalDate;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.modules.junit4.PowerMockRunner;
 
 /**
  * Test class in charge of the unit tests related to the {@link DsoPlanboardBusinessService}.

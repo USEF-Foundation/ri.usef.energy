@@ -16,6 +16,8 @@
 
 package energy.usef.agr.workflow.plan.updateforecast;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_CREATE_N_DAY_AHEAD_FORECAST;
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_NON_UDI_CREATE_N_DAY_AHEAD_FORECAST;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 
@@ -25,7 +27,6 @@ import energy.usef.agr.dto.ConnectionPortfolioDto;
 import energy.usef.agr.service.business.AgrPortfolioBusinessService;
 import energy.usef.agr.workflow.plan.connection.forecast.ConnectionForecastStepParameter.IN;
 import energy.usef.agr.workflow.plan.connection.forecast.ConnectionForecastStepParameter.OUT;
-import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.util.DateTimeUtil;
@@ -108,11 +109,11 @@ public class AgrUpdateConnectionForecastCoordinator {
 
         WorkflowContext outContext;
         if (configAgr.getBooleanProperty(ConfigAgrParam.AGR_IS_NON_UDI_AGGREGATOR)) {
-            outContext = workflowStepExecuter.invoke(AgrWorkflowStep.AGR_NON_UDI_CREATE_N_DAY_AHEAD_FORECAST.name(), context);
+            outContext = workflowStepExecuter.invoke(AGR_NON_UDI_CREATE_N_DAY_AHEAD_FORECAST.name(), context);
         } else {
-            outContext = workflowStepExecuter.invoke(AgrWorkflowStep.AGR_CREATE_N_DAY_AHEAD_FORECAST.name(), context);
+            outContext = workflowStepExecuter.invoke(AGR_CREATE_N_DAY_AHEAD_FORECAST.name(), context);
         }
-        WorkflowUtil.validateContext(AgrWorkflowStep.AGR_CREATE_N_DAY_AHEAD_FORECAST.name(), outContext, OUT.values());
+        WorkflowUtil.validateContext(AGR_CREATE_N_DAY_AHEAD_FORECAST.name(), outContext, OUT.values());
 
         // Executing step
         return outContext.get(OUT.CONNECTION_PORTFOLIO.name(), List.class);

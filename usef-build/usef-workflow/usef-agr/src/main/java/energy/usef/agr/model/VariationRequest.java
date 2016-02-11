@@ -19,6 +19,8 @@ package energy.usef.agr.model;
 import java.math.BigInteger;
 
 import javax.persistence.Column;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.MappedSuperclass;
 
 import org.joda.time.LocalDate;
@@ -38,6 +40,10 @@ public abstract class VariationRequest extends DeviceRequest {
     private Integer endDtu;
     @Column(name = "POWER", nullable = false, precision=18, scale=0)
     private BigInteger power;
+    @Column(name = "CONSUMPTION_PRODUCTION_TYPE",
+            length = 16)
+    @Enumerated(value = EnumType.STRING)
+    private ConsumptionProductionType consumptionProductionType;
 
     /**
      * Default constructor.
@@ -51,19 +57,21 @@ public abstract class VariationRequest extends DeviceRequest {
 
     /**
      * Creates a new {@link VariationRequest} with the given fields.
-     *
-     * @param period {@link LocalDate} period of the request.
+     *  @param period {@link LocalDate} period of the request.
      * @param eventId {@link String} Event ID.
      * @param startDtu {@link Integer} Start DTU. Can be <code>null</code>.
      * @param endDtu {@link Integer} End DTU. Can be <code>null</code>.
      * @param power {@link BigInteger} amount of power to vary. Negative value indicates production of power.
+     * @param consumptionProductionType {@link ConsumptionProductionType} the value CONSUMPTION or PRODUCTION.
      */
-    protected VariationRequest(LocalDate period, String eventId, Integer startDtu, Integer endDtu, BigInteger power) {
+    protected VariationRequest(LocalDate period, String eventId, Integer startDtu, Integer endDtu, BigInteger power,
+            ConsumptionProductionType consumptionProductionType) {
         this(period);
         this.eventId = eventId;
         this.startDtu = startDtu;
         this.endDtu = endDtu;
         this.power = power;
+        this.consumptionProductionType = consumptionProductionType;
     }
 
     public String getEventId() {
@@ -96,5 +104,13 @@ public abstract class VariationRequest extends DeviceRequest {
 
     public void setPower(BigInteger power) {
         this.power = power;
+    }
+
+    public ConsumptionProductionType getConsumptionProductionType() {
+        return consumptionProductionType;
+    }
+
+    public void setConsumptionProductionType(ConsumptionProductionType consumptionProductionType) {
+        this.consumptionProductionType = consumptionProductionType;
     }
 }

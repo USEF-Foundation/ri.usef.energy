@@ -22,7 +22,6 @@ import energy.usef.core.data.xml.bean.message.CommonReferenceQuery;
 import energy.usef.core.data.xml.bean.message.MessageMetadata;
 import energy.usef.core.data.xml.bean.message.MessagePrecedence;
 import energy.usef.core.data.xml.bean.message.USEFRole;
-
 import energy.usef.core.service.helper.MessageMetadataBuilder;
 
 import org.junit.Before;

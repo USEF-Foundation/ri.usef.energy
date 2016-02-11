@@ -49,7 +49,8 @@ public class IncreaseRequest extends VariationRequest {
     /**
      * {@inheritDoc}
      */
-    public IncreaseRequest(LocalDate period, String eventId, Integer startDtu, Integer endDtu, BigInteger power) {
-        super(period, eventId, startDtu, endDtu, power);
+    public IncreaseRequest(LocalDate period, String eventId, Integer startDtu, Integer endDtu, BigInteger power,
+            ConsumptionProductionType consumptionProductionType) {
+        super(period, eventId, startDtu, endDtu, power, consumptionProductionType);
     }
 }

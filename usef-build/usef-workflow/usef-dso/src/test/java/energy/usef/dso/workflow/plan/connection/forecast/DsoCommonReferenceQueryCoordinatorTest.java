@@ -16,16 +16,6 @@
 
 package energy.usef.dso.workflow.plan.connection.forecast;
 
-import energy.usef.core.config.Config;
-import energy.usef.core.config.ConfigParam;
-import energy.usef.core.service.business.CorePlanboardBusinessService;
-import energy.usef.core.service.helper.JMSHelperService;
-import energy.usef.core.util.DateTimeUtil;
-import energy.usef.dso.config.ConfigDso;
-import energy.usef.dso.config.ConfigDsoParam;
-import energy.usef.dso.model.CommonReferenceOperator;
-import energy.usef.dso.service.business.DsoPlanboardBusinessService;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +35,16 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.xml.sax.SAXException;
+
+import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
+import energy.usef.core.service.business.CorePlanboardBusinessService;
+import energy.usef.core.service.helper.JMSHelperService;
+import energy.usef.core.util.DateTimeUtil;
+import energy.usef.dso.config.ConfigDso;
+import energy.usef.dso.config.ConfigDsoParam;
+import energy.usef.dso.model.CommonReferenceOperator;
+import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 
 /**
  * Test class in charge of the unit tests related to the {@link DsoCommonReferenceQueryCoordinator}.

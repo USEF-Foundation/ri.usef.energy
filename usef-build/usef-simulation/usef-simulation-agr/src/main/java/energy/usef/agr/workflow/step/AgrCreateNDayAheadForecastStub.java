@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * <ul>
  * <li>PTU_DATE : PTU day {@link org.joda.time.LocalDate}.</li>
  * <li>PTU_DURATION : PTU duration as int.</li>
- * <li>CONNECTIONS : the list of connections {@link energy.usef.agr.portfolio.dto.Connection}.</li>
+ * <li>CONNECTIONS : the list of connections {@link ConnectionPortfolioDto}.</li>
  * <li>CONNECTION_TO_CONGESTION_POINT_MAP : connection entity address to corresponding congestion point entity address map
  * {@link Map<String, String>}.</li>
  * <li>CONNECTION_TO_BRP_MAP : connection entity address to corresponding BRP domain map {@link Map<String, String>}.</li>
@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * The PBC returns the following parameters as output:
  * <ul>
- * <li>CONNECTION_PORTFOLIO : connection portfolio - a list of connections {@link energy.usef.agr.portfolio.dto.Connection}
+ * <li>CONNECTION_PORTFOLIO : connection portfolio - a list of connections {@link ConnectionPortfolioDto}
  * containing the connection portfolio data.</li>
  * </ul>
  */

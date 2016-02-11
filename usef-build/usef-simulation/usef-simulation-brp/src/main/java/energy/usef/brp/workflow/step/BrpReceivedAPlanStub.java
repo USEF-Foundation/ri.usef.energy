@@ -16,7 +16,8 @@
 
 package energy.usef.brp.workflow.step;
 
-import energy.usef.brp.workflow.plan.connection.forecast.ReceivedAPlanWorkflowParameter;
+import energy.usef.brp.workflow.plan.connection.forecast.ReceivedAPlanWorkflowParameter.IN;
+import energy.usef.brp.workflow.plan.connection.forecast.ReceivedAPlanWorkflowParameter.OUT;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.WorkflowStep;
 import energy.usef.core.workflow.dto.PrognosisDto;
@@ -59,8 +60,8 @@ public class BrpReceivedAPlanStub implements WorkflowStep {
         List<PrognosisDto> processedAPlans = new ArrayList<>();
 
         @SuppressWarnings("unchecked")
-        List<PrognosisDto> aPlanDtos = (List<PrognosisDto>) context.getValue(ReceivedAPlanWorkflowParameter.IN.A_PLAN_DTO_LIST.name());
-        List<PrognosisDto> receivedAplanDtos = (List<PrognosisDto>) context.getValue(ReceivedAPlanWorkflowParameter.IN.RECEIVED_A_PLAN_DTO_LIST.name());
+        List<PrognosisDto> aPlanDtos = (List<PrognosisDto>) context.getValue(IN.A_PLAN_DTO_LIST.name());
+        List<PrognosisDto> receivedAplanDtos = (List<PrognosisDto>) context.getValue(IN.RECEIVED_A_PLAN_DTO_LIST.name());
         LOGGER.debug("Input: [{}] A-Plans (with RECEIVED status)", receivedAplanDtos.size());
 
         //create countMap
@@ -77,8 +78,8 @@ public class BrpReceivedAPlanStub implements WorkflowStep {
             }
 
         });
-        context.setValue(ReceivedAPlanWorkflowParameter.OUT.ACCEPTED_A_PLAN_DTO_LIST.name(), acceptedAPlans);
-        context.setValue(ReceivedAPlanWorkflowParameter.OUT.PROCESSED_A_PLAN_DTO_LIST.name(), processedAPlans);
+        context.setValue(OUT.ACCEPTED_A_PLAN_DTO_LIST.name(), acceptedAPlans);
+        context.setValue(OUT.PROCESSED_A_PLAN_DTO_LIST.name(), processedAPlans);
 
         LOGGER.debug("Output: Accepted [{}] A-Plans (status will be changed to ACCEPTED)", acceptedAPlans.size());
         LOGGER.debug("Output: Process [{}] A-Plans (status will be changed to PROCESSED)", processedAPlans.size());

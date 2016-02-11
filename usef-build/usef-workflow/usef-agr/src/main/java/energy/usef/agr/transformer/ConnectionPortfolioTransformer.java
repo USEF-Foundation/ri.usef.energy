@@ -49,7 +49,7 @@ public class ConnectionPortfolioTransformer {
      * objects.
      *
      *
-     * @param activeConnections
+     * @param activeConnections {@link List} of active {@link Connection}'s.
      * @param connectionPowerContainers {@link Map} of {@link PowerContainer} per {@link Connection}.
      * @param udisPerConnection {@link List} of {@link Udi} per {@link Connection}.
      * @param udiPowerContainers power containers at UDI level.
@@ -60,7 +60,7 @@ public class ConnectionPortfolioTransformer {
             Map<Connection, List<Udi>> udisPerConnection, Map<Udi, List<PowerContainer>> udiPowerContainers) {
         List<ConnectionPortfolioDto> results = new ArrayList<>();
         //map connections
-        activeConnections.forEach((c) -> {
+        activeConnections.forEach(c -> {
             ConnectionPortfolioDto connectionPortfolioDTO = new ConnectionPortfolioDto(c.getEntityAddress());
             results.add(connectionPortfolioDTO);
             List<PowerContainer> powerContainers = connectionPowerContainers.getOrDefault(c, new ArrayList<>());

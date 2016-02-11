@@ -20,6 +20,22 @@ import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_H
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 import static energy.usef.core.data.xml.bean.message.MessagePrecedence.TRANSACTIONAL;
 
+import java.util.Comparator;
+import java.util.List;
+
+import javax.ejb.Asynchronous;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
+import javax.ejb.Stateless;
+import javax.enterprise.event.Observes;
+import javax.enterprise.event.TransactionPhase;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+
+import org.joda.time.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.FlexRequest;
@@ -44,22 +60,6 @@ import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 import energy.usef.dso.workflow.DsoWorkflowStep;
 import energy.usef.dso.workflow.dto.GridSafetyAnalysisDto;
 import energy.usef.dso.workflow.transformer.GridSafetyAnalysisDtoTransformer;
-
-import java.util.Comparator;
-import java.util.List;
-
-import javax.ejb.Asynchronous;
-import javax.ejb.Lock;
-import javax.ejb.LockType;
-import javax.ejb.Stateless;
-import javax.enterprise.event.Observes;
-import javax.enterprise.event.TransactionPhase;
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-
-import org.joda.time.Period;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Coordinator class for the 'Create Flex Request' workflow.
@@ -87,7 +87,7 @@ public class DsoCreateFlexRequestCoordinator {
     @Inject
     private WorkflowStepExecuter workflowStubLoader;
 
-        @Inject
+    @Inject
     private JMSHelperService jmsHelperService;
 
     @Inject

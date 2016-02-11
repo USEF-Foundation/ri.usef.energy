@@ -23,9 +23,9 @@ import energy.usef.agr.dto.device.capability.ReduceCapabilityDto;
 import energy.usef.agr.dto.device.capability.UdiEventDto;
 import energy.usef.agr.dto.device.request.ConsumptionProductionTypeDto;
 import energy.usef.agr.dto.device.request.DeviceMessageDto;
-import energy.usef.agr.dto.device.request.ReduceRequestDto;
 import energy.usef.agr.util.PowerContainerDtoUtil;
 import energy.usef.agr.workflow.operate.reoptimize.ReOptimizePortfolioStepParameter;
+import energy.usef.agr.workflow.operate.reoptimize.ReOptimizePortfolioStepParameter.IN;
 import energy.usef.core.util.DateTimeUtil;
 import energy.usef.core.util.PtuUtil;
 import energy.usef.core.workflow.DefaultWorkflowContext;
@@ -36,10 +36,10 @@ import energy.usef.core.workflow.dto.PrognosisDto;
 import energy.usef.core.workflow.dto.PtuFlexOrderDto;
 import energy.usef.core.workflow.dto.PtuPrognosisDto;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,11 +49,14 @@ import java.util.stream.IntStream;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Test class in charge of the unit tests related to the {@link AgrReOptimizePortfolioStub} class.
  */
 public class AgrReOptimizePortfolioStubTest {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AgrReOptimizePortfolioStubTest.class);
     private final static int NR_OF_PTUS = 12;
 
     private AgrReOptimizePortfolioStub stub;
@@ -64,47 +67,74 @@ public class AgrReOptimizePortfolioStubTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
-    public void testInvoke() throws Exception {
-        WorkflowContext inContext = buildContext();
+    public void testInvokeWithEmptyPrognosis() throws Exception {
+        testInvoke(false);
+    }
 
-        List<PrognosisDto> prognosis = inContext.get(ReOptimizePortfolioStepParameter.IN.LATEST_D_PROGNOSIS_DTO_LIST.name(), List.class);
-        Map<Integer, BigInteger> prognosisPerPtu = prognosis.get(0).getPtus().stream()
-                .collect(Collectors.toMap(ptuPrognosisDto -> ptuPrognosisDto.getPtuIndex().intValue(), PtuPrognosisDto::getPower));
+    @Test
+    public void testInvokeWithPrognosis() throws Exception {
+        testInvoke(true);
+    }
+
+    @SuppressWarnings("unchecked")
+    private void testInvoke(boolean prognosisAvailable) throws Exception {
+        WorkflowContext inContext = buildContext(prognosisAvailable);
+
+        List<PrognosisDto> prognosis = inContext.get(IN.LATEST_D_PROGNOSIS_DTO_LIST.name(), List.class);
+
+        Map<Integer, BigInteger> prognosisPerPtu;
+        if (prognosisAvailable) {
+            prognosisPerPtu = prognosis.get(0).getPtus().stream().collect(
+                    Collectors.toMap(ptuPrognosisDto -> ptuPrognosisDto.getPtuIndex().intValue(), PtuPrognosisDto::getPower));
+        } else {
+            prognosisPerPtu = new HashMap<>();
+            for (int ptuIndex = 1; ptuIndex <= 12; ptuIndex++) {
+                prognosisPerPtu.put(ptuIndex, BigInteger.ZERO);
+            }
+        }
 
         // calculate total power per ptu in forecast before re-optimize
         Map<Integer, BigInteger> summedPowerBeforeReOptimize = new HashMap<>();
         for (ConnectionPortfolioDto connectionDto : (List<ConnectionPortfolioDto>) inContext
-                .getValue(ReOptimizePortfolioStepParameter.IN.CONNECTION_PORTFOLIO_IN.name())) {
+                .getValue(IN.CONNECTION_PORTFOLIO_IN.name())) {
             for (int ptuIndex = 1; ptuIndex <= NR_OF_PTUS; ptuIndex++) {
-                if (summedPowerBeforeReOptimize.get(ptuIndex) == null) {
-                    summedPowerBeforeReOptimize.put(ptuIndex, BigInteger.ZERO);
-                }
-
-                summedPowerBeforeReOptimize.put(ptuIndex, summedPowerBeforeReOptimize.get(ptuIndex).add(PowerContainerDtoUtil
+                Map<Integer, PowerContainerDto> powerContainerPerPtu = PowerContainerDtoUtil
                         .sumUdisPerPtu(connectionDto.getUdis(), 120,
-                                PtuUtil.getNumberOfPtusPerDay(DateTimeUtil.getCurrentDate().plusDays(1), 120)).get(ptuIndex)
-                        .getForecast()
-                        .getAverageConsumption()));
+                                PtuUtil.getNumberOfPtusPerDay(DateTimeUtil.getCurrentDate().plusDays(1), 120));
+
+                BigInteger forecastPower = powerContainerPerPtu.get(ptuIndex).getForecast().getAverageConsumption()
+                        .subtract(powerContainerPerPtu.get(ptuIndex).getForecast().getAverageProduction());
+
+                summedPowerBeforeReOptimize
+                        .put(ptuIndex, summedPowerBeforeReOptimize.getOrDefault(ptuIndex, BigInteger.ZERO).add(forecastPower));
             }
         }
 
         WorkflowContext result = stub.invoke(inContext);
 
-        Assert.assertEquals(inContext.get(ReOptimizePortfolioStepParameter.IN.CONNECTION_PORTFOLIO_IN.name(), List.class).size(),
+        if (prognosisAvailable) {
+            assertionsWithPrognosis(prognosisPerPtu, inContext, summedPowerBeforeReOptimize, result);
+        } else {
+            assertionsWithEmptyPrognosis(result);
+        }
+    }
+
+    private void assertionsWithEmptyPrognosis(WorkflowContext result) {
+        Assert.assertEquals(0, result.get(ReOptimizePortfolioStepParameter.OUT.CONNECTION_PORTFOLIO_OUT.name(), List.class).size());
+    }
+
+    private void assertionsWithPrognosis(Map<Integer, BigInteger> prognosisPerPtu, WorkflowContext inContext,
+            Map<Integer, BigInteger> summedPowerBeforeReOptimize, WorkflowContext result) {
+        Assert.assertEquals(inContext.get(IN.CONNECTION_PORTFOLIO_IN.name(), List.class).size(),
                 result.get(ReOptimizePortfolioStepParameter.OUT.CONNECTION_PORTFOLIO_OUT.name(), List.class).size());
 
         // sum all the flex power ordered
         Map<Integer, BigInteger> summedOrderedPower = new HashMap<>();
-        for (FlexOrderDto flexOrderDto : (List<FlexOrderDto>) inContext.getValue(ReOptimizePortfolioStepParameter.IN.RECEIVED_FLEXORDER_LIST.name())) {
+        for (FlexOrderDto flexOrderDto : (List<FlexOrderDto>) inContext.getValue(IN.RECEIVED_FLEXORDER_LIST.name())) {
             for (PtuFlexOrderDto ptuFlexOrderDto : flexOrderDto.getPtus()) {
                 int ptuIndex = ptuFlexOrderDto.getPtuIndex().intValue();
-
-                if (summedOrderedPower.get(ptuIndex) == null) {
-                    summedOrderedPower.put(ptuIndex, BigInteger.ZERO);
-                }
-
-                summedOrderedPower.put(ptuIndex, summedOrderedPower.get(ptuIndex).add(ptuFlexOrderDto.getPower()));
+                summedOrderedPower
+                        .put(ptuIndex, summedOrderedPower.getOrDefault(ptuIndex, BigInteger.ZERO).add(ptuFlexOrderDto.getPower()));
             }
         }
 
@@ -113,77 +143,86 @@ public class AgrReOptimizePortfolioStubTest {
         for (ConnectionPortfolioDto connectionDto : (List<ConnectionPortfolioDto>) result
                 .getValue(ReOptimizePortfolioStepParameter.OUT.CONNECTION_PORTFOLIO_OUT.name())) {
             for (int ptuIndex = 1; ptuIndex <= NR_OF_PTUS; ptuIndex++) {
-                if (summedPowerAfterReOptimize.get(ptuIndex) == null) {
-                    summedPowerAfterReOptimize.put(ptuIndex, BigInteger.ZERO);
-                }
-
-                summedPowerAfterReOptimize.put(ptuIndex, summedPowerAfterReOptimize.get(ptuIndex).add(PowerContainerDtoUtil
+                Map<Integer, PowerContainerDto> powerContainerPerPtu = PowerContainerDtoUtil
                         .sumUdisPerPtu(connectionDto.getUdis(), 120,
-                                PtuUtil.getNumberOfPtusPerDay(DateTimeUtil.getCurrentDate().plusDays(1), 120)).get(ptuIndex)
-                        .getForecast()
-                        .getAverageConsumption()));
+                                PtuUtil.getNumberOfPtusPerDay(DateTimeUtil.getCurrentDate().plusDays(1), 120));
+
+                BigInteger forecastPower = powerContainerPerPtu.get(ptuIndex).getForecast().getAverageConsumption()
+                        .subtract(powerContainerPerPtu.get(ptuIndex).getForecast().getAverageProduction());
+
+                summedPowerAfterReOptimize
+                        .put(ptuIndex, summedPowerAfterReOptimize.getOrDefault(ptuIndex, BigInteger.ZERO).add(forecastPower));
             }
         }
+
+        // ptu index 1, 2 and 7 are capped, so all available potential flex will be used for these ptu's
+        Integer[] expectedForecast = { -41, 97, 200, 300, 400, 740, 454, 700, 1235, 1400, 1565, 1730 };
 
         // Assert that the ordered power is divided amongst all the connections
         // summedPowerAfterReOptimize = Ordered + prognosis
-        int targetLessThanZero = 0;
         for (int ptuIndex = 1; ptuIndex <= NR_OF_PTUS; ptuIndex++) {
-            // Due to rounding issues, the result may slightly deviate (max deviation = 5 due to 5 connections used in this unit test).
-            // Since we only reduce consumption, forecast is only changed for targets > 0
-            BigInteger target = prognosisPerPtu.get(ptuIndex)
-                    .add(summedOrderedPower.get(ptuIndex).subtract(summedPowerBeforeReOptimize.get(ptuIndex)));
-            if (target.compareTo(BigInteger.ZERO) < 0) {
-                targetLessThanZero++;
-                int diff = summedPowerAfterReOptimize.get(ptuIndex)
-                        .subtract(summedOrderedPower.get(ptuIndex).add(prognosisPerPtu.get(ptuIndex))).intValue();
-                Assert.assertTrue("Forecast power consumption after re-optimize for ptu index " + ptuIndex + " is incorrect",
-                        diff >= -5 && diff <= 5);
-            } else {
-                Assert.assertEquals("Forecast power consumption shouldn't be changed for target > 0 for ptu index " + ptuIndex,
-                        summedPowerBeforeReOptimize.get(ptuIndex), summedPowerAfterReOptimize.get(ptuIndex));
-            }
-        }
+            // Due to rounding issues, the result may slightly deviate (max deviation = 5 due to 5 connections used in this unit
+            // test).
 
-        // Assert that there is at least one ptu targeted < 0
-        Assert.assertTrue("There is no target < 0, this makes this unit test useless", targetLessThanZero > 0);
+            int diff = summedPowerAfterReOptimize.get(ptuIndex).subtract(BigInteger.valueOf(expectedForecast[ptuIndex - 1]))
+                    .intValue();
+            Assert.assertTrue("Forecast power consumption after re-optimize for ptu index " + ptuIndex + " is expected to be "
+                            + expectedForecast[ptuIndex - 1] + " (is " + summedPowerAfterReOptimize.get(ptuIndex) + ")",
+                        diff >= -5 && diff <= 5);
+        }
 
         // check returned device messages
         List<DeviceMessageDto> deviceMessageDtos = result
                 .get(ReOptimizePortfolioStepParameter.OUT.DEVICE_MESSAGES_OUT.name(), List.class);
         Assert.assertNotNull(deviceMessageDtos);
 
-        // Assert that there is a reduce request for dtu 3 for udi with endpoint 1 with power value -10
-        List<ReduceRequestDto> endpoint1ReduceRequestsForDtu3 = deviceMessageDtos.stream()
-                .filter(deviceMessageDto -> deviceMessageDto.getEndpoint().equals("endpoint:1"))
-                .map(deviceMessageDto1 -> deviceMessageDto1.getReduceRequestDtos()).flatMap(Collection::stream)
-                .filter(reduceRequestDto -> reduceRequestDto.getStartDTU().equals(BigInteger.valueOf(3)))
-                .collect(Collectors.toList());
-        Assert.assertEquals(BigInteger.valueOf(-10), endpoint1ReduceRequestsForDtu3.get(0).getPower());
-        Assert.assertEquals(BigInteger.valueOf(4), endpoint1ReduceRequestsForDtu3.get(0).getEndDTU());
+        Map<Integer, BigInteger> targetPerPtu = new HashMap<>();
+        for (int ptuIndex = 1; ptuIndex <= NR_OF_PTUS; ptuIndex++) {
+            BigInteger target = prognosisPerPtu.get(ptuIndex).add(summedOrderedPower.get(ptuIndex))
+                    .subtract(summedPowerBeforeReOptimize.get(ptuIndex));
+            target = new BigDecimal(target).multiply(BigDecimal.valueOf(1.05)).toBigInteger();
+            targetPerPtu.put(ptuIndex, target);
+        }
 
-        // Assert that there is a reduce request for dtu 3 for udi with endpoint 2 with power value -20
-        List<ReduceRequestDto> endpoint2ReduceRequestsForDtu3 = deviceMessageDtos.stream()
-                .filter(deviceMessageDto -> deviceMessageDto.getEndpoint().equals("endpoint:2"))
-                .map(deviceMessageDto1 -> deviceMessageDto1.getReduceRequestDtos()).flatMap(Collection::stream)
-                .filter(reduceRequestDto -> reduceRequestDto.getStartDTU().equals(BigInteger.valueOf(3)))
-                .collect(Collectors.toList());
-        Assert.assertEquals(BigInteger.valueOf(-20), endpoint2ReduceRequestsForDtu3.get(0).getPower());
-        Assert.assertEquals(BigInteger.valueOf(4), endpoint2ReduceRequestsForDtu3.get(0).getEndDTU());
+        // sum all the reduced power per ptu
+        Map<Integer, BigInteger> summedReducedPowerPerPtu = new HashMap<>();
+        deviceMessageDtos.forEach(deviceMessageDto -> deviceMessageDto.getReduceRequestDtos().forEach(reduceRequestDto -> {
+            int ptuIndex = reduceRequestDto.getEndDTU().divide(BigInteger.valueOf(2)).intValue();
+            summedReducedPowerPerPtu.put(ptuIndex,
+                    summedReducedPowerPerPtu.getOrDefault(ptuIndex, BigInteger.ZERO).add(reduceRequestDto.getPower()));
+            Assert.assertTrue("ReduceRequest should have type PRODUCTION for target > 0 and CONSUMPTION for target < 0",
+                    (targetPerPtu.get(ptuIndex).compareTo(BigInteger.ZERO) < 0) ?
+                            reduceRequestDto.getConsumptionProductionType() == ConsumptionProductionTypeDto.CONSUMPTION :
+                            reduceRequestDto.getConsumptionProductionType() == ConsumptionProductionTypeDto.PRODUCTION);
+        }));
+
+        // make sure the device requests reduced enough power
+        summedReducedPowerPerPtu.forEach((ptuIndex, reducedPower) -> {
+            LOGGER.debug("ptu index {}: {} (target {})", ptuIndex, reducedPower, targetPerPtu.get(ptuIndex));
+            Assert.assertTrue("Summed reduced powers in request (" + reducedPower + ") should be more or equal to the target (" +
+                            targetPerPtu.get(ptuIndex) + "), or maximum 300",
+                    reducedPower.abs().compareTo(targetPerPtu.get(ptuIndex)) >= 0 || reducedPower.abs()
+                            .equals(BigInteger.valueOf(300)));
+        });
     }
 
-    private WorkflowContext buildContext() {
+    private WorkflowContext buildContext(boolean prognosisAvailable) {
         WorkflowContext context = new DefaultWorkflowContext();
 
-        context.setValue(ReOptimizePortfolioStepParameter.IN.PTU_DURATION.name(), (24 * 60) / NR_OF_PTUS);
-        context.setValue(ReOptimizePortfolioStepParameter.IN.PTU_DATE.name(), DateTimeUtil.getCurrentDate().plusDays(1));
-        context.setValue(ReOptimizePortfolioStepParameter.IN.CURRENT_PTU_INDEX.name(), 1);
-        context.setValue(ReOptimizePortfolioStepParameter.IN.CONNECTION_PORTFOLIO_IN.name(), buildPortfolio());
-        context.setValue(ReOptimizePortfolioStepParameter.IN.UDI_EVENTS.name(), buildUdiEvents());
-        context.setValue(ReOptimizePortfolioStepParameter.IN.CONNECTION_GROUPS_TO_CONNECTIONS_MAP.name(), buildMap());
-        context.setValue(ReOptimizePortfolioStepParameter.IN.RECEIVED_FLEXORDER_LIST.name(), buildOrders());
-        context.setValue(ReOptimizePortfolioStepParameter.IN.LATEST_A_PLAN_DTO_LIST.name(), buildAPlans());
-        context.setValue(ReOptimizePortfolioStepParameter.IN.LATEST_D_PROGNOSIS_DTO_LIST.name(), buildDPrognosis());
+        context.setValue(IN.PTU_DURATION.name(), (24 * 60) / NR_OF_PTUS);
+        context.setValue(IN.PTU_DATE.name(), DateTimeUtil.getCurrentDate().plusDays(1));
+        context.setValue(IN.CURRENT_PTU_INDEX.name(), 1);
+        context.setValue(IN.CONNECTION_PORTFOLIO_IN.name(), buildPortfolio());
+        context.setValue(IN.UDI_EVENTS.name(), buildUdiEvents());
+        context.setValue(IN.CONNECTION_GROUPS_TO_CONNECTIONS_MAP.name(), buildMap());
+        context.setValue(IN.RECEIVED_FLEXORDER_LIST.name(), buildOrders());
+        if (prognosisAvailable) {
+            context.setValue(IN.LATEST_A_PLAN_DTO_LIST.name(), buildAPlans());
+            context.setValue(IN.LATEST_D_PROGNOSIS_DTO_LIST.name(), buildDPrognosis());
+        } else {
+            context.setValue(IN.LATEST_A_PLAN_DTO_LIST.name(), new ArrayList<>());
+            context.setValue(IN.LATEST_D_PROGNOSIS_DTO_LIST.name(), new ArrayList<>());
+        }
 
         return context;
     }
@@ -202,11 +241,18 @@ public class AgrReOptimizePortfolioStubTest {
 
             // create a reduce capability of type CONSUMPTION
             ReduceCapabilityDto deviceCapability = new ReduceCapabilityDto();
-            deviceCapability.setPowerStep(BigInteger.valueOf(count * 10).negate());
-            deviceCapability.setMinPower(deviceCapability.getPowerStep().multiply(BigInteger.valueOf(count)));
+            deviceCapability.setPowerStep(BigInteger.valueOf(10).negate());
+            deviceCapability.setMinPower(deviceCapability.getPowerStep().multiply(BigInteger.valueOf(count * 2)));
             deviceCapability.setConsumptionProductionType(ConsumptionProductionTypeDto.CONSUMPTION);
-
             udiEvent.getDeviceCapabilities().add(deviceCapability);
+
+            // create a reduce capability of type PRODUCTION
+            deviceCapability = new ReduceCapabilityDto();
+            deviceCapability.setPowerStep(BigInteger.valueOf(10).negate());
+            deviceCapability.setMinPower(deviceCapability.getPowerStep().multiply(BigInteger.valueOf(count * 2)));
+            deviceCapability.setConsumptionProductionType(ConsumptionProductionTypeDto.PRODUCTION);
+            udiEvent.getDeviceCapabilities().add(deviceCapability);
+
             udiEvents.add(udiEvent);
         }
 
@@ -253,7 +299,7 @@ public class AgrReOptimizePortfolioStubTest {
     }
 
     private List<PtuFlexOrderDto> buildPtus() {
-        Integer[] orderedPower = { -195, -300, -400, -500, -600, -100, -200, -300, -400, -500, 100, 100 };
+        Integer[] orderedPower = { -195, -300, -400, -500, -600, -100, -1200, -900, -400, -500, 100, 100 };
 
         List<PtuFlexOrderDto> ptuFlexOrderDtos = new ArrayList<>();
 
@@ -294,13 +340,16 @@ public class AgrReOptimizePortfolioStubTest {
 
                 if (consumption.compareTo(BigInteger.ZERO) < 0) {
                     powerContainerDto.getForecast().setAverageConsumption(BigInteger.ZERO);
-                    powerContainerDto.getForecast().setAverageProduction(BigInteger.ZERO);
+                    powerContainerDto.getForecast().setAverageProduction(consumption.abs());
                 } else {
                     powerContainerDto.getForecast().setAverageConsumption(consumption);
                     powerContainerDto.getForecast().setAverageProduction(BigInteger.ZERO);
                 }
-                powerContainerDto.getForecast().setPotentialFlexConsumption(powerContainerDto.getForecast().
-                        getAverageConsumption().negate());
+
+                powerContainerDto.getForecast().setPotentialFlexConsumption(
+                        powerContainerDto.getForecast().getAverageConsumption().divide(BigInteger.valueOf(2)).negate());
+                powerContainerDto.getForecast().setPotentialFlexProduction(
+                        powerContainerDto.getForecast().getAverageProduction().divide(BigInteger.valueOf(2)).negate());
 
                 udiPortfolio1.getUdiPowerPerDTU().put(dtuIndex, powerContainerDto);
             });

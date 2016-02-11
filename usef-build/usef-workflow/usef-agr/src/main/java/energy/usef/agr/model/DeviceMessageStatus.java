@@ -15,6 +15,7 @@
  */
 
 package energy.usef.agr.model;
+
 /**
  * Enumeration of the various statuses possible for a {@link DeviceMessage} entity.
  */

@@ -16,13 +16,14 @@
 
 package energy.usef.agr.workflow.operate.control.ads;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_CONTROL_ACTIVE_DEMAND_SUPPLY;
+
 import energy.usef.agr.config.ConfigAgr;
 import energy.usef.agr.config.ConfigAgrParam;
 import energy.usef.agr.dto.device.request.DeviceMessageDto;
 import energy.usef.agr.model.DeviceMessage;
 import energy.usef.agr.model.DeviceMessageStatus;
 import energy.usef.agr.service.business.AgrPortfolioBusinessService;
-import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.model.BrpConnectionGroup;
@@ -102,13 +103,13 @@ public class AgrControlActiveDemandSupplyCoordinatorTest {
     public void testInvokeWithSuccessResult() {
         ArgumentCaptor<WorkflowContext> contextCaptor = ArgumentCaptor.forClass(WorkflowContext.class);
         ArgumentCaptor<DeviceMessageStatus> statusCaptor = ArgumentCaptor.forClass(DeviceMessageStatus.class);
-        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AgrWorkflowStep.AGR_CONTROL_ACTIVE_DEMAND_SUPPLY.name()),
+        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AGR_CONTROL_ACTIVE_DEMAND_SUPPLY.name()),
                 contextCaptor.capture())).thenReturn(buildResultContext(null));
 
         coordinator.controlActiveDemandSupply(new ControlActiveDemandSupplyEvent());
 
         Mockito.verify(workflowStepExecuter, Mockito.times(1)).invoke(
-                Mockito.eq(AgrWorkflowStep.AGR_CONTROL_ACTIVE_DEMAND_SUPPLY.name()),
+                Mockito.eq(AGR_CONTROL_ACTIVE_DEMAND_SUPPLY.name()),
                 contextCaptor.capture());
 
         // verify that we updated the status of the Device Message twice with the right values.
@@ -124,11 +125,11 @@ public class AgrControlActiveDemandSupplyCoordinatorTest {
     @Test
     public void testInvokeWithFailureResult() {
         ArgumentCaptor<DeviceMessageStatus> statusCaptor = ArgumentCaptor.forClass(DeviceMessageStatus.class);
-        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AgrWorkflowStep.AGR_CONTROL_ACTIVE_DEMAND_SUPPLY.name()),
+        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AGR_CONTROL_ACTIVE_DEMAND_SUPPLY.name()),
                 Mockito.any())).thenReturn(buildResultContext(new DeviceMessageDto()));
         coordinator.controlActiveDemandSupply(new ControlActiveDemandSupplyEvent());
         Mockito.verify(workflowStepExecuter, Mockito.times(1)).invoke(
-                Mockito.eq(AgrWorkflowStep.AGR_CONTROL_ACTIVE_DEMAND_SUPPLY.name()),
+                Mockito.eq(AGR_CONTROL_ACTIVE_DEMAND_SUPPLY.name()),
                 Mockito.any());
 
         // verify that we updated the status of the Device Message twice with the right values.

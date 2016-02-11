@@ -16,12 +16,13 @@
 
 package energy.usef.agr.service.business;
 
+import static energy.usef.agr.model.SynchronisationConnectionStatusType.MODIFIED;
+
 import energy.usef.agr.model.CommonReferenceOperator;
 import energy.usef.agr.model.SynchronisationConnection;
 import energy.usef.agr.repository.CommonReferenceOperatorRepository;
 import energy.usef.agr.repository.SynchronisationConnectionRepository;
 import energy.usef.agr.repository.SynchronisationConnectionStatusRepository;
-import energy.usef.agr.model.SynchronisationConnectionStatusType;
 import energy.usef.core.model.AcknowledgementStatus;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
@@ -171,8 +172,7 @@ public class AgrPlanboardBusinessService {
      * Clean's the synchronization table's if synchronization is complete.
      */
     public void cleanSynchronization() {
-        long count = synchronisationConnectionStatusRepository.countSynchronisationConnectionStatusWithStatus(
-                SynchronisationConnectionStatusType.MODIFIED);
+        long count = synchronisationConnectionStatusRepository.countSynchronisationConnectionStatusWithStatus(MODIFIED);
         if (count == 0L) {
             // everything is synchronized, time to remove everything.
             synchronisationConnectionStatusRepository.deleteAll();

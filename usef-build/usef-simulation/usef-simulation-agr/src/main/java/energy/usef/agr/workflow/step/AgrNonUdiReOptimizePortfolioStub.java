@@ -16,15 +16,7 @@
 
 package energy.usef.agr.workflow.step;
 
-import energy.usef.agr.dto.ConnectionGroupPortfolioDto;
-import energy.usef.agr.dto.ConnectionPortfolioDto;
-import energy.usef.agr.dto.ForecastPowerDataDto;
-import energy.usef.agr.workflow.operate.reoptimize.ReOptimizePortfolioStepParameter;
-import energy.usef.core.util.DateTimeUtil;
-import energy.usef.core.workflow.WorkflowContext;
-import energy.usef.core.workflow.WorkflowStep;
-import energy.usef.core.workflow.dto.FlexOrderDto;
-import energy.usef.core.workflow.dto.PrognosisDto;
+import static energy.usef.agr.workflow.step.AgrReOptimizePortfolioStubUtil.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -36,6 +28,17 @@ import java.util.Map;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import energy.usef.agr.dto.ConnectionGroupPortfolioDto;
+import energy.usef.agr.dto.ConnectionPortfolioDto;
+import energy.usef.agr.dto.ForecastPowerDataDto;
+import energy.usef.agr.workflow.operate.reoptimize.ReOptimizePortfolioStepParameter.IN;
+import energy.usef.agr.workflow.operate.reoptimize.ReOptimizePortfolioStepParameter.OUT_NON_UDI;
+import energy.usef.core.util.DateTimeUtil;
+import energy.usef.core.workflow.WorkflowContext;
+import energy.usef.core.workflow.WorkflowStep;
+import energy.usef.core.workflow.dto.FlexOrderDto;
+import energy.usef.core.workflow.dto.PrognosisDto;
 
 /**
  * A simple implementation of a workflow step to simulation the behavior of an Aggregator Re-optimize portfolio for non-udi
@@ -71,15 +74,15 @@ public class AgrNonUdiReOptimizePortfolioStub implements WorkflowStep {
     public WorkflowContext invoke(WorkflowContext context) {
 
         // Getting input parameters
-        int ptuDuration = (int) context.getValue(ReOptimizePortfolioStepParameter.IN.PTU_DURATION.name());
-        int currentPtuIndex = (int) context.getValue(ReOptimizePortfolioStepParameter.IN.CURRENT_PTU_INDEX.name());
-        LocalDate period = (LocalDate) context.getValue(ReOptimizePortfolioStepParameter.IN.PTU_DATE.name());
-        List<ConnectionPortfolioDto> connectionPortfolio = context.get(ReOptimizePortfolioStepParameter.IN.CONNECTION_PORTFOLIO_IN.name(), List.class);
-        Map<String, List<String>> connectionGroupsToConnectionMap = context.get(ReOptimizePortfolioStepParameter.IN.CONNECTION_GROUPS_TO_CONNECTIONS_MAP.name(),
+        int ptuDuration = (int) context.getValue(IN.PTU_DURATION.name());
+        int currentPtuIndex = (int) context.getValue(IN.CURRENT_PTU_INDEX.name());
+        LocalDate period = (LocalDate) context.getValue(IN.PTU_DATE.name());
+        List<ConnectionPortfolioDto> connectionPortfolio = context.get(IN.CONNECTION_PORTFOLIO_IN.name(), List.class);
+        Map<String, List<String>> connectionGroupsToConnectionMap = context.get(IN.CONNECTION_GROUPS_TO_CONNECTIONS_MAP.name(),
                 HashMap.class);
-        List<FlexOrderDto> flexOrders = context.get(ReOptimizePortfolioStepParameter.IN.RECEIVED_FLEXORDER_LIST.name(), List.class);
-        List<PrognosisDto> dPrognosis = context.get(ReOptimizePortfolioStepParameter.IN.LATEST_D_PROGNOSIS_DTO_LIST.name(), List.class);
-        List<PrognosisDto> aPlans = context.get(ReOptimizePortfolioStepParameter.IN.LATEST_A_PLAN_DTO_LIST.name(), List.class);
+        List<FlexOrderDto> flexOrders = context.get(IN.RECEIVED_FLEXORDER_LIST.name(), List.class);
+        List<PrognosisDto> dPrognosis = context.get(IN.LATEST_D_PROGNOSIS_DTO_LIST.name(), List.class);
+        List<PrognosisDto> aPlans = context.get(IN.LATEST_A_PLAN_DTO_LIST.name(), List.class);
 
         LOGGER.info("Aggregator Re-optimize portfolio Stub started with {} connections in the portfolio.",
                 connectionPortfolio.size());
@@ -92,34 +95,30 @@ public class AgrNonUdiReOptimizePortfolioStub implements WorkflowStep {
         LocalDate currentDate = DateTimeUtil.getCurrentDate();
 
         // Do some mapping, summing and calculation for quick access later in the process
-        Map<String, List<ConnectionPortfolioDto>> connectionPortfolioPerConnectionGroup = AgrReOptimizePortfolioStubUtil
-                .mapConnectionPortfolioPerConnectionGroup(
+        Map<String, List<ConnectionPortfolioDto>> connectionPortfolioPerConnectionGroup = mapConnectionPortfolioPerConnectionGroup(
                 connectionPortfolio, connectionGroupsToConnectionMap);
-        Map<String, Map<Integer, BigInteger>> prognosisPowerPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
-                .mapPrognosisPowerPerPtuPerConnectionGroup(
+        Map<String, Map<Integer, BigInteger>> prognosisPowerPerPtuPerConnectionGroup = mapPrognosisPowerPerPtuPerConnectionGroup(
                 aPlans, dPrognosis);
-        Map<String, Map<Integer, BigInteger>> orderedPowerPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
-                .sumOrderedPowerPerPtuPerConnectionGroup(
+        Map<String, Map<Integer, BigInteger>> orderedPowerPerPtuPerConnectionGroup = sumOrderedPowerPerPtuPerConnectionGroup(
                 flexOrders);
-        Map<String, Map<Integer, BigInteger>> forecastPowerPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
-                .sumForecastPowerPerPtuPerConnectionGroup(
+        Map<String, Map<Integer, BigInteger>> forecastPowerPerPtuPerConnectionGroup = sumForecastPowerPerPtuPerConnectionGroup(
                 connectionPortfolioPerConnectionGroup, period, ptuDuration);
-        Map<String, Map<Integer, BigInteger>> targetPowerPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
-                .fetchTargetPowerPerPtuPerConnectionGroup(
+        Map<String, Map<Integer, BigInteger>> targetPowerPerPtuPerConnectionGroup = fetchTargetPowerPerPtuPerConnectionGroup(
                 prognosisPowerPerPtuPerConnectionGroup, orderedPowerPerPtuPerConnectionGroup,
                 forecastPowerPerPtuPerConnectionGroup);
-        Map<String, Map<Integer, BigInteger>> sumPotentialFlexPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
-                .sumPotentialFlexPerPtuPerConnectionGroup(
+        Map<String, Map<Integer, BigInteger>> sumPotentialFlexConsumptionPerPtuPerConnectionGroup = sumPotentialFlexConsumptionPerPtuPerConnectionGroup(
                 connectionPortfolioPerConnectionGroup, period, ptuDuration);
-        Map<String, Map<Integer, BigDecimal>> flexFactorPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
-                .fetchFlexFactorPerPtuPerConnectionGroup(
-                targetPowerPerPtuPerConnectionGroup, sumPotentialFlexPerPtuPerConnectionGroup);
+        Map<String, Map<Integer, BigInteger>> sumPotentialFlexProductionPerPtuPerConnectionGroup = sumPotentialFlexProductionPerPtuPerConnectionGroup(
+                connectionPortfolioPerConnectionGroup, period, ptuDuration);
+        Map<String, Map<Integer, BigDecimal>> flexFactorPerPtuPerConnectionGroup = fetchFlexFactorPerPtuPerConnectionGroup(
+                targetPowerPerPtuPerConnectionGroup, sumPotentialFlexConsumptionPerPtuPerConnectionGroup,
+                sumPotentialFlexProductionPerPtuPerConnectionGroup);
 
         // Calculate the new portfolio consumption forecast (consumption + potentialFlex * factor)
         calculatePortfolioForecast(connectionPortfolioPerConnectionGroup, flexFactorPerPtuPerConnectionGroup, period, currentDate,
                 currentPtuIndex);
 
-        context.setValue(ReOptimizePortfolioStepParameter.OUT_NON_UDI.CONNECTION_PORTFOLIO_OUT.name(), connectionPortfolio);
+        context.setValue(OUT_NON_UDI.CONNECTION_PORTFOLIO_OUT.name(), connectionPortfolio);
         return context;
     }
 
@@ -158,6 +157,13 @@ public class AgrNonUdiReOptimizePortfolioStub implements WorkflowStep {
                 newForecast = BigInteger.ZERO;
             }
             forecastPowerData.setAverageConsumption(newForecast);
+        } else if (factoredFlex.compareTo(BigInteger.ZERO) > 0) {
+            BigInteger newForecast = forecastPowerData.getAverageProduction().subtract(factoredFlex);
+            // production cannot be less than 0
+            if (newForecast.compareTo(BigInteger.ZERO) < 0) {
+                newForecast = BigInteger.ZERO;
+            }
+            forecastPowerData.setAverageProduction(newForecast);
         }
     }
 
@@ -165,11 +171,11 @@ public class AgrNonUdiReOptimizePortfolioStub implements WorkflowStep {
     private boolean validateInput(WorkflowContext context) {
         boolean validInput = true;
 
-        LocalDate ptuDate = context.get(ReOptimizePortfolioStepParameter.IN.PTU_DATE.name(), LocalDate.class);
-        List<ConnectionPortfolioDto> connectionPortfolio = context.get(ReOptimizePortfolioStepParameter.IN.CONNECTION_PORTFOLIO_IN.name(), List.class);
-        List<FlexOrderDto> flexOrders = context.get(ReOptimizePortfolioStepParameter.IN.RECEIVED_FLEXORDER_LIST.name(), List.class);
-        List<PrognosisDto> dPrognosis = context.get(ReOptimizePortfolioStepParameter.IN.LATEST_D_PROGNOSIS_DTO_LIST.name(), List.class);
-        List<PrognosisDto> aPlans = context.get(ReOptimizePortfolioStepParameter.IN.LATEST_A_PLAN_DTO_LIST.name(), List.class);
+        LocalDate ptuDate = context.get(IN.PTU_DATE.name(), LocalDate.class);
+        List<ConnectionPortfolioDto> connectionPortfolio = context.get(IN.CONNECTION_PORTFOLIO_IN.name(), List.class);
+        List<FlexOrderDto> flexOrders = context.get(IN.RECEIVED_FLEXORDER_LIST.name(), List.class);
+        List<PrognosisDto> dPrognosis = context.get(IN.LATEST_D_PROGNOSIS_DTO_LIST.name(), List.class);
+        List<PrognosisDto> aPlans = context.get(IN.LATEST_A_PLAN_DTO_LIST.name(), List.class);
 
         if (connectionPortfolio.isEmpty()) {
             validInput = false;
@@ -190,7 +196,7 @@ public class AgrNonUdiReOptimizePortfolioStub implements WorkflowStep {
     }
 
     private WorkflowContext returnDefaultContext(WorkflowContext context) {
-        context.setValue(ReOptimizePortfolioStepParameter.OUT_NON_UDI.CONNECTION_PORTFOLIO_OUT.name(), new ArrayList<ConnectionPortfolioDto>());
+        context.setValue(OUT_NON_UDI.CONNECTION_PORTFOLIO_OUT.name(), new ArrayList<ConnectionPortfolioDto>());
         LOGGER.info("Ended AgrReOptimizePortfolioStub workflow with empty return values");
         return context;
     }

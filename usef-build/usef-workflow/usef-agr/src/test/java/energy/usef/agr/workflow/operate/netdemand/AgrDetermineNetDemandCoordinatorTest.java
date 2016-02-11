@@ -16,6 +16,7 @@
 
 package energy.usef.agr.workflow.operate.netdemand;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_DETERMINE_NET_DEMANDS;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
@@ -27,7 +28,7 @@ import energy.usef.agr.dto.ConnectionPortfolioDto;
 import energy.usef.agr.dto.device.capability.UdiEventDto;
 import energy.usef.agr.service.business.AgrDeviceCapabilityBusinessService;
 import energy.usef.agr.service.business.AgrPortfolioBusinessService;
-import energy.usef.agr.workflow.AgrWorkflowStep;
+import energy.usef.agr.workflow.operate.netdemand.DetermineNetDemandStepParameter.OUT;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
@@ -51,7 +52,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -107,7 +107,7 @@ public class AgrDetermineNetDemandCoordinatorTest {
 
         ArgumentCaptor<WorkflowContext> workflowIn = ArgumentCaptor.forClass(WorkflowContext.class);
 
-        when(workflowStepExecuter.invoke(Matchers.eq(AgrWorkflowStep.AGR_DETERMINE_NET_DEMANDS.name()), any())).thenReturn(new DefaultWorkflowContext());
+        when(workflowStepExecuter.invoke(eq(AGR_DETERMINE_NET_DEMANDS.name()), any())).thenReturn(new DefaultWorkflowContext());
         try {
             coordinator.handleEvent(new DetermineNetDemandEvent());
             Assert.fail("Expecting Context Validation error ");
@@ -116,7 +116,7 @@ public class AgrDetermineNetDemandCoordinatorTest {
         }
 
         verify(agrPortfolioBusinessService, times(1)).findConnectionPortfolioDto(eq(PERIOD), eq(PERIOD.plusDays(1)));
-        verify(workflowStepExecuter, times(1)).invoke(Matchers.eq(AgrWorkflowStep.AGR_DETERMINE_NET_DEMANDS.name()), workflowIn.capture());
+        verify(workflowStepExecuter, times(1)).invoke(eq(AGR_DETERMINE_NET_DEMANDS.name()), workflowIn.capture());
     }
 
     @Test
@@ -129,15 +129,14 @@ public class AgrDetermineNetDemandCoordinatorTest {
 
         WorkflowContext outContext = new DefaultWorkflowContext();
 
-        outContext.setValue(DetermineNetDemandStepParameter.OUT.CONNECTION_PORTFOLIO_DTO_LIST.name(), connectionPortfolioPerDay.get(PERIOD));
-        outContext.setValue(
-                DetermineNetDemandStepParameter.OUT.UPDATED_UDI_EVENT_DTO_LIST.name(), Collections.singletonList(new UdiEventDto()));
-        when(workflowStepExecuter.invoke(Matchers.eq(AgrWorkflowStep.AGR_DETERMINE_NET_DEMANDS.name()), any())).thenReturn(outContext);
+        outContext.setValue(OUT.CONNECTION_PORTFOLIO_DTO_LIST.name(), connectionPortfolioPerDay.get(PERIOD));
+        outContext.setValue(OUT.UPDATED_UDI_EVENT_DTO_LIST.name(), Collections.singletonList(new UdiEventDto()));
+        when(workflowStepExecuter.invoke(eq(AGR_DETERMINE_NET_DEMANDS.name()), any())).thenReturn(outContext);
 
         coordinator.handleEvent(new DetermineNetDemandEvent());
 
         verify(agrPortfolioBusinessService, times(1)).findConnectionPortfolioDto(eq(PERIOD), eq(PERIOD.plusDays(1)));
-        verify(workflowStepExecuter, times(2)).invoke(Matchers.eq(AgrWorkflowStep.AGR_DETERMINE_NET_DEMANDS.name()), any());
+        verify(workflowStepExecuter, times(2)).invoke(eq(AGR_DETERMINE_NET_DEMANDS.name()), any());
         verify(agrPortfolioBusinessService, times(2)).updateConnectionPortfolio(any(LocalDate.class),
                 Mockito.anyListOf(ConnectionPortfolioDto.class));
         verify(agrDeviceCapabilityBusinessService, times(2)).updateUdiEvents(any(LocalDate.class),

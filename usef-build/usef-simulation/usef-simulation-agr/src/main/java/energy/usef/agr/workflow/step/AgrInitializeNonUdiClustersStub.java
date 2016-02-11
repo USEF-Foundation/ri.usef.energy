@@ -19,8 +19,8 @@ package energy.usef.agr.workflow.step;
 import energy.usef.agr.workflow.nonudi.dto.BalanceResponsiblePartyDto;
 import energy.usef.agr.workflow.nonudi.dto.CongestionPointDto;
 import energy.usef.agr.workflow.nonudi.dto.ConnectionDto;
-import energy.usef.agr.workflow.nonudi.initialize.AgrInitializeNonUdiClustersParameter.IN;
 import energy.usef.agr.workflow.nonudi.service.PowerMatcher;
+import energy.usef.agr.workflow.nonudi.initialize.AgrInitializeNonUdiClustersParameter;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.WorkflowStep;
 
@@ -64,9 +64,9 @@ public class AgrInitializeNonUdiClustersStub implements WorkflowStep {
     @Override
     public WorkflowContext invoke(WorkflowContext context) {
         // get the input parameters
-        LocalDate period = context.get(IN.PERIOD.name(), LocalDate.class);
-        Map<String, List<String>> brpConnectionListMap = context.get(IN.BRP_CONNECTION_LIST_MAP.name(), HashMap.class);
-        Map<String, List<String>> cpConnectionListMap = context.get(IN.CP_CONNECTION_LIST_MAP.name(), HashMap.class);
+        LocalDate period = context.get(AgrInitializeNonUdiClustersParameter.IN.PERIOD.name(), LocalDate.class);
+        Map<String, List<String>> brpConnectionListMap = context.get(AgrInitializeNonUdiClustersParameter.IN.BRP_CONNECTION_LIST_MAP.name(), HashMap.class);
+        Map<String, List<String>> cpConnectionListMap = context.get(AgrInitializeNonUdiClustersParameter.IN.CP_CONNECTION_LIST_MAP.name(), HashMap.class);
 
         //BRPs
         List<BalanceResponsiblePartyDto> powerMatcherBrpList = powerMatcher.findAllBalanceResponsibleParties();

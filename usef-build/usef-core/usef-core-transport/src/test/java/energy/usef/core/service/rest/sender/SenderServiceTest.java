@@ -16,6 +16,7 @@
 
 package energy.usef.core.service.rest.sender;
 
+import static energy.usef.core.util.ReflectionUtil.setFinalStatic;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -24,7 +25,7 @@ import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.participant.Participant;
 import energy.usef.core.data.participant.ParticipantRole;
 import energy.usef.core.data.participant.ParticipantType;
-
+import energy.usef.core.data.xml.bean.message.Message;
 import energy.usef.core.data.xml.bean.message.USEFRole;
 import energy.usef.core.exception.BusinessException;
 import energy.usef.core.exception.TechnicalException;
@@ -56,8 +57,6 @@ import org.slf4j.Logger;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
-
-import energy.usef.core.util.ReflectionUtil;
 
 /**
  * JUnit test for the SenderService class.
@@ -132,7 +131,7 @@ public class SenderServiceTest {
         Whitebox.setInternalState(senderService, "config", config);
 
         Mockito.when(
-                participantDiscoveryService.discoverParticipant(Matchers.any(energy.usef.core.data.xml.bean.message.Message.class), Matchers.any(ParticipantType.class)))
+                participantDiscoveryService.discoverParticipant(Matchers.any(Message.class), Matchers.any(ParticipantType.class)))
                 .thenReturn(buildParticipant());
 
         // message = (Message) XMLUtil.xmlToMessage(MSG);
@@ -146,12 +145,12 @@ public class SenderServiceTest {
     @Test
     public void testCreateOutMessageError() throws Exception {
         Mockito.when(messageService.storeMessage(Matchers.any(String.class),
-                Matchers.any(energy.usef.core.data.xml.bean.message.Message.class), Matchers.any(MessageDirection.class)))
+                Matchers.any(Message.class), Matchers.any(MessageDirection.class)))
                 .thenReturn(new energy.usef.core.model.Message());
 
         senderService.sendMessage(MSG);
 
-        verify(messageService).storeMessage(Matchers.anyString(), Matchers.any(energy.usef.core.data.xml.bean.message.Message.class),
+        verify(messageService).storeMessage(Matchers.anyString(), Matchers.any(Message.class),
                 Matchers.eq(MessageDirection.OUTBOUND));
     }
 
@@ -169,11 +168,11 @@ public class SenderServiceTest {
     public void testBypassTLSIsLogged() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException,
             SecurityException, BusinessException {
         Logger loggerMock = PowerMockito.mock(Logger.class);
-        ReflectionUtil.setFinalStatic(SenderService.class.getDeclaredField("LOGGER"), loggerMock);
+        setFinalStatic(SenderService.class.getDeclaredField("LOGGER"), loggerMock);
 
         Mockito.when(config.getBooleanProperty(ConfigParam.BYPASS_TLS_VERIFICATION)).thenReturn(Boolean.TRUE);
         Mockito.when(messageService.storeMessage(Matchers.any(String.class),
-                Matchers.any(energy.usef.core.data.xml.bean.message.Message.class), Matchers.any(MessageDirection.class)))
+                Matchers.any(Message.class), Matchers.any(MessageDirection.class)))
                 .thenReturn(new energy.usef.core.model.Message());
 
         senderService.sendMessage(MSG);
@@ -196,10 +195,10 @@ public class SenderServiceTest {
             SecurityException, BusinessException {
         Logger loggerMock = PowerMockito.mock(Logger.class);
         Mockito.when(config.getBooleanProperty(ConfigParam.BYPASS_TLS_VERIFICATION)).thenReturn(Boolean.FALSE);
-        ReflectionUtil.setFinalStatic(SenderService.class.getDeclaredField("LOGGER"), loggerMock);
+        setFinalStatic(SenderService.class.getDeclaredField("LOGGER"), loggerMock);
 
         Mockito.when(messageService.storeMessage(Matchers.any(String.class),
-                Matchers.any(energy.usef.core.data.xml.bean.message.Message.class), Matchers.any(MessageDirection.class)))
+                Matchers.any(Message.class), Matchers.any(MessageDirection.class)))
                 .thenReturn(new energy.usef.core.model.Message());
 
         senderService.sendMessage(MSG);
@@ -216,8 +215,7 @@ public class SenderServiceTest {
     public void testSendScheduledMessage() throws Exception {
         SenderService instance = PowerMockito.spy(senderService);
 
-        PowerMockito.when(messageService.storeMessage(Matchers.any(String.class), Matchers.any(
-                energy.usef.core.data.xml.bean.message.Message.class),
+        PowerMockito.when(messageService.storeMessage(Matchers.any(String.class), Matchers.any(Message.class),
                 Matchers.any(MessageDirection.class))).thenReturn(new energy.usef.core.model.Message());
 
         PowerMockito.whenNew(HttpRequest.class).withAnyArguments().thenReturn(httpRequest);
@@ -226,10 +224,10 @@ public class SenderServiceTest {
 
         instance.sendMessage(MSG);
 
-        verify(messageService, Mockito.times(1)).storeMessage(eq(MSG), Matchers.any(energy.usef.core.data.xml.bean.message.Message.class),
+        verify(messageService, Mockito.times(1)).storeMessage(eq(MSG), Matchers.any(Message.class),
                 Matchers.eq(MessageDirection.OUTBOUND));
         verify(notificationHelperService, Mockito.times(1)).notifyNoMessageResponse(Mockito.anyString(),
-                Mockito.any(energy.usef.core.data.xml.bean.message.Message.class));
+                Mockito.any(Message.class));
         verify(config, Mockito.times(1)).getIntegerProperty(ConfigParam.TRANSACTIONAL_EXPONENTIAL_BACKOFF_INITIAL_INTERVAL_MILLIS);
         verify(config, Mockito.times(1)).getIntegerProperty(ConfigParam.TRANSACTIONAL_HTTP_REQUEST_MAX_RETRIES);
     }
@@ -243,8 +241,7 @@ public class SenderServiceTest {
     public void sendInvalidXMLMessage() throws Exception {
         SenderService instance = PowerMockito.spy(senderService);
 
-        PowerMockito.when(messageService.storeMessage(Matchers.any(String.class), Matchers.any(
-                energy.usef.core.data.xml.bean.message.Message.class),
+        PowerMockito.when(messageService.storeMessage(Matchers.any(String.class), Matchers.any(Message.class),
                 Matchers.any(MessageDirection.class))).thenReturn(new energy.usef.core.model.Message());
 
         PowerMockito.whenNew(HttpRequest.class).withAnyArguments().thenReturn(httpRequest);

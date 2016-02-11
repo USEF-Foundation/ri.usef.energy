@@ -31,10 +31,10 @@ import energy.usef.core.service.business.SequenceGeneratorService;
 import energy.usef.core.service.helper.JMSHelperService;
 import energy.usef.core.workflow.settlement.CoreSettlementBusinessService;
 import energy.usef.dso.config.ConfigDso;
-import energy.usef.dso.model.Aggregator;
-import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 import energy.usef.dso.config.ConfigDsoParam;
+import energy.usef.dso.model.Aggregator;
 import energy.usef.dso.model.AggregatorOnConnectionGroupState;
+import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

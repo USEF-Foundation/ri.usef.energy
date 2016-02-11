@@ -83,6 +83,8 @@ public class PowerContainerTransformerTest extends TestCase {
         assertEquals(BigInteger.valueOf(7), result.getForecast().getAverageProduction());
         assertEquals(BigInteger.valueOf(8), result.getForecast().getPotentialFlexConsumption());
         assertEquals(BigInteger.valueOf(9), result.getForecast().getPotentialFlexProduction());
+        assertEquals(BigInteger.valueOf(10), result.getForecast().getAllocatedFlexConsumption());
+        assertEquals(BigInteger.valueOf(10), result.getForecast().getAllocatedFlexProduction());
         assertEquals(BigInteger.valueOf(10), result.getForecast().getUncontrolledLoad());
         assertEquals(BigInteger.valueOf(11), result.getObserved().getAverageConsumption());
         assertEquals(BigInteger.valueOf(12), result.getObserved().getAverageProduction());

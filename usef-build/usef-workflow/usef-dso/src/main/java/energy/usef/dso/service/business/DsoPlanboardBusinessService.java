@@ -16,6 +16,25 @@
 
 package energy.usef.dso.service.business;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
+
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.CongestionPoint;
@@ -49,53 +68,34 @@ import energy.usef.core.util.DocumentStatusUtil;
 import energy.usef.core.util.PtuUtil;
 import energy.usef.core.workflow.dto.FlexOrderDto;
 import energy.usef.core.workflow.transformer.FlexOrderTransformer;
-import energy.usef.dso.model.MeterDataCompany;
-import energy.usef.dso.model.PrognosisUpdateDeviation;
-import energy.usef.dso.repository.AggregatorRepository;
-import energy.usef.dso.repository.NonAggregatorForecastRepository;
-import energy.usef.dso.repository.PtuGridMonitorRepository;
-import energy.usef.dso.repository.SynchronisationCongestionPointRepository;
 import energy.usef.dso.model.Aggregator;
 import energy.usef.dso.model.AggregatorOnConnectionGroupState;
 import energy.usef.dso.model.CommonReferenceOperator;
 import energy.usef.dso.model.ConnectionCapacityLimitationPeriod;
 import energy.usef.dso.model.ConnectionMeterEvent;
 import energy.usef.dso.model.GridSafetyAnalysis;
+import energy.usef.dso.model.MeterDataCompany;
 import energy.usef.dso.model.NonAggregatorForecast;
+import energy.usef.dso.model.PrognosisUpdateDeviation;
 import energy.usef.dso.model.PtuGridMonitor;
 import energy.usef.dso.model.SynchronisationCongestionPoint;
 import energy.usef.dso.model.SynchronisationConnection;
 import energy.usef.dso.model.SynchronisationConnectionStatusType;
 import energy.usef.dso.repository.AggregatorOnConnectionGroupStateRepository;
+import energy.usef.dso.repository.AggregatorRepository;
 import energy.usef.dso.repository.CommonReferenceOperatorRepository;
 import energy.usef.dso.repository.ConnectionCapacityLimitationPeriodRepository;
 import energy.usef.dso.repository.ConnectionMeterEventRepository;
 import energy.usef.dso.repository.GridSafetyAnalysisRepository;
 import energy.usef.dso.repository.MeterDataCompanyRepository;
+import energy.usef.dso.repository.NonAggregatorForecastRepository;
 import energy.usef.dso.repository.PrognosisUpdateDeviationRepository;
+import energy.usef.dso.repository.PtuGridMonitorRepository;
+import energy.usef.dso.repository.SynchronisationCongestionPointRepository;
 import energy.usef.dso.repository.SynchronisationCongestionPointStatusRepository;
 import energy.usef.dso.repository.SynchronisationConnectionRepository;
 import energy.usef.dso.workflow.dto.GridSafetyAnalysisDto;
 import energy.usef.dso.workflow.transformer.GridSafetyAnalysisDtoTransformer;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import javax.transaction.Transactional.TxType;
-
-import org.apache.commons.lang.StringUtils;
-import org.joda.time.LocalDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Service class in charge of operations and validations related to the DSO planboard.
@@ -655,7 +655,7 @@ public class DsoPlanboardBusinessService {
                                         .equals(xmlCongestionPoint.getEntityAddress())))
                 .filter(xmlAggregator -> StringUtils.isNotEmpty(xmlAggregator.getDomain()))
                 .forEach(xmlAggregator -> {
-                    energy.usef.dso.model.Aggregator dbAggregator = aggregatorRepository.findOrCreate(xmlAggregator.getDomain());
+                    Aggregator dbAggregator = aggregatorRepository.findOrCreate(xmlAggregator.getDomain());
                     AggregatorOnConnectionGroupState newState = new AggregatorOnConnectionGroupState();
                     newState.setAggregator(dbAggregator);
                     newState.setConnectionCount(

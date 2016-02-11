@@ -16,6 +16,24 @@
 
 package energy.usef.dso.workflow.settlement.collect;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import javax.enterprise.event.Event;
+
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
+
 import energy.usef.core.config.Config;
 import energy.usef.core.data.xml.bean.message.ConnectionMeterEvent;
 import energy.usef.core.data.xml.bean.message.MeterData;
@@ -37,24 +55,6 @@ import energy.usef.dso.model.MeterDataCompany;
 import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 import energy.usef.dso.workflow.DsoWorkflowStep;
 import energy.usef.dso.workflow.settlement.determine.DetermineOrangeEvent;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import javax.enterprise.event.Event;
-
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Matchers;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.powermock.modules.junit4.PowerMockRunner;
-import org.powermock.reflect.Whitebox;
 
 /**
  * Test class in charge of the unit tests related to the {@link DsoCollectOrangeRegimeDataCoordinator}.

@@ -23,6 +23,7 @@ import energy.usef.core.workflow.dto.PrognosisDto;
 import energy.usef.core.workflow.dto.PrognosisTypeDto;
 import energy.usef.core.workflow.dto.PtuPrognosisDto;
 import energy.usef.dso.workflow.validate.gridsafetyanalysis.CreateMissingDPrognosisParameter;
+import energy.usef.dso.workflow.validate.gridsafetyanalysis.CreateMissingDPrognosisParameter.IN;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -60,17 +61,17 @@ public class DsoCreateMissingDPrognosesStub implements WorkflowStep {
      * {@inheritDoc}
      */
     public WorkflowContext invoke(WorkflowContext context) {
-        String entityAddress = (String) context.getValue(CreateMissingDPrognosisParameter.IN.CONGESTION_POINT_ENTITY_ADDRESS.name());
+        String entityAddress = (String) context.getValue(IN.CONGESTION_POINT_ENTITY_ADDRESS.name());
 
         // Not used in this PBC STUB implementation but supposed to be used in the real PBC.
-        String aggregatorDomain = (String) context.getValue(CreateMissingDPrognosisParameter.IN.AGGREGATOR_DOMAIN.name());
+        String aggregatorDomain = (String) context.getValue(IN.AGGREGATOR_DOMAIN.name());
 
         LOGGER.info("Starting workflow step 'DSOCreateMissingPrognosis' for AGR: {}, congestion point: {}.", aggregatorDomain,
                 entityAddress);
 
-        LocalDate analysisDay = (LocalDate) context.getValue(CreateMissingDPrognosisParameter.IN.ANALYSIS_DAY.name());
-        int ptuDuration = (int) context.getValue(CreateMissingDPrognosisParameter.IN.PTU_DURATION.name());
-        int aggregatorConnectionNumber = (int) context.getValue(CreateMissingDPrognosisParameter.IN.AGGREGATOR_CONNECTION_AMOUNT.name());
+        LocalDate analysisDay = (LocalDate) context.getValue(IN.ANALYSIS_DAY.name());
+        int ptuDuration = (int) context.getValue(IN.PTU_DURATION.name());
+        int aggregatorConnectionNumber = (int) context.getValue(IN.AGGREGATOR_CONNECTION_AMOUNT.name());
 
         int numberOfPtusPerDay = PtuUtil.getNumberOfPtusPerDay(analysisDay, ptuDuration);
 

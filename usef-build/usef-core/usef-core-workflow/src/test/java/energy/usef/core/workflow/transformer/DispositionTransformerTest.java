@@ -16,7 +16,7 @@
 
 package energy.usef.core.workflow.transformer;
 
-import energy.usef.core.model.DispositionAvailableRequested;
+import energy.usef.core.data.xml.bean.message.DispositionAvailableRequested;
 import energy.usef.core.workflow.dto.DispositionTypeDto;
 
 import java.lang.reflect.Constructor;
@@ -45,28 +45,28 @@ public class DispositionTransformerTest extends TestCase {
 
     @Test
     public void testTransformDispositionAvailableRequested() throws Exception {
-        Assert.assertEquals(null, DispositionTransformer.transform((DispositionAvailableRequested) null));
+        Assert.assertEquals(null, DispositionTransformer.transform((energy.usef.core.model.DispositionAvailableRequested) null));
         Assert.assertEquals(DispositionTypeDto.AVAILABLE,
-                DispositionTransformer.transform(DispositionAvailableRequested.AVAILABLE));
+                DispositionTransformer.transform(energy.usef.core.model.DispositionAvailableRequested.AVAILABLE));
         Assert.assertEquals(DispositionTypeDto.REQUESTED,
-                DispositionTransformer.transform(DispositionAvailableRequested.REQUESTED));
+                DispositionTransformer.transform(energy.usef.core.model.DispositionAvailableRequested.REQUESTED));
     }
 
     @Test
     public void testTransformDispositionTypeDto() throws Exception {
         Assert.assertEquals(null, DispositionTransformer.transform((DispositionTypeDto) null));
-        Assert.assertEquals(DispositionAvailableRequested.AVAILABLE,
+        Assert.assertEquals(energy.usef.core.model.DispositionAvailableRequested.AVAILABLE,
                 DispositionTransformer.transform(DispositionTypeDto.AVAILABLE));
-        Assert.assertEquals(DispositionAvailableRequested.REQUESTED,
+        Assert.assertEquals(energy.usef.core.model.DispositionAvailableRequested.REQUESTED,
                 DispositionTransformer.transform(DispositionTypeDto.REQUESTED));
     }
 
     @Test
     public void testTransformToXml() throws Exception {
         Assert.assertEquals(null, DispositionTransformer.transformToXml((DispositionTypeDto) null));
-        Assert.assertEquals(energy.usef.core.data.xml.bean.message.DispositionAvailableRequested.AVAILABLE,
+        Assert.assertEquals(DispositionAvailableRequested.AVAILABLE,
                 DispositionTransformer.transformToXml(DispositionTypeDto.AVAILABLE));
-        Assert.assertEquals(energy.usef.core.data.xml.bean.message.DispositionAvailableRequested.REQUESTED,
+        Assert.assertEquals(DispositionAvailableRequested.REQUESTED,
                 DispositionTransformer.transformToXml(DispositionTypeDto.REQUESTED));
     }
 }

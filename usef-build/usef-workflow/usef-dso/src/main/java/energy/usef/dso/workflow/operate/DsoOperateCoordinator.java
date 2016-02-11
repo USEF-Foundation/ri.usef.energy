@@ -25,6 +25,23 @@ import static energy.usef.dso.workflow.DsoWorkflowStep.DSO_PLACE_OPERATE_FLEX_OR
 import static energy.usef.dso.workflow.DsoWorkflowStep.DSO_RESTORE_CONNECTIONS;
 import static energy.usef.dso.workflow.operate.DsoMonitorGridStepParameter.IN.CONGESTION_POINT_ENTITY_ADDRESS;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.ejb.Asynchronous;
+import javax.ejb.Stateless;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.joda.time.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.FlexOrder;
@@ -58,23 +75,6 @@ import energy.usef.dso.config.ConfigDso;
 import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 import energy.usef.dso.workflow.DsoWorkflowStep;
 import energy.usef.dso.workflow.dto.GridSafetyAnalysisDto;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.ejb.Asynchronous;
-import javax.ejb.Stateless;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.joda.time.Period;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * This coordinater executes the business logic for the DSO operate phase.

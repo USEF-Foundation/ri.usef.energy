@@ -16,6 +16,7 @@
 
 package energy.usef.core.service.rest.sender;
 
+import static energy.usef.core.service.business.error.ParticipantDiscoveryError.RECIPIENT_ROLE_NOT_PROVIDED;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.ws.rs.core.MediaType.TEXT_XML;
 
@@ -25,7 +26,7 @@ import energy.usef.core.constant.USEFLogCategory;
 import energy.usef.core.data.participant.Participant;
 import energy.usef.core.data.participant.ParticipantRole;
 import energy.usef.core.data.participant.ParticipantType;
-
+import energy.usef.core.data.xml.bean.message.Message;
 import energy.usef.core.data.xml.bean.message.MessagePrecedence;
 import energy.usef.core.data.xml.bean.message.SignedMessage;
 import energy.usef.core.data.xml.bean.message.USEFRole;
@@ -65,8 +66,6 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.util.BackOff;
 import com.google.api.client.util.ExponentialBackOff;
 
-import energy.usef.core.service.business.error.ParticipantDiscoveryError;
-
 /**
  * This sender service is designed to send outgoing messages to a recipient.
  */
@@ -102,7 +101,7 @@ public class SenderService {
         LOGGER.debug("Started sending message");
         LOGGER_CONFIDENTIAL.debug("Trying to send message {} ", xmlString);
 
-        energy.usef.core.data.xml.bean.message.Message dtoMessage = (energy.usef.core.data.xml.bean.message.Message) XMLUtil
+        Message dtoMessage = (Message) XMLUtil
                 .xmlToMessage(xmlString, config.getBooleanProperty(ConfigParam.VALIDATE_OUTGOING_XML).booleanValue());
         energy.usef.core.model.Message storedMessage = messageService.storeMessage(xmlString, dtoMessage, MessageDirection.OUTBOUND);
 
@@ -144,12 +143,11 @@ public class SenderService {
      * Handles the message according to the response status.
      * 
      * @param storedMessage - {@link energy.usef.core.model.Message}
-     * @param dtoMessage - {@link energy.usef.core.data.xml.bean.message.Message}
+     * @param dtoMessage - {@link Message}
      * @param response - {@link HttpResponse}
      * @throws IOException if the content of the HttpResponse cannot be read.
      */
-    private void handleResponseStatuses(
-            energy.usef.core.model.Message storedMessage, energy.usef.core.data.xml.bean.message.Message dtoMessage, HttpResponse response)
+    private void handleResponseStatuses(energy.usef.core.model.Message storedMessage, Message dtoMessage, HttpResponse response)
             throws IOException {
         int statusCode = response.getStatusCode();
         String errorMessage = IOUtils.toString(response.getContent());
@@ -177,12 +175,11 @@ public class SenderService {
      * Stores an error about a message which has not been successfully delivered (HTTP code not 200).
      * 
      * @param storedMessage - {@link energy.usef.core.model.Message}
-     * @param dtoMessage - {@link energy.usef.core.data.xml.bean.message.Message}
+     * @param dtoMessage - {@link Message}
      * @param errorMessage - content of the HTTP response
      * @param errorCode - HTTP error code.
      */
-    private void reportMessageNotSentError(
-            energy.usef.core.model.Message storedMessage, energy.usef.core.data.xml.bean.message.Message dtoMessage, String errorMessage,
+    private void reportMessageNotSentError(energy.usef.core.model.Message storedMessage, Message dtoMessage, String errorMessage,
             Integer errorCode) {
         LOGGER.error("Sending message to {} {} failed: {}", dtoMessage.getMessageMetadata().getRecipientRole(), dtoMessage
                 .getMessageMetadata().getRecipientDomain(), errorMessage);
@@ -262,7 +259,7 @@ public class SenderService {
     /*
      * Creates a SignedMessage object
      */
-    private SignedMessage createSignedMessage(String xmlMessage, energy.usef.core.data.xml.bean.message.Message dtoMessage) throws BusinessException {
+    private SignedMessage createSignedMessage(String xmlMessage, Message dtoMessage) throws BusinessException {
         SignedMessage signedMessage = new SignedMessage();
         signedMessage.setSenderDomain(config.getProperty(ConfigParam.HOST_DOMAIN));
         signedMessage.setSenderRole(dtoMessage.getMessageMetadata().getSenderRole());
@@ -273,7 +270,7 @@ public class SenderService {
     /*
      * Build a correct url
      */
-    private String createUrl(energy.usef.core.data.xml.bean.message.Message message) throws BusinessException {
+    private String createUrl(Message message) throws BusinessException {
         Participant participant = participantDiscoveryService.discoverParticipant(message, ParticipantType.RECIPIENT);
 
         USEFRole targetRole = message.getMessageMetadata().getRecipientRole();
@@ -286,7 +283,7 @@ public class SenderService {
         }
 
         if (participantRole == null) {
-            throw new BusinessException(ParticipantDiscoveryError.RECIPIENT_ROLE_NOT_PROVIDED);
+            throw new BusinessException(RECIPIENT_ROLE_NOT_PROVIDED);
         }
 
         return participantRole.getUrl();

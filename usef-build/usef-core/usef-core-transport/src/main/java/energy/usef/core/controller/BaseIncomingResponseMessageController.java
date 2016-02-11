@@ -16,6 +16,7 @@
 
 package energy.usef.core.controller;
 
+import energy.usef.core.data.xml.bean.message.Message;
 import energy.usef.core.exception.BusinessException;
 import energy.usef.core.service.business.error.MessageControllerError;
 
@@ -30,9 +31,9 @@ import org.slf4j.LoggerFactory;
  * the
  * incoming response message is part of a conversation.
  *
- * @param <T> type of {@link energy.usef.core.data.xml.bean.message.Message} handled by the {@link BaseIncomingMessageController}
+ * @param <T> type of {@link Message} handled by the {@link BaseIncomingMessageController}
  */
-public abstract class BaseIncomingResponseMessageController<T extends energy.usef.core.data.xml.bean.message.Message> extends BaseIncomingMessageController<T> {
+public abstract class BaseIncomingResponseMessageController<T extends Message> extends BaseIncomingMessageController<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger(BaseIncomingResponseMessageController.class);
 
     /**

@@ -50,7 +50,7 @@ public class PowerContainerTransformer {
         if (powerContainer.getForecast() == null) {
             powerContainerDto.setForecast(null);
         } else {
-            PowerContainerTransformer.updateDTOValues(powerContainer.getForecast(), powerContainerDto.getForecast());
+            PowerContainerTransformer.updateForecastDTOValues(powerContainer.getForecast(), powerContainerDto.getForecast());
         }
 
         if (powerContainer.getObserved() == null) {
@@ -74,6 +74,19 @@ public class PowerContainerTransformer {
         toPowerContainerDto.setAverageProduction(fromPowerContainerModel.getAverageProduction());
         toPowerContainerDto.setPotentialFlexConsumption(fromPowerContainerModel.getPotentialFlexConsumption());
         toPowerContainerDto.setPotentialFlexProduction(fromPowerContainerModel.getPotentialFlexProduction());
+    }
+
+    /**
+     * Copy the values from the {@link ForecastPowerData} to the {@link ForecastPowerDataDto}.
+     *
+     * @param fromPowerContainerModel
+     * @param toPowerContainerDto
+     */
+    private static void updateForecastDTOValues(ForecastPowerData fromPowerContainerModel,
+            ForecastPowerDataDto toPowerContainerDto) {
+        updateDTOValues(fromPowerContainerModel, toPowerContainerDto);
+        toPowerContainerDto.setAllocatedFlexProduction(fromPowerContainerModel.getAllocatedFlexProduction());
+        toPowerContainerDto.setAllocatedFlexConsumption(fromPowerContainerModel.getAllocatedFlexConsumption());
     }
 
     /**

@@ -16,6 +16,8 @@
 
 package energy.usef.agr.workflow.plan.connection.profile;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_CREATE_UDI;
+
 import energy.usef.agr.config.ConfigAgr;
 import energy.usef.agr.config.ConfigAgrParam;
 import energy.usef.agr.dto.ConnectionPortfolioDto;
@@ -26,7 +28,6 @@ import energy.usef.agr.service.business.AgrElementBusinessService;
 import energy.usef.agr.service.business.AgrPortfolioBusinessService;
 import energy.usef.agr.workflow.plan.connection.profile.CreateUdiStepParameter.IN;
 import energy.usef.agr.workflow.plan.connection.profile.CreateUdiStepParameter.OUT;
-import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.constant.USEFConstants;
@@ -129,8 +130,8 @@ public class AgrCreateUdiCoordinator {
         inputContext.setValue(IN.CONNECTION_PORTFOLIO_DTO_LIST.name(), connectionPortfolioDto);
         inputContext.setValue(IN.ELEMENT_PER_CONNECTION_MAP.name(), elementsPerConnection);
 
-        WorkflowContext outContext = workflowStepExecuter.invoke(AgrWorkflowStep.AGR_CREATE_UDI.name(), inputContext);
-        WorkflowUtil.validateContext(AgrWorkflowStep.AGR_CREATE_UDI.name(), outContext, OUT.values());
+        WorkflowContext outContext = workflowStepExecuter.invoke(AGR_CREATE_UDI.name(), inputContext);
+        WorkflowUtil.validateContext(AGR_CREATE_UDI.name(), outContext, OUT.values());
 
         return outContext;
     }

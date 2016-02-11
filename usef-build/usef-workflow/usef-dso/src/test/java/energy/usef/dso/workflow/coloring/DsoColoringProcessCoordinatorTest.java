@@ -16,19 +16,8 @@
 
 package energy.usef.dso.workflow.coloring;
 
-import energy.usef.core.dto.PtuContainerDto;
-import energy.usef.core.model.CongestionPointConnectionGroup;
-import energy.usef.core.model.DispositionAvailableRequested;
-import energy.usef.core.model.PtuContainer;
-import energy.usef.core.model.PtuState;
-import energy.usef.core.service.business.CorePlanboardBusinessService;
-import energy.usef.core.util.DateTimeUtil;
-import energy.usef.core.workflow.WorkflowContext;
-import energy.usef.core.workflow.step.WorkflowStepExecuter;
-import energy.usef.dso.service.business.DsoPlanboardBusinessService;
-import energy.usef.dso.workflow.DsoWorkflowStep;
-import energy.usef.dso.model.GridSafetyAnalysis;
-import energy.usef.dso.util.ReflectionUtil;
+import static energy.usef.dso.workflow.DsoWorkflowStep.DSO_POST_COLORING_PROCESS;
+import static energy.usef.dso.workflow.DsoWorkflowStep.DSO_PREPARE_STEPWISE_LIMITING;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +33,19 @@ import org.mockito.Mockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
+
+import energy.usef.core.dto.PtuContainerDto;
+import energy.usef.core.model.CongestionPointConnectionGroup;
+import energy.usef.core.model.DispositionAvailableRequested;
+import energy.usef.core.model.PtuContainer;
+import energy.usef.core.model.PtuState;
+import energy.usef.core.service.business.CorePlanboardBusinessService;
+import energy.usef.core.util.DateTimeUtil;
+import energy.usef.core.workflow.WorkflowContext;
+import energy.usef.core.workflow.step.WorkflowStepExecuter;
+import energy.usef.dso.model.GridSafetyAnalysis;
+import energy.usef.dso.service.business.DsoPlanboardBusinessService;
+import energy.usef.dso.util.ReflectionUtil;
 
 /**
  * Unit tests for testing the {@link DsoColoringProcessCoordinator}.
@@ -93,11 +95,11 @@ public class DsoColoringProcessCoordinatorTest {
         coordinator.handleEvent(event);
 
         Mockito.verify(workflowStepExecuter, Mockito.times(1))
-                .invoke(Matchers.eq(DsoWorkflowStep.DSO_PREPARE_STEPWISE_LIMITING.name()), Matchers.any());
+                .invoke(Matchers.eq(DSO_PREPARE_STEPWISE_LIMITING.name()), Matchers.any());
 
         ArgumentCaptor<WorkflowContext> contextCaptor = ArgumentCaptor.forClass(WorkflowContext.class);
         Mockito.verify(workflowStepExecuter, Mockito.times(1))
-                .invoke(Matchers.eq(DsoWorkflowStep.DSO_POST_COLORING_PROCESS.name()), contextCaptor.capture());
+                .invoke(Matchers.eq(DSO_POST_COLORING_PROCESS.name()), contextCaptor.capture());
 
         @SuppressWarnings("unchecked")
         List<PtuContainerDto> ptuContainerList = (List<PtuContainerDto>) contextCaptor.getValue().getValue(

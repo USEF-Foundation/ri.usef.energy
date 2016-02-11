@@ -16,6 +16,7 @@
 
 package energy.usef.core.controller;
 
+import energy.usef.core.data.xml.bean.message.Message;
 import energy.usef.core.exception.BusinessException;
 import energy.usef.core.model.MessageDirection;
 import energy.usef.core.service.business.MessageService;
@@ -25,9 +26,9 @@ import javax.inject.Inject;
 /**
  * Base controller class. This class is responsible for the general operations related to incoming xml messages processing.
  *
- * @param <T> a subclass of the {@link energy.usef.core.data.xml.bean.message.Message} class (e.g. CommonReferenceUpdate).
+ * @param <T> a subclass of the {@link Message} class (e.g. CommonReferenceUpdate).
  */
-public abstract class BaseIncomingMessageController<T extends energy.usef.core.data.xml.bean.message.Message>
+public abstract class BaseIncomingMessageController<T extends Message>
         implements IncomingMessageController<T> {
 
     @Inject
@@ -47,7 +48,7 @@ public abstract class BaseIncomingMessageController<T extends energy.usef.core.d
     /**
      * Takes an action based on an incoming message.
      * 
-     * @param message a specific type of {@link energy.usef.core.data.xml.bean.message.Message}.
+     * @param message a specific type of {@link Message}.
      * @param savedMessage the previously saved message.
      * @throws BusinessException
      */

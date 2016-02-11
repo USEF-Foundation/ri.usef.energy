@@ -18,8 +18,7 @@ package energy.usef.agr.workflow.step;
 
 import energy.usef.agr.dto.ConnectionPortfolioDto;
 import energy.usef.agr.dto.UdiPortfolioDto;
-import energy.usef.agr.workflow.operate.recreate.prognoses.ReCreatePrognosesWorkflowParameter.IN;
-import energy.usef.agr.workflow.operate.recreate.prognoses.ReCreatePrognosesWorkflowParameter.OUT;
+import energy.usef.agr.workflow.operate.recreate.prognoses.ReCreatePrognosesWorkflowParameter;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.WorkflowStep;
 import energy.usef.core.workflow.dto.PrognosisDto;
@@ -40,15 +39,17 @@ import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import energy.usef.core.data.xml.bean.message.Prognosis;
+
 /**
  * Stub implementation of the PBC which is in charge of deciding to re-create or not A-Plans and or D-Prognoses after the
  * re-optimization of the portfolio.
  * <p>
  * The PBC receives the following parameters as input to make the decision:
  * <ul>
- * <li>LATEST_D_PROGNOSES_DTO_LIST : the list of latest {@link energy.usef.core.data.xml.bean.message.Prognosis} of type 'D-Progosis'.
+ * <li>LATEST_D_PROGNOSES_DTO_LIST : the list of latest {@link Prognosis} of type 'D-Progosis'.
  * </li>
- * <li>LATEST_A_PLANS_DTO_LIST : the list of latest {@link energy.usef.core.data.xml.bean.message.Prognosis} of type 'A-Plan'.</li>
+ * <li>LATEST_A_PLANS_DTO_LIST : the list of latest {@link Prognosis} of type 'A-Plan'.</li>
  * <li>CURRENT_PORTFOLIO : the current (and hence latest) portfolio with connection information.</li>
  * <li>CONNECTION_GROUPS_TO_CONNECTIONS_MAP : a map with a list of connection entity addresses per connection group.</li>
  * </ul>
@@ -75,13 +76,13 @@ public class AgrReCreatePrognosesStub implements WorkflowStep {
     public WorkflowContext invoke(WorkflowContext context) {
         LOGGER.debug("Invoking PBC 'AGRReCreatePrognoses'.");
 
-        List<PrognosisDto> dPrognoses = (List<PrognosisDto>) context.getValue(IN.LATEST_D_PROGNOSES_DTO_LIST.name());
-        List<PrognosisDto> aPlans = (List<PrognosisDto>) context.getValue(IN.LATEST_A_PLANS_DTO_LIST.name());
-        List<ConnectionPortfolioDto> currentPortfolio = context.get(IN.CURRENT_PORTFOLIO.name(), List.class);
+        List<PrognosisDto> dPrognoses = (List<PrognosisDto>) context.getValue(ReCreatePrognosesWorkflowParameter.IN.LATEST_D_PROGNOSES_DTO_LIST.name());
+        List<PrognosisDto> aPlans = (List<PrognosisDto>) context.getValue(ReCreatePrognosesWorkflowParameter.IN.LATEST_A_PLANS_DTO_LIST.name());
+        List<ConnectionPortfolioDto> currentPortfolio = context.get(ReCreatePrognosesWorkflowParameter.IN.CURRENT_PORTFOLIO.name(), List.class);
         Map<String, List<String>> connectionGroupsToConnections = context
-                .get(IN.CONNECTION_GROUPS_TO_CONNECTIONS_MAP.name(), HashMap.class);
-        LocalDate period = (LocalDate) context.getValue(IN.PERIOD.name());
-        Integer ptuSize = context.get(IN.PTU_DURATION.name(), Integer.class);
+                .get(ReCreatePrognosesWorkflowParameter.IN.CONNECTION_GROUPS_TO_CONNECTIONS_MAP.name(), HashMap.class);
+        LocalDate period = (LocalDate) context.getValue(ReCreatePrognosesWorkflowParameter.IN.PERIOD.name());
+        Integer ptuSize = context.get(ReCreatePrognosesWorkflowParameter.IN.PTU_DURATION.name(), Integer.class);
         LOGGER.debug("Received [{}] d-prognoses, [{}] a-plans and the current portfolio.", dPrognoses.size(), aPlans.size());
 
         Map<String, Map<Integer, BigInteger>> loadPerPtuPerConnectionGroup = totalLoadPerConnectionGroupPerPtu(
@@ -90,8 +91,8 @@ public class AgrReCreatePrognosesStub implements WorkflowStep {
         List<Long> sequencesOfDPrognosesToBeRecreated = compareDPrognosesAgainstLoad(dPrognoses, loadPerPtuPerConnectionGroup);
         List<Long> sequencesOfAPlansToBeRecreated = compareAPlansAgainstLoad(aPlans, loadPerPtuPerConnectionGroup);
 
-        context.setValue(OUT.REQUIRES_NEW_D_PROGNOSIS_SEQUENCES_LIST.name(), sequencesOfDPrognosesToBeRecreated);
-        context.setValue(OUT.REQUIRES_NEW_A_PLAN_SEQUENCES_LIST.name(), sequencesOfAPlansToBeRecreated);
+        context.setValue(ReCreatePrognosesWorkflowParameter.OUT.REQUIRES_NEW_D_PROGNOSIS_SEQUENCES_LIST.name(), sequencesOfDPrognosesToBeRecreated);
+        context.setValue(ReCreatePrognosesWorkflowParameter.OUT.REQUIRES_NEW_A_PLAN_SEQUENCES_LIST.name(), sequencesOfAPlansToBeRecreated);
         LOGGER.debug("Output values:");
         LOGGER.debug("Re-create A-Plans: [{}]",
                 sequencesOfAPlansToBeRecreated.stream().map(String::valueOf).collect(Collectors.joining(";")));

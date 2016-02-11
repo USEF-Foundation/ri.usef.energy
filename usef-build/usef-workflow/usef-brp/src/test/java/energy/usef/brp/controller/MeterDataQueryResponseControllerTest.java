@@ -24,7 +24,6 @@ import energy.usef.core.data.xml.bean.message.MeterData;
 import energy.usef.core.data.xml.bean.message.MeterDataQueryResponse;
 import energy.usef.core.data.xml.bean.message.MeterDataSet;
 import energy.usef.core.data.xml.bean.message.PTUMeterData;
-
 import energy.usef.core.exception.BusinessException;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;

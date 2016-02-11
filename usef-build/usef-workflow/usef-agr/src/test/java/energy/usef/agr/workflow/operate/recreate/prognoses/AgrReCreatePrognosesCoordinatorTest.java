@@ -16,6 +16,7 @@
 
 package energy.usef.agr.workflow.operate.recreate.prognoses;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_RECREATE_PROGNOSES;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -24,10 +25,10 @@ import energy.usef.agr.dto.ForecastPowerDataDto;
 import energy.usef.agr.dto.PowerContainerDto;
 import energy.usef.agr.service.business.AgrPlanboardBusinessService;
 import energy.usef.agr.service.business.AgrPortfolioBusinessService;
+import energy.usef.agr.workflow.operate.recreate.prognoses.ReCreatePrognosesWorkflowParameter.OUT;
 import energy.usef.agr.workflow.plan.create.aplan.CreateAPlanEvent;
 import energy.usef.agr.workflow.plan.recreate.aplan.ReCreateAPlanEvent;
 import energy.usef.agr.workflow.validate.create.dprognosis.ReCreateDPrognosisEvent;
-import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.event.RequestMoveToValidateEvent;
 import energy.usef.core.model.BrpConnectionGroup;
@@ -118,7 +119,7 @@ public class AgrReCreatePrognosesCoordinatorTest {
         Long[] dprognosisSequences = new Long[] { 3l, 4l, 5l };
 
         List<PrognosisDto> latestDPrognoses = buildLatestDPrognoses(dprognosisSequences);
-        PowerMockito.when(workflowStepExecuter.invoke(Mockito.eq(AgrWorkflowStep.AGR_RECREATE_PROGNOSES.name()), Mockito.any()))
+        PowerMockito.when(workflowStepExecuter.invoke(Mockito.eq(AGR_RECREATE_PROGNOSES.name()), Mockito.any()))
                 .thenReturn(buildContextAfterPBC());
         PowerMockito.when(
                 agrPlanboardBusinessService.findLastPrognoses(Matchers.any(LocalDate.class), Matchers.eq(PrognosisType.A_PLAN),
@@ -155,7 +156,7 @@ public class AgrReCreatePrognosesCoordinatorTest {
 
         List<PrognosisDto> latestDPrognoses = buildLatestDPrognoses(dprognosisSequences);
         PowerMockito
-                .when(workflowStepExecuter.invoke(Mockito.eq(AgrWorkflowStep.AGR_RECREATE_PROGNOSES.name()), contextCaptor.capture()))
+                .when(workflowStepExecuter.invoke(Mockito.eq(AGR_RECREATE_PROGNOSES.name()), contextCaptor.capture()))
                 .thenReturn(buildContextAfterPBC());
         PowerMockito.when(
                 agrPlanboardBusinessService.findLastPrognoses(Matchers.any(LocalDate.class),
@@ -183,9 +184,8 @@ public class AgrReCreatePrognosesCoordinatorTest {
 
     private WorkflowContext buildContextAfterPBC() {
         WorkflowContext context = new DefaultWorkflowContext();
-        context.setValue(ReCreatePrognosesWorkflowParameter.OUT.REQUIRES_NEW_A_PLAN_SEQUENCES_LIST.name(), Arrays.asList(1l, 2l));
-        context.setValue(
-                ReCreatePrognosesWorkflowParameter.OUT.REQUIRES_NEW_D_PROGNOSIS_SEQUENCES_LIST.name(), Arrays.asList(3l, 4l, 5l));
+        context.setValue(OUT.REQUIRES_NEW_A_PLAN_SEQUENCES_LIST.name(), Arrays.asList(1l, 2l));
+        context.setValue(OUT.REQUIRES_NEW_D_PROGNOSIS_SEQUENCES_LIST.name(), Arrays.asList(3l, 4l, 5l));
         return context;
     }
 

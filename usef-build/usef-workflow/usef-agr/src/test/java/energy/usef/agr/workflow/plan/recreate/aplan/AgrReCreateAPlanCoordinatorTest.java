@@ -44,8 +44,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
 /**
- * Test class in charge of the unit tests related to the
- * {@link energy.usef.agr.workflow.plan.recreate.aplan .AgrReCreateAPlanCoordinator} class.
+ * Test class in charge of the unit tests related to the {@link AgrReCreateAPlanCoordinator} class.
  */
 @RunWith(PowerMockRunner.class)
 public class AgrReCreateAPlanCoordinatorTest {

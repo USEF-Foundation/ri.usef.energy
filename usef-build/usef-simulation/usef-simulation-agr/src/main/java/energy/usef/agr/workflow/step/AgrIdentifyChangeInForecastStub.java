@@ -23,7 +23,8 @@ import energy.usef.agr.dto.PowerContainerDto;
 import energy.usef.agr.dto.UdiPortfolioDto;
 import energy.usef.agr.model.ConnectionForecastSnapshot;
 import energy.usef.agr.repository.ConnectionForecastSnapshotRepository;
-import energy.usef.agr.workflow.operate.identifychangeforecast.IdentifyChangeInForecastStepParameter;
+import energy.usef.agr.workflow.operate.identifychangeforecast.IdentifyChangeInForecastStepParameter.IN;
+import energy.usef.agr.workflow.operate.identifychangeforecast.IdentifyChangeInForecastStepParameter.OUT;
 import energy.usef.core.dto.PtuContainerDto;
 import energy.usef.core.util.DateTimeUtil;
 import energy.usef.core.util.PtuUtil;
@@ -82,14 +83,14 @@ public class AgrIdentifyChangeInForecastStub implements WorkflowStep {
     public WorkflowContext invoke(WorkflowContext context) {
         LOGGER.debug("Invoking PBC 'AGRIdentifyChangeInForecast'.");
         List<ConnectionPortfolioDto> connectionPortfolioDto = (List<ConnectionPortfolioDto>) context.getValue(
-                IdentifyChangeInForecastStepParameter.IN.CONNECTION_PORTFOLIO.name());
+                IN.CONNECTION_PORTFOLIO.name());
 
-        Integer ptuDuration = context.get(IdentifyChangeInForecastStepParameter.IN.PTU_DURATION.name(), Integer.class);
-        LocalDate period = context.get(IdentifyChangeInForecastStepParameter.IN.PERIOD.name(), LocalDate.class);
+        Integer ptuDuration = context.get(IN.PTU_DURATION.name(), Integer.class);
+        LocalDate period = context.get(IN.PERIOD.name(), LocalDate.class);
 
         if (connectionPortfolioDto.isEmpty()) {
-            context.setValue(IdentifyChangeInForecastStepParameter.OUT.FORECAST_CHANGED.name(), false);
-            context.setValue(IdentifyChangeInForecastStepParameter.OUT.FORECAST_CHANGED_PTU_CONTAINER_DTO_LIST.name(), new ArrayList<PtuContainerDto>());
+            context.setValue(OUT.FORECAST_CHANGED.name(), false);
+            context.setValue(OUT.FORECAST_CHANGED_PTU_CONTAINER_DTO_LIST.name(), new ArrayList<PtuContainerDto>());
             return context;
         }
         Map<Integer, Map<String, ConnectionForecastSnapshot>> previousConnecionForecastSnapshots =
@@ -98,7 +99,7 @@ public class AgrIdentifyChangeInForecastStub implements WorkflowStep {
                 transformPortolioToSnapshots(connectionPortfolioDto, period, ptuDuration);
         boolean forecastChanged = haveForecastsChanged(previousConnecionForecastSnapshots, incomingConnectionForecastSnaphots,
                 period, ptuDuration);
-        context.setValue(IdentifyChangeInForecastStepParameter.OUT.FORECAST_CHANGED.name(), forecastChanged);
+        context.setValue(OUT.FORECAST_CHANGED.name(), forecastChanged);
 
         int currentPtuIndex = PtuUtil.getPtuIndex(DateTimeUtil.getCurrentDateTime(), ptuDuration);
         LocalDate today = DateTimeUtil.getCurrentDate();
@@ -117,7 +118,7 @@ public class AgrIdentifyChangeInForecastStub implements WorkflowStep {
                 .filter(snapshot -> snapshot.getChanged() == Boolean.TRUE)
                 .map(snapshot -> new PtuContainerDto(snapshot.getPtuDate(), snapshot.getPtuIndex()))
                 .collect(Collectors.toList());
-        context.setValue(IdentifyChangeInForecastStepParameter.OUT.FORECAST_CHANGED_PTU_CONTAINER_DTO_LIST.name(), changedPtus);
+        context.setValue(OUT.FORECAST_CHANGED_PTU_CONTAINER_DTO_LIST.name(), changedPtus);
         return context;
     }
 

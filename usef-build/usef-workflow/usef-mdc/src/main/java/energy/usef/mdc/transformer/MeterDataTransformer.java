@@ -20,9 +20,9 @@ import energy.usef.core.data.xml.bean.message.ConnectionMeterData;
 import energy.usef.core.data.xml.bean.message.MeterData;
 import energy.usef.core.data.xml.bean.message.PTUMeterData;
 import energy.usef.core.workflow.transformer.MeterEventTransformer;
+import energy.usef.mdc.dto.ConnectionMeterDataDto;
 import energy.usef.mdc.dto.MeterDataDto;
 import energy.usef.mdc.dto.PtuMeterDataDto;
-import energy.usef.mdc.dto.ConnectionMeterDataDto;
 
 import java.util.ArrayList;
 import java.util.List;

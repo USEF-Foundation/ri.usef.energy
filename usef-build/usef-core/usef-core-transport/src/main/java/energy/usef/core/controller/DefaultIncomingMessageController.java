@@ -16,6 +16,7 @@
 
 package energy.usef.core.controller;
 
+import energy.usef.core.data.xml.bean.message.Message;
 import energy.usef.core.exception.BusinessException;
 
 import javax.ejb.Singleton;
@@ -28,14 +29,14 @@ import org.slf4j.LoggerFactory;
  */
 @Singleton
 public class DefaultIncomingMessageController extends
-        BaseIncomingMessageController<energy.usef.core.data.xml.bean.message.Message> {
+        BaseIncomingMessageController<Message> {
     private static final Logger LOGGER = LoggerFactory
             .getLogger(DefaultIncomingMessageController.class);
 
     /**
      * {@inheritDoc}
      */
-    public void action(energy.usef.core.data.xml.bean.message.Message message, energy.usef.core.model.Message savedMessage) throws BusinessException {
+    public void action(Message message, energy.usef.core.model.Message savedMessage) throws BusinessException {
         LOGGER.info("Message is received");
     }
 

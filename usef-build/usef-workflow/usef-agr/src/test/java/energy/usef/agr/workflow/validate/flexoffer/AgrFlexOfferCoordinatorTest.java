@@ -16,10 +16,11 @@
 
 package energy.usef.agr.workflow.validate.flexoffer;
 
+import static energy.usef.agr.workflow.AgrWorkflowStep.AGR_FLEX_OFFER_DETERMINE_FLEXIBILITY;
+
 import energy.usef.agr.config.ConfigAgr;
 import energy.usef.agr.service.business.AgrPlanboardBusinessService;
 import energy.usef.agr.service.business.AgrPortfolioBusinessService;
-import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.USEFRole;
@@ -66,6 +67,8 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+
+import energy.usef.core.data.xml.bean.message.FlexOffer;
 
 /**
  * Unit test for {@link AgrFlexOfferCoordinator}.
@@ -146,7 +149,7 @@ public class AgrFlexOfferCoordinatorTest {
         });
 
         ArgumentCaptor<WorkflowContext> workflowIn = ArgumentCaptor.forClass(WorkflowContext.class);
-        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AgrWorkflowStep.AGR_FLEX_OFFER_DETERMINE_FLEXIBILITY.name()), Mockito.any()))
+        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AGR_FLEX_OFFER_DETERMINE_FLEXIBILITY.name()), Mockito.any()))
                 .thenReturn(outContext);
 
         // execute test
@@ -158,7 +161,7 @@ public class AgrFlexOfferCoordinatorTest {
 
         // verify workflowstep
         Mockito.verify(workflowStepExecuter, Mockito.times(1)).invoke(
-                Mockito.eq(AgrWorkflowStep.AGR_FLEX_OFFER_DETERMINE_FLEXIBILITY.name()), workflowIn.capture());
+                Mockito.eq(AGR_FLEX_OFFER_DETERMINE_FLEXIBILITY.name()), workflowIn.capture());
         Assert.assertNotNull(
                 workflowIn.getValue().getValue(FlexOfferDetermineFlexibilityStepParameter.IN.FLEX_REQUEST_DTO_LIST.name()));
 
@@ -166,7 +169,7 @@ public class AgrFlexOfferCoordinatorTest {
         Mockito.verify(planboardValidatorService, Mockito.times(1))
                 .isPlanboardItemWithingIntradayGateClosureTime(Matchers.any(PtuFlexOffer.class));
         Mockito.verify(corePlanboardBusinessService, Mockito.times(1))
-                .storeFlexOffer(Mockito.anyString(), Matchers.any(energy.usef.core.data.xml.bean.message.FlexOffer.class),
+                .storeFlexOffer(Mockito.anyString(), Matchers.any(FlexOffer.class),
                         Matchers.eq(DocumentStatus.SENT), Matchers.anyString());
         Mockito.verify(jmsHelperService, Mockito.times(1))
                 .sendMessageToOutQueue(Matchers.contains(request.getConnectionGroup().getUsefIdentifier()));
@@ -189,7 +192,7 @@ public class AgrFlexOfferCoordinatorTest {
                 .thenReturn(requestList);
 
         ArgumentCaptor<WorkflowContext> workflowIn = ArgumentCaptor.forClass(WorkflowContext.class);
-        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AgrWorkflowStep.AGR_FLEX_OFFER_DETERMINE_FLEXIBILITY.name()), Mockito.any()))
+        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(AGR_FLEX_OFFER_DETERMINE_FLEXIBILITY.name()), Mockito.any()))
                 .thenReturn(outContext);
 
         // execute test
@@ -201,14 +204,14 @@ public class AgrFlexOfferCoordinatorTest {
 
         // verify workflowstep
         Mockito.verify(workflowStepExecuter, Mockito.times(1)).invoke(
-                Mockito.eq(AgrWorkflowStep.AGR_FLEX_OFFER_DETERMINE_FLEXIBILITY.name()), workflowIn.capture());
+                Mockito.eq(AGR_FLEX_OFFER_DETERMINE_FLEXIBILITY.name()), workflowIn.capture());
         Assert.assertNotNull(
                 workflowIn.getValue().getValue(FlexOfferDetermineFlexibilityStepParameter.IN.FLEX_REQUEST_DTO_LIST.name()));
         // verify execution of processing results
         Mockito.verify(planboardValidatorService, Mockito.times(1))
                 .isPlanboardItemWithingIntradayGateClosureTime(Matchers.any(PtuFlexOffer.class));
         Mockito.verify(corePlanboardBusinessService, Mockito.times(1))
-                .storeFlexOffer(Mockito.anyString(), Matchers.any(energy.usef.core.data.xml.bean.message.FlexOffer.class),
+                .storeFlexOffer(Mockito.anyString(), Matchers.any(FlexOffer.class),
                         Matchers.eq(DocumentStatus.SENT), Matchers.anyString());
         Mockito.verify(jmsHelperService, Mockito.times(1)).sendMessageToOutQueue(Matchers.any(String.class));
 

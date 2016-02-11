@@ -32,8 +32,8 @@ import energy.usef.core.model.RegimeType;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
 import energy.usef.core.service.business.SequenceGeneratorService;
 import energy.usef.dso.config.ConfigDso;
-import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 import energy.usef.dso.config.ConfigDsoParam;
+import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 
 import java.util.List;
 

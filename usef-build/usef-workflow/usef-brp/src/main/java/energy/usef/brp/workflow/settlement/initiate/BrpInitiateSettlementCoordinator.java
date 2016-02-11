@@ -80,7 +80,7 @@ import org.slf4j.LoggerFactory;
 /**
  * BRP Initiate Settlement workflow coordinator. This workflow is cut into two parts:
  * <p>
- * <li>1. prepare initiate settlement sends a {@link energy.usef.core.data.xml.bean.message.MeterDataQuery}</li>
+ * <li>1. prepare initiate settlement sends a {@link MeterDataQuery}</li>
  * <li>2. finalise initiate settlement triggered by the {@link MeterDataQueryResponseController}
  * workflow.</li>
  */

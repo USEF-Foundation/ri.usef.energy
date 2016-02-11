@@ -19,24 +19,6 @@ package energy.usef.dso.workflow.plan.connection.forecast;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 
-import energy.usef.core.config.Config;
-import energy.usef.core.config.ConfigParam;
-import energy.usef.core.event.RequestMoveToValidateEvent;
-import energy.usef.core.model.CongestionPointConnectionGroup;
-import energy.usef.core.model.Connection;
-import energy.usef.core.model.ConnectionGroup;
-import energy.usef.core.service.business.CorePlanboardBusinessService;
-import energy.usef.core.util.DateTimeUtil;
-import energy.usef.core.workflow.DefaultWorkflowContext;
-import energy.usef.core.workflow.WorkflowContext;
-import energy.usef.core.workflow.step.WorkflowStepExecuter;
-import energy.usef.core.workflow.util.WorkflowUtil;
-import energy.usef.dso.config.ConfigDso;
-import energy.usef.dso.service.business.DsoPlanboardBusinessService;
-import energy.usef.dso.workflow.DsoWorkflowStep;
-import energy.usef.dso.config.ConfigDsoParam;
-import energy.usef.dso.model.AggregatorOnConnectionGroupState;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +35,24 @@ import javax.inject.Inject;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
+import energy.usef.core.event.RequestMoveToValidateEvent;
+import energy.usef.core.model.CongestionPointConnectionGroup;
+import energy.usef.core.model.Connection;
+import energy.usef.core.model.ConnectionGroup;
+import energy.usef.core.service.business.CorePlanboardBusinessService;
+import energy.usef.core.util.DateTimeUtil;
+import energy.usef.core.workflow.DefaultWorkflowContext;
+import energy.usef.core.workflow.WorkflowContext;
+import energy.usef.core.workflow.step.WorkflowStepExecuter;
+import energy.usef.core.workflow.util.WorkflowUtil;
+import energy.usef.dso.config.ConfigDso;
+import energy.usef.dso.config.ConfigDsoParam;
+import energy.usef.dso.model.AggregatorOnConnectionGroupState;
+import energy.usef.dso.service.business.DsoPlanboardBusinessService;
+import energy.usef.dso.workflow.DsoWorkflowStep;
 
 /**
  * DSO Non Aggreagator Connection Forecast workflow, Plan board sub-flow workflow coordinator.

@@ -16,6 +16,8 @@
 
 package energy.usef.agr.model.device.capability;
 
+import energy.usef.agr.model.ConsumptionProductionType;
+
 import java.math.BigInteger;
 
 import javax.persistence.Column;
@@ -35,7 +37,8 @@ public abstract class VariationCapability extends DeviceCapability {
     @Column(name = "POWER_STEP", precision = 18, scale = 0, nullable = false)
     private BigInteger powerStep;
 
-    @Column(name = "CONSUMPTION_PRODUCTION_TYPE")
+    @Column(name = "CONSUMPTION_PRODUCTION_TYPE",
+            length = 16)
     @Enumerated(value = EnumType.STRING)
     private ConsumptionProductionType consumptionProductionType;
 

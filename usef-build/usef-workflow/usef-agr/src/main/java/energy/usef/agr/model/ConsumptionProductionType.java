@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package energy.usef.agr.model.device.capability;
+package energy.usef.agr.model;
 
 /**
- * Enumeration of the action types for power values:
+ * Enumeration of the action types for power values (used for device capabilities and requests):
  * <ul>
  * <li>CONSUMPTION</li>
  * <li>PRODUCTION</li>
