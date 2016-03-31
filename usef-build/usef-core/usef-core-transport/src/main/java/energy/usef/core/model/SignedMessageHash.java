@@ -16,7 +16,10 @@
 
 package energy.usef.core.model;
 
+import static javax.persistence.TemporalType.TIMESTAMP;
+
 import java.util.Arrays;
+import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -25,6 +28,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+
+import org.joda.time.LocalDateTime;
 
 /**
  * Entity representing the hash of a incoming signed message.
@@ -38,6 +44,10 @@ public class SignedMessageHash {
     @Column(name = "ID", nullable = false)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @Column(name = "CREATION_TIME", nullable = false)
+    @Temporal(TIMESTAMP)
+    private Date creationTime;
 
     @Lob
     @Column(name = "HASHED_CONTENT", nullable = false)
@@ -54,6 +64,22 @@ public class SignedMessageHash {
     public void setId(Long id) {
         this.id = id;
     }
+
+    public LocalDateTime getCreationTime() {
+        if (creationTime == null) {
+            return null;
+        }
+        return LocalDateTime.fromDateFields(creationTime);
+    }
+
+    public void setCreationTime(LocalDateTime creationTime) {
+        if (creationTime == null) {
+            this.creationTime = null;
+        } else {
+            this.creationTime = creationTime.toDateTime().toDate();
+        }
+    }
+
 
     public byte[] getHashedContent() {
         return hashedContent == null ? new byte[0] : Arrays.copyOf(hashedContent, hashedContent.length);

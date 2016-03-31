@@ -16,19 +16,6 @@
 
 package energy.usef.agr.pbcfeederimpl;
 
-import energy.usef.agr.dto.ConnectionPortfolioDto;
-import energy.usef.agr.dto.ElementDto;
-import energy.usef.agr.dto.ElementDtuDataDto;
-import energy.usef.agr.dto.ElementTypeDto;
-import energy.usef.agr.dto.ForecastPowerDataDto;
-import energy.usef.agr.dto.PowerContainerDto;
-import energy.usef.agr.dto.PowerDataDto;
-import energy.usef.agr.dto.UdiPortfolioDto;
-import energy.usef.core.util.DateTimeUtil;
-import energy.usef.core.util.PtuUtil;
-import energy.usef.pbcfeeder.PbcFeederClient;
-import energy.usef.pbcfeeder.dto.PbcStubDataDto;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -44,6 +31,19 @@ import javax.inject.Inject;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import energy.usef.agr.dto.ConnectionPortfolioDto;
+import energy.usef.agr.dto.ElementDto;
+import energy.usef.agr.dto.ElementDtuDataDto;
+import energy.usef.agr.dto.ElementTypeDto;
+import energy.usef.agr.dto.ForecastPowerDataDto;
+import energy.usef.agr.dto.PowerContainerDto;
+import energy.usef.agr.dto.PowerDataDto;
+import energy.usef.agr.dto.UdiPortfolioDto;
+import energy.usef.core.util.DateTimeUtil;
+import energy.usef.core.util.PtuUtil;
+import energy.usef.pbcfeeder.PbcFeederClient;
+import energy.usef.pbcfeeder.dto.PbcStubDataDto;
 
 /**
  * This class is the entry point for all data that is being 'fed' to the Aggregator PBCs.
@@ -275,7 +275,7 @@ public class PbcFeederService {
 
         for (int dtuIndex = startDtu; dtuIndex <= endDtu; dtuIndex++) {
             PowerContainerDto powerContainerDto = udiPortfolioDto.getUdiPowerPerDTU().get(dtuIndex);
-            if (powerContainerDto.getPeriod().toDateTimeAtStartOfDay().toDate()
+            if (powerContainerDto == null || powerContainerDto.getPeriod().toDateTimeAtStartOfDay().toDate()
                     .compareTo(pbcStubData.getPtuContainer().getPtuDate()) != 0 && powerContainerDto.getTimeIndex() != dtuIndex) {
                 continue;
             }

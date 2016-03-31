@@ -193,6 +193,7 @@ public class PrognosisConsolidationBusinessServiceTest {
                 .then(invocation -> IntStream.rangeClosed(1, 1).mapToObj(index -> {
                     PlanboardMessage pbMessage = new PlanboardMessage();
                     pbMessage.setSequence(random.nextLong());
+                    pbMessage.setCreationDateTime(new LocalDateTime(2015, 3, 30, 22, 0));
                     Message message = new Message();
                     message.setCreationTime(new LocalDateTime(2015, 3, 30, 22, 0));
                     pbMessage.setMessage(message);
@@ -208,6 +209,7 @@ public class PrognosisConsolidationBusinessServiceTest {
                 }).collect(Collectors.toList()));
         PowerMockito.when(config.getIntegerProperty(ConfigParam.PTU_DURATION)).thenReturn(15);
         PowerMockito.when(config.getIntegerProperty(ConfigParam.INTRADAY_GATE_CLOSURE_PTUS)).thenReturn(8);
+
 
         // when
         List<PtuPrognosis> ptuPrognosisList = service.consolidatePrognosisForDate(localDate, entityAddress, participantDomain);

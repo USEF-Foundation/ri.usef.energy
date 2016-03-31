@@ -18,6 +18,7 @@ package energy.usef.core.service.business;
 
 import energy.usef.core.model.SignedMessageHash;
 import energy.usef.core.repository.SignedMessageHashRepository;
+import energy.usef.core.util.DateTimeUtil;
 
 import java.util.Arrays;
 
@@ -54,6 +55,7 @@ public class SignedMessageHashService {
             throw new IllegalArgumentException("Cannot create a new entry for a null hashed content");
         }
         SignedMessageHash signedMessageHash = new SignedMessageHash();
+        signedMessageHash.setCreationTime(DateTimeUtil.getCurrentDateTime());
         signedMessageHash.setHashedContent(Arrays.copyOf(hashedContent, hashedContent.length));
         repository.persist(signedMessageHash);
     }

@@ -139,7 +139,7 @@ public class DsoOperateCoordinator {
 
             PtuState ptuState = dsoPlanboardBusinessService.findOrCreatePtuState(currentPtuContainer, congestionPoint);
             Optional<Long> currentLimitedPower = dsoPlanboardBusinessService.findLimitedPower(currentPtuContainer, congestionPoint);
-            if (!currentLimitedPower.isPresent()) {
+            if (!currentLimitedPower.isPresent() && previousPtuContainer != null) {
                 currentLimitedPower = dsoPlanboardBusinessService.findLimitedPower(previousPtuContainer, congestionPoint);
             }
             Long sumOfPower = currentLimitedPower.orElse(0L);

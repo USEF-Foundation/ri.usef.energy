@@ -36,6 +36,7 @@ import java.security.Key;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 
+import energy.usef.core.util.encryption.SodiumStub;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -63,11 +64,15 @@ public class KeystoreHelperServiceTest {
     private final static String KEYSTORE_PRIVATE_KEY = "usef_private_key";
 
     private final static String KEYSTORE_PASSWORD = "usef1234";
+
     @Mock
     private Config config;
 
     @Mock
     private File fileMock;
+
+    @Mock
+    private SodiumStub sodium;
 
     @Mock
     private KeyStore keyStoreMock;
@@ -85,8 +90,9 @@ public class KeystoreHelperServiceTest {
 
     @Before
     public void init() throws Exception {
-
         byte[] b = "Any String you want".getBytes();
+
+        sodium = new SodiumStub();
 
         keystoreHelperService = new KeystoreHelperService();
         Whitebox.setInternalState(keystoreHelperService, "config", config);
@@ -94,6 +100,9 @@ public class KeystoreHelperServiceTest {
         when(config.getProperty(Matchers.eq(ConfigParam.KEYSTORE_PASSWORD))).thenReturn(KEYSTORE_PASSWORD);
         when(config.getProperty(Matchers.eq(ConfigParam.KEYSTORE_PRIVATE_KEY_ALIAS))).thenReturn(KEYSTORE_PRIVATE_KEY_ALIAS);
         when(config.getProperty(Matchers.eq(ConfigParam.KEYSTORE_PRIVATE_KEY_PASSWORD))).thenReturn(KEYSTORE_PRIVATE_KEY);
+
+        PowerMockito.mockStatic(NaCl.class);
+        PowerMockito.when(NaCl.sodium()).thenReturn(sodium);
 
         PowerMockito.mockStatic(KeyStore.class);
         when(KeyStore.getInstance(Matchers.eq("JCEKS"))).thenReturn(keyStoreMock);

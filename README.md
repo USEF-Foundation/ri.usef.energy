@@ -1,5 +1,12 @@
 # Release notes USEF Reference Implementation
 
+## Release v 1.3.2 , 30 March 2016 ##
+
+###Delivered items###
+	*	A timestamp field is added to the SIGNED_MESSAGE_HASH table to enable housekeeping.
+	*	Various small performance related improvements.
+	
+
 ## Release v 1.3.1 , 12 February 2016 ##
 
 ###Important Notes###

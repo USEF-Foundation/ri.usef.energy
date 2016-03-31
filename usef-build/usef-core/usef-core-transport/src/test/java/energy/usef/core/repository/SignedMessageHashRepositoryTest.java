@@ -20,6 +20,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.powermock.reflect.Whitebox.setInternalState;
 import energy.usef.core.model.SignedMessageHash;
+import energy.usef.core.util.DateTimeUtil;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -73,6 +74,7 @@ public class SignedMessageHashRepositoryTest {
         repository.getEntityManager().getTransaction().begin();
 
         SignedMessageHash signedMessageHash = new SignedMessageHash();
+        signedMessageHash.setCreationTime(DateTimeUtil.getCurrentDateTime());
         signedMessageHash.setHashedContent(DigestUtils.sha256(HELLO_USEF_CONTENT));
         repository.persist(signedMessageHash);
         repository.getEntityManager().getTransaction().commit();

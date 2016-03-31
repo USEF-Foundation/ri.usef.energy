@@ -16,28 +16,26 @@
 
 package energy.usef.core.service.business;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import static java.util.Objects.requireNonNull;
-import static org.apache.commons.codec.binary.Base64.decodeBase64;
 import energy.usef.core.exception.BusinessException;
 import energy.usef.core.service.business.error.MessageEncryptionError;
 import energy.usef.core.service.helper.KeystoreHelperService;
 import energy.usef.core.util.encryption.NaCl;
+import jnr.ffi.byref.LongLongByReference;
+import org.abstractj.kalium.NaCl.Sodium;
+import org.apache.commons.codec.binary.Base64;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 
-import jnr.ffi.byref.LongLongByReference;
-
-import org.abstractj.kalium.NaCl.Sodium;
-import org.apache.commons.codec.binary.Base64;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.codec.binary.Base64.decodeBase64;
 
 /**
  * Business Service class in charge of the encryption/decryption/signing of the different messages.
  */
 @Stateless
 public class MessageEncryptionService {
-
     @Inject
     private KeystoreHelperService keystoreHelperService;
 
@@ -91,6 +89,7 @@ public class MessageEncryptionService {
         if (result != 0) {
             throw new BusinessException(MessageEncryptionError.MESSAGE_SEALING_FAILED);
         }
+
         // encode result in Base64
         return Base64.encodeBase64(cipher);
     }
@@ -103,6 +102,7 @@ public class MessageEncryptionService {
                 sealedMessage,
                 sealedMessage.length,
                 publicKey);
+
         // check status of the operation (0=success)
         if (result != 0) {
             throw new BusinessException(MessageEncryptionError.MESSAGE_UNSEALING_FAILED);
