@@ -41,10 +41,7 @@ import org.codehaus.jackson.type.TypeReference;
 import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -210,8 +207,10 @@ public class PowerMatcherTest {
 
     @Test
     public void testGetInterval() {
-        Assert.assertEquals("2015-05-01T13:00:00Z/2015-05-01T13:59:59Z",
+        Assert.assertEquals("2015-05-01T11:00:00Z/2015-05-01T11:59:59Z",
                 PowerMatcher.getInterval(new LocalDate(2015, 5, 1), 53, 15, 4));
+        Assert.assertEquals("2015-01-01T12:00:00Z/2015-01-01T12:59:59Z",
+                PowerMatcher.getInterval(new LocalDate(2015, 1, 1), 53, 15, 4));
     }
 
     private List<ObjectiveAgentProfileDto> buildObjectiveAgentProfileDtos() {

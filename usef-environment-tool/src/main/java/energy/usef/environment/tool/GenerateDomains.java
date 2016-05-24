@@ -62,6 +62,8 @@ public class GenerateDomains {
     private static final String PBC_FEEDER_ENDPOINT = "pbc_feeder_endpoint";
     private UsefEnvironment environmentConfig = new UsefEnvironment();
 
+
+
     /**
      * @param args
      * @throws Exception
@@ -90,6 +92,7 @@ public class GenerateDomains {
         environmentConfig.load(environmentYaml);
 
         generateNodeFolders();
+        generateDataSources();
 
         // copy the global yaml file to every node
         String globalParticipantFile = ToolConfig.getUsefEnvironmentNodesFolder() + File.separator +
@@ -116,15 +119,6 @@ public class GenerateDomains {
         Server server = Server.createTcpServer("-tcpAllowOthers").start();
         for (String nodeName : environmentConfig.getNodeNames()) {
             NodeConfig nodeConfig = environmentConfig.getNodeConfig(nodeName);
-            String dbFilename = ToolConfig.getUsefEnvironmentDomainDataFolder(nodeName) + File.separator + ToolConfig.DB_FILE + "."
-                    +
-                    ToolConfig.DB_FILE_EXTENSION;
-            LOGGER.info("The location of the database file: " + dbFilename);
-
-            if (!FileUtil.isFileExists(dbFilename)) {
-                LOGGER.error("Database file {} does not exist.", dbFilename);
-                System.exit(1);
-            }
 
             String credentialProperties = ToolConfig.getUsefEnvironmentDomainConfigurationFolder(nodeName) + File.separator +
                     ToolConfig.CREDENTIALS;
@@ -136,11 +130,19 @@ public class GenerateDomains {
             Properties properties = FileUtil.readProperties(credentialProperties);
 
             Class.forName(ToolConfig.DRIVER_CLASS);
-            Connection connection = DriverManager.getConnection(ToolConfig.getUsefEnvironmentDbUrl(nodeName), ToolConfig.USER,
-                    properties.getProperty(ToolConfig.DB_PASSWORD_PROPERTY));
 
             List<RoleConfig> domains = environmentConfig.getDomainRoleConfig(nodeConfig);
             for (RoleConfig roleConfig : domains) {
+
+                String dbFolder = ToolConfig.getUsefEnvironmentDomainDataFolder(nodeName) + File.separator;
+
+                String dbFilename = dbFolder + (environmentConfig.isDatabasePerParticipant() ? roleConfig.getDomain() : "usef_db");
+
+                LOGGER.info("The location of the database file: " + dbFilename);
+
+                Connection connection = DriverManager.getConnection(ToolConfig.getUsefEnvironmentDbUrl(dbFilename), ToolConfig.USER,
+                        properties.getProperty(ToolConfig.DB_PASSWORD_PROPERTY));
+
                 List<String> statements = new ArrayList<>();
 
                 statements.add("drop schema " + roleConfig.getUniqueDbSchemaName() + " if exists;");
@@ -182,8 +184,8 @@ public class GenerateDomains {
                     executeDdlStatement(connection, statement);
                 }
 
+                connection.close();
             }
-            connection.close();
         }
         LOGGER.info("Closing H2 database.");
         server.stop();
@@ -202,6 +204,63 @@ public class GenerateDomains {
             generateDomainFolders(nodeConfig);
 
         }
+    }
+
+    private void generateDataSources()  throws IOException {
+        for (String nodeName : environmentConfig.getNodeNames()) {
+            NodeConfig nodeConfig = environmentConfig.getNodeConfig(nodeName);
+
+            StringBuffer datasources = new StringBuffer("");
+
+            if (environmentConfig.isDatabasePerParticipant()) {
+                List<RoleConfig> domains = environmentConfig.getDomainRoleConfig(nodeConfig);
+
+                for (RoleConfig roleConfig : domains) {
+                    String dbFilename = ToolConfig.getUsefEnvironmentDomainDataFolder(nodeName) + File.separator + roleConfig.getDomain();
+                    datasources.append(getDataSource(roleConfig.getUniqueDatasourceName(), getDbUrl(dbFilename).replace("\\", "/")));
+                }
+            } else
+            {
+                String dbFilename = ToolConfig.getUsefEnvironmentDomainDataFolder(nodeName) + File.separator + "usef_db";
+                datasources.append(getDataSource("USEF_DS", getDbUrl(dbFilename).replace("\\", "/")));
+            }
+
+            String standaloneXml = ToolConfig.getUsefEnvironmentDomainConfigurationFolder(nodeName) + File.separator + ToolConfig.STANDALONE_XML;
+
+            List<String> config = new ArrayList<>();
+            List<String> templateConfig = FileUtil.readLines(ToolConfig.getUsefEnvironmentTemplateFolder() + File.separator + ToolConfig.STANDALONE_XML);
+
+            for (String line : templateConfig) {
+                if ("USEF_DATASOURCES".equalsIgnoreCase(line)) {
+                    config.add(datasources.toString());
+                }
+                else {
+                    config.add(line);
+                }
+            }
+
+            BufferedOutputStream bout = null;
+            try {
+                bout = new BufferedOutputStream(new FileOutputStream(standaloneXml));
+
+                for (String line : config) {
+                    line += System.getProperty("line.separator");
+                    bout.write(line.getBytes());
+                }
+            } catch (IOException e) {
+            } finally {
+                if (bout != null) {
+                    try {
+                        bout.close();
+                    } catch (Exception e) {
+                    }
+                }
+            }
+        }
+    }
+
+    public String getDbUrl(String file) {
+        return ("jdbc:h2:tcp://127.0.0.1/" + file + ";CIPHER=AES;MVCC=true;TRACE_LEVEL_FILE=0");
     }
 
     private void generateDomainFolders(NodeConfig nodeConfig) throws IOException, ParserConfigurationException, SAXException,
@@ -494,5 +553,32 @@ public class GenerateDomains {
         sb.append("send\n");
         FileUtil.appendNonDelimitingTextToFile(zoneFilename, sb.toString());
     }
+
+
+    private String getDataSource (String datasourceName, String url) {
+        StringBuffer sb=new StringBuffer("");
+        sb.append("                <xa-datasource jndi-name=\"java:jboss/datasources/");
+        sb.append(datasourceName);
+        sb.append("\" pool-name=\"");
+        sb.append(datasourceName+"_POOL");
+        sb.append("\" enabled=\"true\">\n");
+        sb.append("                    <xa-datasource-property name=\"URL\">");
+        sb.append(url);
+        sb.append("</xa-datasource-property>\n");
+        sb.append("                    <driver>h2</driver>\n");
+        sb.append("                    <xa-pool>\n");
+        sb.append("                        <min-pool-size>10</min-pool-size>\n");
+        sb.append("                        <max-pool-size>20</max-pool-size>\n");
+        sb.append("                        <prefill>true</prefill>\n");
+        sb.append("                    </xa-pool>\n");
+        sb.append("                    <security>\n");
+        sb.append("                        <user-name>usef</user-name>\n");
+        sb.append("                        <password>${VAULT::USEF_DS_ENCRYPTED::password::1}</password>\n");
+        sb.append("                    </security>\n");
+        sb.append("                </xa-datasource>\n");
+
+        return sb.toString();
+    }
+
 
 }

@@ -43,7 +43,6 @@ public class DomainConfig {
     }
 
     /**
-     * @param role
      * @param domain
      */
     public DomainConfig(String domain) {

@@ -259,8 +259,8 @@ public class ToolConfig {
         return getUsefEnvironmentNodeFolder(nodeName) + File.separator + "lib";
     }
 
-    public static String getUsefEnvironmentDbUrl(String nodeName) {
-        String filename = getUsefEnvironmentDomainDataFolder(nodeName) + File.separator + DB_FILE;
+    public static String getUsefEnvironmentDbUrl(String filename) {
+
         String url = "jdbc:h2:tcp://localhost/" + filename.replace(File.separatorChar, '/') + ";CIPHER=AES;MVCC=true";
         return url;
     }

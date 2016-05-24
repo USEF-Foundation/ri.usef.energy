@@ -16,9 +16,12 @@
 
 package energy.usef.environment.tool.security;
 
+import energy.usef.environment.tool.config.SortedProperties;
 import energy.usef.environment.tool.config.ToolConfig;
 import energy.usef.environment.tool.util.FileUtil;
+import energy.usef.environment.tool.yaml.DomainConfig;
 import energy.usef.environment.tool.yaml.NodeConfig;
+import energy.usef.environment.tool.yaml.RoleConfig;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -172,40 +175,46 @@ public class VaultService {
     }
 
     /**
-     * Creates a node-specific encrypted database and credentials.properties. All paths in the credentials.properties file are from
-     * the node's point of view, so do include node(os)-specific paths and path seperators.
-     * 
+     * Creates a node-specific credentials.properties. All paths in the credentials.properties file are from
+     * the node's point of view, so do include node(os)-specific paths and path seperators. Encrypted database(s) creation
+     * is done upon first access when generating Domains
+     *
      * @throws SQLException
      * @throws ClassNotFoundException
      * @throws IOException
      */
-    public void createEncryptedDatabase() throws SQLException, ClassNotFoundException, IOException {
+    public void createEncryptedDatabase(boolean isPerParticipantDatabase) throws SQLException, ClassNotFoundException, IOException {
         LOGGER.info("Database Settings" + "\n" + "\tDriver Class {} " + "\n"
                 + "\tJDBC URL {} " + "\n" + "\tUser Name: {}" + "\n"
                 + "\tPassword: {}", ToolConfig.DRIVER_CLASS, ToolConfig.getUsefEnvironmentDbUrl(node.getName()), ToolConfig.USER,
                 password);
 
-        Properties properties = new Properties();
+        SortedProperties properties = new SortedProperties();
         properties.setProperty(ToolConfig.USEF_ROOT_FOLDER, node.getBasePath());
-        properties.setProperty(ToolConfig.DB_URL_PROPERTY, node.getDbUrl());
         properties.setProperty(ToolConfig.DB_DRIVER_PROPERTY, ToolConfig.DRIVER_CLASS);
         properties.setProperty(ToolConfig.DB_USER_PROPERTY, ToolConfig.USER);
         properties.setProperty(ToolConfig.DB_PASSWORD_PROPERTY, password);
-        properties.setProperty(ToolConfig.SOAP_DB_URL_PROPERTY, node.getDbUrlIncludingUsernameAndPassword(password));
+
+        // Provide some backwards compatibility
+        if (!isPerParticipantDatabase) {
+            properties.setProperty(ToolConfig.DB_URL_PROPERTY, node.getDbUrl());
+            properties.setProperty(ToolConfig.SOAP_DB_URL_PROPERTY, node.getDbUrlIncludingUsernameAndPassword(password));
+        }
+
+        for (DomainConfig domainConfig : node.getDomainConfigs()) {
+            for (RoleConfig roleConfig : domainConfig.getRoleConfigs()) {
+                if (isPerParticipantDatabase) {
+                    properties.setProperty(ToolConfig.DB_URL_PROPERTY + "_" + roleConfig.getUniqueDbSchemaName(),  node.getDbUrl().replace("usef_db", roleConfig.getDomain()));
+                    properties.setProperty(ToolConfig.SOAP_DB_URL_PROPERTY + "_" + roleConfig.getUniqueDbSchemaName(), node.getDbUrlIncludingUsernameAndPassword(password).replace("usef_db", roleConfig.getDomain()));
+                } else {
+                    properties.setProperty(ToolConfig.SOAP_DB_URL_PROPERTY + "_" + roleConfig.getUniqueDbSchemaName(), node.getDbUrlIncludingUsernameAndPassword(password));
+                    properties.setProperty(ToolConfig.DB_URL_PROPERTY + "_" + roleConfig.getUniqueDbSchemaName(),  node.getDbUrl());
+                }
+            }
+        }
+
         FileUtil.writeProperties(ToolConfig.getUsefEnvironmentDomainConfigurationFolder(node.getName()) + File.separator +
                 ToolConfig.CREDENTIALS, "Database credential properties file - REMOVE THIS FILE FOR SECURITY REASONS!", properties);
-
-        String dbFilename = ToolConfig.getUsefEnvironmentDomainDataFolder(node.getName()) + File.separator + ToolConfig.DB_FILE;
-        LOGGER.info("The location of the database file: " + dbFilename);
-        if (!FileUtil.isFileExists(dbFilename)) {
-            LOGGER.info("Creating database file.");
-            Server server = Server.createTcpServer("-tcpAllowOthers").start();
-            Class.forName(ToolConfig.DRIVER_CLASS);
-            DriverManager.getConnection(ToolConfig.getUsefEnvironmentDbUrl(node.getName()), ToolConfig.USER, password).close();
-            server.stop();
-        } else {
-            LOGGER.info("Database file does already exist. Do not overwrite!");
-        }
     }
 
     /**

@@ -1,19 +1,19 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<messaging-deployment xmlns="urn:jboss:messaging-deployment:1.0">
-	<hornetq-server>
-		<jms-destinations>
-			<jms-queue name="IN_QUEUE_DSO">
-				<entry name="java:jboss/exported/jms/usefInQueueDso" />
-				<durable>true</durable>
-			</jms-queue>
-			<jms-queue name="OUT_QUEUE_DSO">
-				<entry name="java:jboss/exported/jms/usefOutQueueDso" />
-				<durable>true</durable>
-			</jms-queue>
-			<jms-queue name="NOT_SENT_QUEUE_DSO">
-				<entry name="java:jboss/exported/jms/usefNotSentQueueDso" />
-				<durable>true</durable>
-			</jms-queue>
-		</jms-destinations>
-	</hornetq-server>
+<?xml version="1.0" encoding="UTF-8"?>
+<messaging-deployment xmlns="urn:jboss:messaging-activemq-deployment:1.0">
+    <server name="default">
+        <jms-destinations>
+            <jms-queue name="IN_QUEUE_DSO">
+                <entry name="java:jboss/exported/jms/usefInQueueDso" />
+                <durable>true</durable>
+            </jms-queue>
+            <jms-queue name="OUT_QUEUE_DSO">
+                <entry name="java:jboss/exported/jms/usefOutQueueDso" />
+                <durable>true</durable>
+            </jms-queue>
+            <jms-queue name="NOT_SENT_QUEUE_DSO">
+                <entry name="java:jboss/exported/jms/usefNotSentQueueDso" />
+                <durable>true</durable>
+            </jms-queue>
+        </jms-destinations>
+    </server>
 </messaging-deployment>

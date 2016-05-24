@@ -118,7 +118,7 @@ public class WarUtil {
                 newXmlOrSql = XmlConfig.processQueueConfigJms(xmlOrSql, roleConfig.getUniqueName());
                 break;
             case PERSISTENCE_XML:
-                newXmlOrSql = XmlConfig.processPersistenceXml(xmlOrSql, roleConfig.getUniqueName());
+                newXmlOrSql = XmlConfig.processPersistenceXml(xmlOrSql, roleConfig);
                 break;
             case LOGBACK_XML:
                 newXmlOrSql = XmlConfig.processLogbackXml(xmlOrSql, roleConfig.getUniqueName());

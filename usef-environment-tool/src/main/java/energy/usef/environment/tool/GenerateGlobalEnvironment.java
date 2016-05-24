@@ -58,7 +58,7 @@ public class GenerateGlobalEnvironment {
             copyFiles(node);
             VaultService vaultService = new VaultService(environmentConfig.getNodeConfig(node));
             vaultService.createWildflyPropertiesFile(keystorePassword);
-            vaultService.createEncryptedDatabase();
+            vaultService.createEncryptedDatabase(environmentConfig.isDatabasePerParticipant());
             vaultService.createVault(keystorePassword);
         }
 
@@ -67,8 +67,7 @@ public class GenerateGlobalEnvironment {
         String participantYamlTarget = ToolConfig.getUsefEnvironmentNodesFolder() + File.separator + ToolConfig.PARTICIPANTS_YAML;
         FileUtil.copyFile(participantYamlSource, participantYamlTarget);
 
-        String zoneFileSource = ToolConfig.getUsefEnvironmentTemplateFolder() + File.separator
-                + ToolConfig.BIND_ZONE_FILE;
+        String zoneFileSource = ToolConfig.getUsefEnvironmentTemplateFolder() + File.separator + ToolConfig.BIND_ZONE_FILE;
         String zoneFileTarget = ToolConfig.getUsefEnvironmentNodesFolder() + File.separator + ToolConfig.BIND_ZONE_FILE;
         FileUtil.copyFile(zoneFileSource, zoneFileTarget);
 
@@ -81,8 +80,8 @@ public class GenerateGlobalEnvironment {
     }
 
     private void copyFiles(String node) throws IOException {
-        FileUtil.copyFile(ToolConfig.getUsefEnvironmentTemplateFolder() + File.separator + ToolConfig.STANDALONE_XML,
-                ToolConfig.getUsefEnvironmentDomainConfigurationFolder(node) + File.separator + ToolConfig.STANDALONE_XML);
+//        FileUtil.copyFile(ToolConfig.getUsefEnvironmentTemplateFolder() + File.separator + ToolConfig.STANDALONE_XML,
+//                ToolConfig.getUsefEnvironmentDomainConfigurationFolder(node) + File.separator + ToolConfig.STANDALONE_XML);
 
         FileUtil.copyFile(ToolConfig.getUsefEnvironmentTemplateFolder() + File.separator + ToolConfig.SSL_KEYSTORE,
                 ToolConfig.getUsefEnvironmentDomainConfigurationFolder(node) + File.separator + ToolConfig.SSL_KEYSTORE);

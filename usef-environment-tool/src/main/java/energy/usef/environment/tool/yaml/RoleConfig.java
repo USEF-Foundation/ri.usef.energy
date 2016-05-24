@@ -31,17 +31,24 @@ public class RoleConfig {
     private static final String HOST_ROLE = "HOST_ROLE";
     private Role role;
     private String domain;
+    private String datasource;
     private Map<String, String> config = new HashMap<>();
 
     /**
      * @param role
      * @param domain
      */
-    public RoleConfig(Role role, String domain, Map<String, String> config) {
+    public RoleConfig(Role role, String domain, Map<String, String> config, boolean perParticipantDatabase) {
         super();
         this.role = role;
         this.domain = domain;
         this.config = config;
+        if (perParticipantDatabase) {
+            datasource = (domain.replace(".", "_").replace("-", "_") + "_" + role.name()).toUpperCase()+ "_DS";
+        } else {
+            datasource = "USEF_DS";
+        }
+
     }
 
     public void mergeConfiguration(Map<String, String> globalConfig) {
@@ -107,6 +114,10 @@ public class RoleConfig {
 
     public String getUniqueDbSchemaName() {
         return (domain.replace(".", "_").replace("-", "_") + "_" + role.name()).toUpperCase();
+    }
+
+    public String getUniqueDatasourceName() {
+        return datasource;
     }
 
     public String getTemplateDbSchemaName() {

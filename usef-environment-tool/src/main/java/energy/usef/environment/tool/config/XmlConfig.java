@@ -40,6 +40,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import energy.usef.environment.tool.yaml.RoleConfig;
+
 public class XmlConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(XmlConfig.class);
     private static final Charset DEFAULT_CHARSET = Charset.forName("UTF-8");
@@ -88,9 +90,14 @@ public class XmlConfig {
         return saveXmlDocument(doc);
     }
 
-    public static String processPersistenceXml(String xmlContent, String uniqueDomainRoleName)
+    public static String processPersistenceXml(String xmlContent, RoleConfig roleConfig)
             throws ParserConfigurationException, SAXException, IOException, TransformerException {
+
+        String dataSourceName = roleConfig.getUniqueDatasourceName();
+        String dbSchemaName = roleConfig.getUniqueDbSchemaName();
         Document doc = loadXmlDocument(xmlContent);
+
+        doc.getElementsByTagName("jta-data-source").item(0).setTextContent("java:jboss/datasources/" + dataSourceName );
 
         NodeList nodelist = doc.getElementsByTagName("property");
         boolean found = false;
@@ -99,7 +106,7 @@ public class XmlConfig {
             if ("hibernate.default_schema".equalsIgnoreCase(nameNode.getTextContent())) {
                 found = true;
                 Node valueNode = nodelist.item(i).getAttributes().getNamedItem("value");
-                valueNode.setTextContent(uniqueDomainRoleName.replace(".", "_").replace("-", "_").toUpperCase());
+                valueNode.setTextContent(dbSchemaName);
             }
         }
 

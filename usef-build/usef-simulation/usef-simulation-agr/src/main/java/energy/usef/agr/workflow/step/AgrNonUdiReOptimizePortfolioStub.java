@@ -134,30 +134,49 @@ public class AgrNonUdiReOptimizePortfolioStub implements WorkflowStep {
                         .forEach(entry -> {
                             Integer ptuIndex = entry.getKey();
                             ForecastPowerDataDto forecastPowerData = entry.getValue().getForecast();
-                            BigInteger factoredFlex = calculateFactoredFlex(potentialFlexFactorPerPtuPerConnectionGroup,
-                                    connectionGroupId, ptuIndex, forecastPowerData);
 
-                            processFlexIntoForecast(forecastPowerData, factoredFlex);
+                            processxFlexIntoForecast(potentialFlexFactorPerPtuPerConnectionGroup, connectionGroupId, ptuIndex,
+                                    forecastPowerData);
+
                         }));
     }
 
-    private BigInteger calculateFactoredFlex(Map<String, Map<Integer, BigDecimal>> potentialFlexFactorPerPtuPerConnectionGroup,
+    private void processxFlexIntoForecast(Map<String, Map<Integer, BigDecimal>> potentialFlexFactorPerPtuPerConnectionGroup,
             String connectionGroupId, Integer ptuIndex, ForecastPowerDataDto forecastPowerData) {
-        BigDecimal potentialFlexFactor = potentialFlexFactorPerPtuPerConnectionGroup.get(connectionGroupId)
-                .get(ptuIndex);
-        BigDecimal flexConsumption = new BigDecimal(forecastPowerData.getPotentialFlexConsumption());
-        return flexConsumption.multiply(potentialFlexFactor).toBigInteger();
-    }
 
-    private void processFlexIntoForecast(ForecastPowerDataDto forecastPowerData, BigInteger factoredFlex) {
-        if (factoredFlex.compareTo(BigInteger.ZERO) <= 0) {
+        BigDecimal factor = potentialFlexFactorPerPtuPerConnectionGroup.get(connectionGroupId).get(ptuIndex);
+
+        if (factor.compareTo(BigDecimal.ZERO) == 0) {
+            // nothing to do
+            return;
+        }
+
+        if (factor.compareTo(BigDecimal.ZERO) > 0) {
+            // factor > 0, reduce consumption (increase of production is not (yet) supported by this stub)
+            // new consumption power = forecast consumption + flex consumption * factor
+            BigDecimal flexConsumption = new BigDecimal(forecastPowerData.getPotentialFlexConsumption());
+            BigInteger factoredFlex = flexConsumption.multiply(factor).toBigInteger();
+
+            if (factoredFlex.compareTo(BigInteger.ZERO) > 0) {
+                return;
+            }
+
             BigInteger newForecast = forecastPowerData.getAverageConsumption().add(factoredFlex);
             // consumption cannot be less than 0
             if (newForecast.compareTo(BigInteger.ZERO) < 0) {
                 newForecast = BigInteger.ZERO;
             }
             forecastPowerData.setAverageConsumption(newForecast);
-        } else if (factoredFlex.compareTo(BigInteger.ZERO) > 0) {
+        } else {
+            // factor < 0, reduce production (increase of consumption is not (yet) supported by this stub)
+            // new production power = forecast production + flex production * factor
+            BigDecimal flexProduction = new BigDecimal(forecastPowerData.getPotentialFlexProduction());
+            BigInteger factoredFlex = flexProduction.multiply(factor).toBigInteger();
+
+            if (factoredFlex.compareTo(BigInteger.ZERO) < 0) {
+                return;
+            }
+
             BigInteger newForecast = forecastPowerData.getAverageProduction().subtract(factoredFlex);
             // production cannot be less than 0
             if (newForecast.compareTo(BigInteger.ZERO) < 0) {

@@ -9,7 +9,7 @@
 *.ear
 
 #IntelliJ
-.idea
+.idea/
 *.iml
 
 #Maven

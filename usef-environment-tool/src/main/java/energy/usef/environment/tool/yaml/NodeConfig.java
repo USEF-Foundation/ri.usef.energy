@@ -119,7 +119,7 @@ public class NodeConfig {
      */
     public String getDbUrl() {
         String filename = getWildFlySubFolder("data") + pathSep + "usef_db";
-        String url = "jdbc:h2:tcp://" + address + "/" + filename.replace(File.separatorChar, '/') + ";CIPHER=AES;MVCC=true";
+        String url = "jdbc:h2:tcp://" + address + "/" + filename.replace(File.separatorChar, '/').replace("//", "/") + ";CIPHER=AES;MVCC=true";
         return url;
     }
 

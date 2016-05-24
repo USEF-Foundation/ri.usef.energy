@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 public class UsefEnvironment {
     private static final Logger LOGGER = LoggerFactory.getLogger(UsefEnvironment.class);
 
+    private static final String DATABASE_PER_PARTICIPANT = "per_participant_database";
     private static final String PROCESSES = "processes";
     private static final String TIME = "timeserver";
     private static final String DOMAIN_NAME = "domain-name";
@@ -127,11 +128,11 @@ public class UsefEnvironment {
                 if (roleElement.getValue() instanceof Map) {
                     Map<String, Object> config = (Map<String, Object>) roleElement.getValue();
                     Role role = getRoleFromElement(roleElement);
-                    parseDomainRole(nodeConfig, domainName, role, config);
+                    parseDomainRole(this, nodeConfig, domainName, role, config);
                 } else if (roleElement.getValue() == null) {
                     // empty role with no configuration items.
                     Role role = getRoleFromElement(roleElement);
-                    parseDomainRole(nodeConfig, domainName, role, new HashMap<>());
+                    parseDomainRole(this, nodeConfig, domainName, role, new HashMap<>());
                 }
             }
 
@@ -191,7 +192,7 @@ public class UsefEnvironment {
         return role;
     }
 
-    private void parseDomainRole(NodeConfig nodeConfig, String domainName, Role role, Map<String, Object> config) {
+    private void parseDomainRole(UsefEnvironment environmentConfig, NodeConfig nodeConfig, String domainName, Role role, Map<String, Object> config) {
         LOGGER.debug("Parsing configuration for node {}, domain {} and role {}.", nodeConfig.getNode(), domainName, role);
       
         DomainConfig domainConfig = nodeConfig.getDomain(domainName);
@@ -220,7 +221,7 @@ public class UsefEnvironment {
 
         RoleConfig roleConfig = domainConfig.getRoleConfig(role);
         if (roleConfig == null) {
-            domainConfig.add(new RoleConfig(role, domainName, configValues));
+            domainConfig.add(new RoleConfig(role, domainName, configValues, environmentConfig.isDatabasePerParticipant()));
         } else {
             LOGGER.error("There is already an configuration for role {} and domain {}.", role, domainName);
             System.exit(1);
@@ -245,6 +246,11 @@ public class UsefEnvironment {
             config.addAll(domain.getRoleConfigs());
         }
         return config;
+    }
+
+    public boolean isDatabasePerParticipant() {
+        String databasePerParticipant = globalConfig.get(DATABASE_PER_PARTICIPANT);
+        return (StringUtils.isEmpty(databasePerParticipant) || "true".equalsIgnoreCase(databasePerParticipant));
     }
 
     public String getKeystorePassword() {

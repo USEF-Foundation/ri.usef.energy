@@ -355,6 +355,9 @@ validate_incoming_xml: true
 # So, when this is commented out, the stub PBCs won't work correctly.
 pbc_feeder_endpoint: http://localhost:8080/usef-pbcfeeder/rest/PBCFeeder  
 
+# Generate a database per participant or one for all participants.
+per_participant_database : true
+
 # A Time Server may be configured to create faster simulations, if this is done, the following properties must be enabled.
 # The following two properties are used by the participants in this USEF environment to connect to the time server
 #time_server: 127.0.0.1
@@ -412,7 +415,7 @@ nodes:
 
               # This public key is used to decrypt incoming xml messages.
               public-encryption-key: "oJsWvumLo1PHdE3ij/sPiLeoiqtMnOZMEmPoz45pIZI="
-
+              
 #        - domain-name: "agr.usef-example.com"
 #          agr-role:
               # If you don't have DNSSEC configured for this participant yet, uncomment the following line:

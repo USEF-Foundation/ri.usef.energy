@@ -1,5 +1,13 @@
 # Release notes USEF Reference Implementation
 
+## Release v 1.3.3 , 24 May 2016 ##
+
+###Delivered items###
+	*	Upgraded Wildfly to release 10.0.0.
+	*	The environment tool now generates a database per participant for improved performance.
+	*   Example Common Reference setup scripts have been added to support a different database per participant.
+	*	Minor changes in stub implementations.
+
 ## Release v 1.3.2 , 30 March 2016 ##
 
 ###Delivered items###

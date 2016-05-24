@@ -45,6 +45,8 @@ import javax.ws.rs.core.Response;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -93,7 +95,10 @@ public class PowerMatcher {
         LocalDateTime start = date.toDateTimeAtStartOfDay().toLocalDateTime().plusMinutes((ptuIndex - 1) * ptuDuration);
         LocalDateTime end = start.plusMinutes(numberOfPtus * ptuDuration).minusSeconds(1);
 
-        return start.toString(POWER_MATCHER_TIME_FORMAT) + "/" + end.toString(POWER_MATCHER_TIME_FORMAT);
+
+        DateTime startDateTime = start.toDateTime().toDateTime(DateTimeZone.UTC);
+        DateTime endDateTime = end.toDateTime().toDateTime(DateTimeZone.UTC);
+        return startDateTime.toString(POWER_MATCHER_TIME_FORMAT) + "/" + endDateTime.toString(POWER_MATCHER_TIME_FORMAT);
     }
 
     /**
