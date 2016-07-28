@@ -93,7 +93,6 @@ public class AgrCommonReferenceUpdateCoordinator {
             SynchronisationConnectionStatusType connectionStatus = connection.findStatusForCRO(croDomain);
             if (!SynchronisationConnectionStatusType.SYNCHRONIZED.equals(connectionStatus)) {
                 Connection dtoConnection = new Connection();
-                dtoConnection.setAGRDomain(config.getProperty(ConfigParam.HOST_DOMAIN));
                 dtoConnection.setEntityAddress(connection.getEntityAddress());
                 dtoConnection.setIsCustomer(connection.isCustomer());
                 message.getConnection().add(dtoConnection);

@@ -18,9 +18,6 @@ package energy.usef.dso.repository;
 
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import energy.usef.core.util.DateTimeUtil;
-import energy.usef.dso.model.GridSafetyAnalysis;
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -28,11 +25,15 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.joda.time.LocalDate;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import energy.usef.core.util.DateTimeUtil;
+import energy.usef.dso.model.GridSafetyAnalysis;
 
 /**
  * Test class in charge of the unit tests related to the {@link GridSafetyAnalysisRepository} class.
@@ -63,12 +64,20 @@ public class GridSafetyAnalysisRepositoryTest {
     }
 
     @Before
-    public void init() {
+    public void before() {
         repository = new GridSafetyAnalysisRepository();
         setInternalState(repository, "entityManager", entityManager);
 
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
+    }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     @Test
@@ -102,11 +111,20 @@ public class GridSafetyAnalysisRepositoryTest {
     @Test
     public void testFindPreviousGridSafetyAnalysis() {
         String congestionPointEntityAddress = "ean.123456789012345678";
-        LocalDate ptuDate = new LocalDate(2014, 11, 28);
+        LocalDate ptuDate = new LocalDate(2014, 11, 29);
         List<GridSafetyAnalysis> previousGridSafetyAnalysis = repository
                 .findGridSafetyAnalysis(congestionPointEntityAddress, ptuDate);
         Assert.assertNotNull(previousGridSafetyAnalysis);
 
+    }
+
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("1999-12-30")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("1999-12-30")));
+        Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("1999-12-29")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("1999-12-29")));
     }
 
 }

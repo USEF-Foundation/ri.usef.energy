@@ -427,7 +427,7 @@ public class CommonReferenceUpdateBusinessServiceTest {
     @Test
     public void updateAggregatorConnectionsNewConnection() {
         CommonReferenceUpdate message = createCommonReferenceUpdateFromAggregator(false, AGR_DOMAIN, CONNECTION_ENTITY_ADDRESS,
-                false);
+                true);
         List<String> errors = new ArrayList<>();
         Aggregator expectedAggregator = new Aggregator(AGR_DOMAIN);
         when(aggregatorRepository.getAggregatorByDomain(AGR_DOMAIN)).thenReturn(expectedAggregator);
@@ -435,10 +435,9 @@ public class CommonReferenceUpdateBusinessServiceTest {
 
         // do the business call
         service.updateAggregatorConnections(message, errors);
-
         Mockito.verify(connectionRepository, Mockito.times(1)).findAll();
         Mockito.verify(connectionRepository, Mockito.times(1)).persist(captorConnection.capture());
-
+//
         Assert.assertEquals(expectedAggregator, captorConnection.getValue().getAggregator());
         Assert.assertTrue("No errors expected", errors.isEmpty());
     }
@@ -621,7 +620,7 @@ public class CommonReferenceUpdateBusinessServiceTest {
      * false.
      */
     @Test
-    public void updateBalanceResponsiblePartyConnectionsWithCustomerFalse() {
+    public void ignoreCustomerFalseForBalanceResponsiblePartyUpdate() {
         CommonReferenceUpdate message = createCommonReferenceUpdateFromBalanceResponsibleParty(BRP_DOMAIN,
                 CONNECTION_ENTITY_ADDRESS,
                 false);
@@ -639,7 +638,7 @@ public class CommonReferenceUpdateBusinessServiceTest {
         // do the business call
         service.updateBalanceResponsiblePartyConnections(message, errors);
 
-        Assert.assertNull(connection.getBalanceResponsibleParty());
+        Assert.assertEquals(balanceResponsibleParty, connection.getBalanceResponsibleParty());
 
         Assert.assertTrue("No errors expected", errors.isEmpty());
     }

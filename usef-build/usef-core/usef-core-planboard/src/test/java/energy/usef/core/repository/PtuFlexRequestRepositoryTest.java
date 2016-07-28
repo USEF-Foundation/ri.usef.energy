@@ -18,15 +18,14 @@ package energy.usef.core.repository;
 
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import energy.usef.core.model.PtuFlexRequest;
-import energy.usef.core.util.DateTimeUtil;
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.joda.time.LocalDate;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,6 +34,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import energy.usef.core.model.PtuFlexRequest;
+import energy.usef.core.util.DateTimeUtil;
 
 /**
  * JUnit test for the GridPointRepository class.
@@ -71,12 +73,20 @@ public class PtuFlexRequestRepositoryTest {
     }
 
     @Before
-    public void init() {
+    public void before() {
         repository = new PtuFlexRequestRepository();
         setInternalState(repository, "entityManager", entityManager);
 
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
+    }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     /**
@@ -107,4 +117,12 @@ public class PtuFlexRequestRepositoryTest {
         Long sequence = repository.findPtuPrognosisSequenceByFlexOfferSequence(20140222112000014L, "agr.usef-example.com");
         Assert.assertEquals(Long.valueOf("20140222112000010"), sequence);
     }
+
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("1999-12-30")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("1999-12-30")));
+    }
+
 }

@@ -16,17 +16,17 @@
 
 package energy.usef.dso.repository;
 
-import energy.usef.core.model.DispositionAvailableRequested;
-import energy.usef.core.model.DocumentStatus;
-import energy.usef.core.model.DocumentType;
-import energy.usef.core.repository.BaseRepository;
-import energy.usef.dso.model.GridSafetyAnalysis;
-
 import java.util.List;
 
 import javax.ejb.Stateless;
 
 import org.joda.time.LocalDate;
+
+import energy.usef.core.model.DispositionAvailableRequested;
+import energy.usef.core.model.DocumentStatus;
+import energy.usef.core.model.DocumentType;
+import energy.usef.core.repository.BaseRepository;
+import energy.usef.dso.model.GridSafetyAnalysis;
 
 /**
  * Repository class for the GridSafetyAnalysis entity.
@@ -127,4 +127,19 @@ public class GridSafetyAnalysisRepository extends BaseRepository<GridSafetyAnaly
                 .setParameter("currentDate", currentDate.toDateMidnight().toDate())
                 .getResultList();
     }
+
+    /**
+     * Delete all {@link GridSafetyAnalysis} objects for a certain date.
+     *
+     * @param period
+     * @return the number of {@link GridSafetyAnalysis} objects deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM GridSafetyAnalysis gsa ");
+        sql.append("WHERE gsa.ptuContainer IN (SELECT pc FROM PtuContainer pc WHERE pc.ptuDate = :ptuDate)");
+
+        return entityManager.createQuery(sql.toString()).setParameter("ptuDate", period.toDateMidnight().toDate()).executeUpdate();
+    }
+
 }

@@ -1,5 +1,17 @@
 # Release notes USEF Reference Implementation
 
+## Release v 1.3.4 , 28 July 2016 ##
+
+###Delivered items###
+	*   Added functionality to clean old data from the database.
+	*   Added functionality to allow for long running GridSafetyAnalysis.
+	*   Fixed an issue related to the recreation of expired prognoses.
+	*   Fixed an issue related to the creation of invalid flex requests.
+	*   Fixed an issue related to the use of the isCustomer field in CommonReferenceUpdate.
+	*   Fixed an issue related to the use of missing D-Prognoses
+	*   Minor documentation updates.
+
+
 ## Release v 1.3.3 , 24 May 2016 ##
 
 ###Delivered items###

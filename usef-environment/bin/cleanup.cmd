@@ -61,7 +61,7 @@ if NOT defined JBOSS_HOME (
   echo The environment variable JBOSS_HOME can not be found. JBoss Wildfly is not installed or the
   echo environment variable is not set.
   echo.
-  echo If not installed, download and install JBoss Wildfly version 8.1.0 from the website:
+  echo If not installed, download and install JBoss Wildfly version 10.0.0 from the website:
   echo.
   echo    http://wildfly.org/downloads
   echo.

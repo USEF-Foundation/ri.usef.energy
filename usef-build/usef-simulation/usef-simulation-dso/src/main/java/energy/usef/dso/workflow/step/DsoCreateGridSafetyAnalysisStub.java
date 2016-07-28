@@ -16,19 +16,6 @@
 
 package energy.usef.dso.workflow.step;
 
-import energy.usef.core.workflow.WorkflowContext;
-import energy.usef.core.workflow.WorkflowStep;
-import energy.usef.core.workflow.dto.DispositionTypeDto;
-import energy.usef.core.workflow.dto.PrognosisDto;
-import energy.usef.core.workflow.dto.PtuPrognosisDto;
-import energy.usef.dso.pbcfeederimpl.PbcFeederService;
-import energy.usef.dso.workflow.dto.GridSafetyAnalysisDto;
-import energy.usef.dso.workflow.dto.NonAggregatorForecastDto;
-import energy.usef.dso.workflow.dto.PtuGridSafetyAnalysisDto;
-import energy.usef.dso.workflow.dto.PtuNonAggregatorForecastDto;
-import energy.usef.dso.workflow.validate.gridsafetyanalysis.CreateGridSafetyAnalysisStepParameter;
-import energy.usef.pbcfeeder.dto.PbcPowerLimitsDto;
-
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +29,19 @@ import javax.inject.Inject;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import energy.usef.core.workflow.WorkflowContext;
+import energy.usef.core.workflow.WorkflowStep;
+import energy.usef.core.workflow.dto.DispositionTypeDto;
+import energy.usef.core.workflow.dto.PrognosisDto;
+import energy.usef.core.workflow.dto.PtuPrognosisDto;
+import energy.usef.dso.pbcfeederimpl.PbcFeederService;
+import energy.usef.dso.workflow.dto.GridSafetyAnalysisDto;
+import energy.usef.dso.workflow.dto.NonAggregatorForecastDto;
+import energy.usef.dso.workflow.dto.PtuGridSafetyAnalysisDto;
+import energy.usef.dso.workflow.dto.PtuNonAggregatorForecastDto;
+import energy.usef.dso.workflow.validate.gridsafetyanalysis.CreateGridSafetyAnalysisStepParameter;
+import energy.usef.pbcfeeder.dto.PbcPowerLimitsDto;
 
 /**
  * Implementation of a workflow step generating the Grid Safety Analysis. The step works as follows: - The step retrieves the
@@ -92,11 +92,11 @@ public class DsoCreateGridSafetyAnalysisStub implements WorkflowStep {
      * Computes the total load from the Non-Aggregator forecast and the different available prognoses.
      *
      * @param nonAggregatorForecastDto {@link NonAggregatorForecastDto} the non-aggregator forecast.
-     * @param prognoses {@link List} of {@link PrognosisDto}.
+     * @param prognoses                {@link List} of {@link PrognosisDto}.
      * @return a {@link Map} with the PTU index as key ({@link Integer}) and the total load as value ({@link BigInteger}).
      */
     private Map<Integer, BigInteger> computeTotalLoad(NonAggregatorForecastDto nonAggregatorForecastDto,
-            List<PrognosisDto> prognoses) {
+                                                      List<PrognosisDto> prognoses) {
         Map<Integer, PtuNonAggregatorForecastDto> nonAggregatorForecastPerPtu = nonAggregatorForecastDto.getPtus()
                 .stream()
                 .collect(Collectors.toMap(PtuNonAggregatorForecastDto::getPtuIndex, Function.identity()));
@@ -114,7 +114,7 @@ public class DsoCreateGridSafetyAnalysisStub implements WorkflowStep {
     }
 
     private GridSafetyAnalysisDto buildGridSafetyAnalysis(String congestionPointEntityAddress, LocalDate period,
-            PbcPowerLimitsDto powerLimitsDto, Map<Integer, BigInteger> totalLoadPerPtu) {
+                                                          PbcPowerLimitsDto powerLimitsDto, Map<Integer, BigInteger> totalLoadPerPtu) {
         GridSafetyAnalysisDto gridSafetyAnalysisDto = new GridSafetyAnalysisDto();
         gridSafetyAnalysisDto.setEntityAddress(congestionPointEntityAddress);
         gridSafetyAnalysisDto.setPtuDate(period);
@@ -139,7 +139,7 @@ public class DsoCreateGridSafetyAnalysisStub implements WorkflowStep {
      * total load is bigger than or equal to the Production limit (Lower Limit).
      *
      * @param powerLimitsDto {@link PbcPowerLimitsDto} the power limits.
-     * @param totalLoad {@link BigInteger} the total load for the PTU.
+     * @param totalLoad      {@link BigInteger} the total load for the PTU.
      * @return {@link DispositionTypeDto} the disposition for the PTU.
      */
     private DispositionTypeDto fetchDisposition(PbcPowerLimitsDto powerLimitsDto, BigInteger totalLoad) {
@@ -159,9 +159,9 @@ public class DsoCreateGridSafetyAnalysisStub implements WorkflowStep {
      * If the disposition is REQUESTED, power will be the difference between Total Load and Consumption Limit (if load bigger
      * than Consumption Limit) or the difference between Total Load and Production Limit (if load lesser than Production Limit).
      *
-     * @param disposition {@link DispositionTypeDto} the already known disposition for the PTU of the grid safety analysis.
+     * @param disposition    {@link DispositionTypeDto} the already known disposition for the PTU of the grid safety analysis.
      * @param powerLimitsDto {@link PbcPowerLimitsDto} the power limits.
-     * @param totalLoad {@link BigInteger} the total load for the PTU.
+     * @param totalLoad      {@link BigInteger} the total load for the PTU.
      * @return a {@link BigInteger} which is the power for the grid safety analysis.
      */
     private BigInteger fetchPowerValue(DispositionTypeDto disposition, PbcPowerLimitsDto powerLimitsDto, BigInteger totalLoad) {

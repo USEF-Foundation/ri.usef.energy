@@ -16,6 +16,7 @@
 
 package energy.usef.agr.repository;
 
+import energy.usef.agr.model.PowerContainer;
 import energy.usef.agr.model.UdiEvent;
 import energy.usef.core.repository.BaseRepository;
 
@@ -44,6 +45,20 @@ public class UdiEventRepository extends BaseRepository<UdiEvent> {
         return getEntityManager().createQuery(sql.toString(), UdiEvent.class)
                 .setParameter("period", period.toDateMidnight().toDate(), TemporalType.DATE)
                 .getResultList();
+    }
+
+    /**
+     * Delete all {@link UdiEvent} objects for a certain date.
+     *
+     * @param period
+     * @return the number of {@link UdiEvent} objects deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM UdiEvent ue ");
+        sql.append("WHERE ue.period = :period)");
+
+        return entityManager.createQuery(sql.toString()).setParameter("period", period.toDateMidnight().toDate()).executeUpdate();
     }
 
 }

@@ -20,36 +20,6 @@ import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import energy.usef.core.config.Config;
-import energy.usef.core.config.ConfigParam;
-import energy.usef.core.model.CongestionPointConnectionGroup;
-import energy.usef.core.model.ConnectionGroup;
-import energy.usef.core.model.DispositionAvailableRequested;
-import energy.usef.core.model.DocumentStatus;
-import energy.usef.core.model.DocumentType;
-import energy.usef.core.model.PlanboardMessage;
-import energy.usef.core.model.PrognosisType;
-import energy.usef.core.model.PtuContainer;
-import energy.usef.core.model.PtuPrognosis;
-import energy.usef.core.model.PtuState;
-import energy.usef.core.model.RegimeType;
-import energy.usef.core.service.business.CorePlanboardBusinessService;
-import energy.usef.core.service.business.SequenceGeneratorService;
-import energy.usef.core.workflow.DefaultWorkflowContext;
-import energy.usef.core.workflow.WorkflowContext;
-import energy.usef.core.workflow.dto.DispositionTypeDto;
-import energy.usef.core.workflow.step.WorkflowStepExecuter;
-import energy.usef.dso.model.GridSafetyAnalysis;
-import energy.usef.dso.model.NonAggregatorForecast;
-import energy.usef.dso.service.business.DsoPlanboardBusinessService;
-import energy.usef.dso.util.ReflectionUtil;
-import energy.usef.dso.workflow.DsoWorkflowStep;
-import energy.usef.dso.workflow.coloring.ColoringProcessEvent;
-import energy.usef.dso.workflow.dto.GridSafetyAnalysisDto;
-import energy.usef.dso.workflow.dto.PtuGridSafetyAnalysisDto;
-import energy.usef.dso.workflow.validate.create.flexrequest.CreateFlexRequestEvent;
-import energy.usef.dso.workflow.validate.gridsafetyanalysis.CreateGridSafetyAnalysisStepParameter.IN;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,6 +43,36 @@ import org.mockito.Mockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
+
+import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
+import energy.usef.core.model.CongestionPointConnectionGroup;
+import energy.usef.core.model.ConnectionGroup;
+import energy.usef.core.model.DispositionAvailableRequested;
+import energy.usef.core.model.DocumentStatus;
+import energy.usef.core.model.DocumentType;
+import energy.usef.core.model.PlanboardMessage;
+import energy.usef.core.model.PrognosisType;
+import energy.usef.core.model.PtuContainer;
+import energy.usef.core.model.PtuPrognosis;
+import energy.usef.core.model.PtuState;
+import energy.usef.core.service.business.CorePlanboardBusinessService;
+import energy.usef.core.service.business.SequenceGeneratorService;
+import energy.usef.core.workflow.DefaultWorkflowContext;
+import energy.usef.core.workflow.WorkflowContext;
+import energy.usef.core.workflow.dto.DispositionTypeDto;
+import energy.usef.core.workflow.step.WorkflowStepExecuter;
+import energy.usef.dso.config.ConfigDso;
+import energy.usef.dso.config.ConfigDsoParam;
+import energy.usef.dso.model.GridSafetyAnalysis;
+import energy.usef.dso.model.NonAggregatorForecast;
+import energy.usef.dso.service.business.DsoPlanboardBusinessService;
+import energy.usef.dso.util.ReflectionUtil;
+import energy.usef.dso.workflow.DsoWorkflowStep;
+import energy.usef.dso.workflow.coloring.ColoringProcessEvent;
+import energy.usef.dso.workflow.dto.GridSafetyAnalysisDto;
+import energy.usef.dso.workflow.dto.PtuGridSafetyAnalysisDto;
+import energy.usef.dso.workflow.validate.create.flexrequest.CreateFlexRequestEvent;
 
 /**
  * Test class in charge of the unit tests related to the {@link DsoGridSafetyAnalysisCoordinator} class.
@@ -100,7 +100,9 @@ public class DsoGridSafetyAnalysisCoordinatorTest {
     private DsoPlanboardBusinessService dsoPlanboardBusinessService;
 
     @Mock
-    private Event<CreateFlexRequestEvent> eventManager;
+    private Event<StoreGridSafetyAnalysisEvent> storeGridSafetyEventManager;
+    @Mock
+    private Event<CreateFlexRequestEvent> flexRequestEventManager;
 
     @Mock
     private Event<ColoringProcessEvent> coloringEventManager;
@@ -110,6 +112,8 @@ public class DsoGridSafetyAnalysisCoordinatorTest {
 
     @Mock
     private Config config;
+    @Mock
+    private ConfigDso configDso;
 
     @Before
     public void init() throws Exception {
@@ -120,13 +124,16 @@ public class DsoGridSafetyAnalysisCoordinatorTest {
         Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, corePlanboardBusinessService);
         Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, dsoPlanboardBusinessService);
         Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, config);
+        Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, configDso);
         Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, sequenceGeneratorService);
-        Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, "eventManager", eventManager);
+        Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, "storeGridSafetyEventManager", storeGridSafetyEventManager);
+        Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, "flexRequestEventManager", flexRequestEventManager);
         Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, "coloringEventManager", coloringEventManager);
 
         Mockito.when(config.getProperty(ConfigParam.DAY_AHEAD_GATE_CLOSURE_TIME)).thenReturn("17:00");
         Mockito.when(config.getIntegerProperty(ConfigParam.DAY_AHEAD_GATE_CLOSURE_PTUS)).thenReturn(3);
         Mockito.when(config.getIntegerProperty(ConfigParam.PTU_DURATION)).thenReturn(15);
+        Mockito.when(configDso.getLongProperty(ConfigDsoParam.DSO_GRID_SAFETY_ANALYSIS_EXPIRATION_IN_MINUTES)).thenReturn(0L);
         Mockito.when(dsoPlanboardBusinessService.findPTUContainersForPeriod(Matchers.any(LocalDate.class)))
                 .then(call -> IntStream.rangeClosed(1, PTUS_PER_DAY).mapToObj(index -> {
                     PtuContainer ptu = new PtuContainer();
@@ -192,8 +199,7 @@ public class DsoGridSafetyAnalysisCoordinatorTest {
 
         dsoGridSafetyAnalysisCoordinator.startGridSafetyAnalysis(new GridSafetyAnalysisEvent(ENTITY_ADDRESS, ptuDate));
 
-        verify(ptuStateMock, Mockito.atLeastOnce()).setRegime(RegimeType.YELLOW);
-        Mockito.verify(workflowStepExecuter, Mockito.times(1)).invoke(Mockito.eq(DsoWorkflowStep.DSO_CREATE_GRID_SAFETY_ANALYSIS.name()),
+        Mockito.verify(workflowStepExecuter, Mockito.timeout(1000).times(1)).invoke(Mockito.eq(DsoWorkflowStep.DSO_CREATE_GRID_SAFETY_ANALYSIS.name()),
                 contextCapturer.capture());
 
         Assert.assertNotNull(contextCapturer.getValue().getValue(
@@ -209,15 +215,15 @@ public class DsoGridSafetyAnalysisCoordinatorTest {
     public void testWithNoAggregators() {
         LocalDate ptuDate = new LocalDate().plusDays(2);
         ArgumentCaptor<WorkflowContext> inputContextCaptor = ArgumentCaptor.forClass(WorkflowContext.class);
-        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(DsoWorkflowStep.DSO_CREATE_GRID_SAFETY_ANALYSIS.name()), inputContextCaptor.capture()))
-                .thenReturn(prepareResultTestContext(new DefaultWorkflowContext(), ptuDate));
 
         Mockito.when(corePlanboardBusinessService.findOrCreatePtuState(Mockito.any(PtuContainer.class), Mockito.any(ConnectionGroup.class)))
                 .thenReturn(ptuStateMock);
 
         dsoGridSafetyAnalysisCoordinator.startGridSafetyAnalysis(new GridSafetyAnalysisEvent(ENTITY_ADDRESS, ptuDate));
 
-        verify(coloringEventManager, times(1)).fire(Matchers.any());
+        Mockito.verify(workflowStepExecuter, Mockito.timeout(1000).times(1)).invoke(Mockito.eq(DsoWorkflowStep.DSO_CREATE_GRID_SAFETY_ANALYSIS.name()),
+                inputContextCaptor.capture());
+
         WorkflowContext inputContext = inputContextCaptor.getValue();
         Assert.assertNotNull(inputContext.get(CreateGridSafetyAnalysisStepParameter.IN.PERIOD.name(), LocalDate.class));
         Assert.assertNotNull(inputContext.get(CreateGridSafetyAnalysisStepParameter.IN.CONGESTION_POINT_ENTITY_ADDRESS.name(), LocalDate.class));
@@ -235,7 +241,14 @@ public class DsoGridSafetyAnalysisCoordinatorTest {
                         .invoke(Mockito.eq(DsoWorkflowStep.DSO_CREATE_GRID_SAFETY_ANALYSIS.name()), Matchers.any(WorkflowContext.class)))
                 .thenReturn(prepareResultTestContext(new DefaultWorkflowContext(), ptuDate));
 
-        dsoGridSafetyAnalysisCoordinator.startGridSafetyAnalysis(new GridSafetyAnalysisEvent(ENTITY_ADDRESS, ptuDate));
+        GridSafetyAnalysisDto dto = new GridSafetyAnalysisDto();
+        dto.setPtus(IntStream.rangeClosed(1,96).mapToObj(i -> {
+            PtuGridSafetyAnalysisDto ptuGridSafetyAnalysisDto = new PtuGridSafetyAnalysisDto();
+            ptuGridSafetyAnalysisDto.setPtuIndex(i);
+            ptuGridSafetyAnalysisDto.setPower(i*100L);
+            return ptuGridSafetyAnalysisDto;
+        }).collect(Collectors.toList()));
+        dsoGridSafetyAnalysisCoordinator.saveAndProcessGridSafetyAnalysis(new StoreGridSafetyAnalysisEvent(ENTITY_ADDRESS, ptuDate, dto));
 
         Mockito.verify(dsoPlanboardBusinessService, Mockito.times(96)).storeGridSafetyAnalysis(Matchers.any(GridSafetyAnalysis.class));
     }

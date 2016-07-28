@@ -16,6 +16,7 @@
 
 package energy.usef.dso.workflow.validate.gridsafetyanalysis;
 
+import energy.usef.core.util.DateTimeUtil;
 import org.joda.time.LocalDate;
 
 /**
@@ -46,6 +47,9 @@ public class GridSafetyAnalysisEvent {
         return congestionPointEntityAddress;
     }
 
+    public boolean isExpired() {
+        return (this.analysisDay.isBefore(DateTimeUtil.getCurrentDate()));
+    }
     @Override
     public String toString() {
         return "GridSafetyAnalysisEvent" + "[" +

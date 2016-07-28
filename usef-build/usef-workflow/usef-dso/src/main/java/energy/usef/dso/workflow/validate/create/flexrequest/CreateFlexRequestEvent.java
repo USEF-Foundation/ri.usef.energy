@@ -20,6 +20,8 @@ import java.util.Arrays;
 
 import org.joda.time.LocalDate;
 
+import energy.usef.core.util.DateTimeUtil;
+
 /**
  * Event class used to trigger the 'Create Flew Request' DSO workflow.
  */
@@ -53,6 +55,12 @@ public class CreateFlexRequestEvent {
     public Integer[] getPtuIndexes() {
         return ptuIndexes;
     }
+
+
+    public boolean isExpired() {
+        return (this.ptuDate.isBefore(DateTimeUtil.getCurrentDate()));
+    }
+
 
     @Override
     public String toString() {

@@ -21,8 +21,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import energy.usef.mdc.model.AggregatorConnection;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +30,14 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.joda.time.LocalDate;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import energy.usef.mdc.model.AggregatorConnection;
 
 /**
  * Test class in charge of the unit tests related to the {@link AggregatorConnectionRepository} class.
@@ -119,12 +121,20 @@ public class AggregatorConnectionRepositoryTest {
     }
 
     @Before
-    public void setUp() throws Exception {
+    public void before() throws Exception {
         repository = new AggregatorConnectionRepository();
 
         setInternalState(repository, "entityManager", entityManager);
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
+    }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     /**
@@ -134,5 +144,12 @@ public class AggregatorConnectionRepositoryTest {
     public static void closeTestFixture() {
         entityManager.close();
         entityManagerFactory.close();
+    }
+
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("1990-01-01")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("1990-01-01")));
     }
 }

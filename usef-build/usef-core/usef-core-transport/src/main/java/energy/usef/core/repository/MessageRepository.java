@@ -16,17 +16,20 @@
 
 package energy.usef.core.repository;
 
-import energy.usef.core.data.xml.bean.message.CommonReferenceQuery;
-import energy.usef.core.data.xml.bean.message.CommonReferenceQueryResponse;
-import energy.usef.core.model.Message;
-import energy.usef.core.model.MessageDirection;
+import static javax.persistence.TemporalType.TIMESTAMP;
 
+import java.sql.Date;
 import java.util.List;
 
 import javax.ejb.Stateless;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+
+import energy.usef.core.data.xml.bean.message.CommonReferenceQuery;
+import energy.usef.core.data.xml.bean.message.CommonReferenceQueryResponse;
+import energy.usef.core.model.Message;
+import energy.usef.core.model.MessageDirection;
 
 /**
  * Repository class for the messages.
@@ -142,4 +145,20 @@ public class MessageRepository extends BaseRepository<Message> {
         return messages.isEmpty();
     }
 
+    /**
+     * Delete all {@link Message}s created on a certain date.
+     *
+     * @param period
+     * @return the number of {@link Message}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        LocalDate endDate = period.plusDays(1);
+
+        Date start = new Date(period.toDateMidnight().getMillis());
+        Date end = new Date(endDate.toDateMidnight().getMillis());
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM Message m WHERE m.creationTime >= :start AND m.creationTime < :end");
+
+        return entityManager.createQuery(sql.toString()).setParameter("start", start, TIMESTAMP).setParameter("end", end, TIMESTAMP).executeUpdate();
+    }
 }

@@ -16,9 +16,13 @@
 
 package energy.usef.core.repository;
 
-import energy.usef.core.model.SignedMessageHash;
+import java.sql.Date;
 
 import javax.ejb.Stateless;
+
+import org.joda.time.LocalDate;
+
+import energy.usef.core.model.SignedMessageHash;
 
 /**
  * Repository class for operations related to the {@link SignedMessageHash} entity.
@@ -49,4 +53,19 @@ public class SignedMessageHashRepository extends BaseRepository<SignedMessageHas
 
     }
 
+    /**
+     * Delete all {@link SignedMessageHash}s for a certain date.
+     *
+     * @param period
+     * @return the number of {@link SignedMessageHash}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        LocalDate endDate = period.plusDays(1);
+
+        Date start = new Date(period.toDateMidnight().getMillis());
+        Date end = new Date(endDate.toDateMidnight().getMillis());
+
+        String sql = "DELETE FROM SignedMessageHash o WHERE o.creationTime >= :start AND o.creationTime < :end";
+        return entityManager.createQuery(sql).setParameter("start", start).setParameter("end", end).executeUpdate();
+    }
 }

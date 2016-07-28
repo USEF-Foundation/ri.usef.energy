@@ -157,4 +157,18 @@ public class PowerContainerRepository extends BaseRepository<PowerContainer> {
         }
         return subquery.append(" ) ").toString();
     }
+
+    /**
+     * Delete all {@link PowerContainer} objects for a certain date.
+     *
+     * @param period
+     * @return the number of {@link PowerContainer} objects deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM PowerContainer pc ");
+        sql.append("WHERE pc.period = :period");
+
+        return entityManager.createQuery(sql.toString()).setParameter("period", period.toDateMidnight().toDate()).executeUpdate();
+    }
 }

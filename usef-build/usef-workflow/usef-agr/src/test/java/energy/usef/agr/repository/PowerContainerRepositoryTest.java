@@ -33,6 +33,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.joda.time.LocalDate;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -71,12 +72,20 @@ public class PowerContainerRepositoryTest {
     }
 
     @Before
-    public void init() {
+    public void before() {
         repository = new PowerContainerRepository();
         setInternalState(repository, "entityManager", entityManager);
 
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
+    }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     @Test
@@ -120,4 +129,10 @@ public class PowerContainerRepositoryTest {
                 powerContainers.size());
     }
 
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 3, repository.cleanup(new LocalDate("2015-01-20")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("2015-01-20")));
+    }
 }

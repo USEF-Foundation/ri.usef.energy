@@ -79,7 +79,7 @@ public class GenerateDomains {
     public void run() throws Exception {
         ToolConfig.checkJavaVersion();
 
-        ToolConfig.checkBuildsOccured();
+        ToolConfig.checkBuildsOccurred();
 
         String environmentYaml = ToolConfig.getUsefEnvironmentConfigFolder() + File.separator +
                 ToolConfig.USEF_ENVIRONMENT_YAML;
@@ -483,7 +483,7 @@ public class GenerateDomains {
 
         StringBuilder sb = new StringBuilder();
         sb.append("    - domain-name: \"" + domainName + "\"\n");
-        sb.append("      spec-version: \"2014:I\"\n");
+        sb.append("      spec-version: \"2015\"\n");
         sb.append("      " + roleConfig.getRole().getRoleNameInParticipantsYaml() + ":\n");
         sb.append("        - public-keys: \"" + ToolConfig.PUBLIC_KEY_PREFIX + publicKey + "\"\n");
         sb.append("          url: \"https://" + domainName);
@@ -493,7 +493,7 @@ public class GenerateDomains {
          * Wildfly.
          */
         if (recipientEndpoint == null) {
-            sb.append("/USEF/2014/I/" + domainName + "/" + roleConfig.getRole() + "/SignedMessage\"\n");
+            sb.append("/USEF/2015/SignedMessage\"\n");
         } else {
             sb.append(":8443/" + roleConfig.getUniqueName() + recipientEndpoint + "\"\n");
         }
@@ -507,7 +507,7 @@ public class GenerateDomains {
                 ToolConfig.BIND_ZONE_FILE;
         final String usefprefix = "_usef";
         final String httpprefix = "_http";
-        final String specVersion = "2014:I.I";
+        final String specVersion = "2015";
         final String ttl = " 86400 ";
         final String delete = "update delete ";
         final String add = "update add ";

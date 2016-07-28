@@ -145,7 +145,7 @@ public class CommonReferenceQueryController extends BaseIncomingMessageControlle
             List<Connection> connections = commonReferenceQueryBusinessService.findAllConnectionsForAggregatorDomain(
                     request.getMessageMetadata().getSenderDomain());
             // Build success response
-            buildConnections(response, connections);
+            buildBrpConnections(response, connections);
             response.setResult(DispositionSuccessFailure.SUCCESS);
         }
     }
@@ -193,7 +193,7 @@ public class CommonReferenceQueryController extends BaseIncomingMessageControlle
                     request.getMessageMetadata().getSenderDomain());
 
             // Build success response
-            buildConnections(response, connections);
+            buildAgrConnections(response, connections);
             response.setResult(DispositionSuccessFailure.SUCCESS);
         }
     }
@@ -207,22 +207,37 @@ public class CommonReferenceQueryController extends BaseIncomingMessageControlle
                     .filter(p -> request.getConnectionEntityAddress().contains(p.getEntityAddress())).collect(Collectors.toList());
 
             // Build success response
-            buildConnections(response, connections);
+            buildMdcConnections(response, connections);
             response.setResult(DispositionSuccessFailure.SUCCESS);
         }
     }
 
-    private void buildConnections(CommonReferenceQueryResponse response, List<Connection> connections) {
+    private void buildAgrConnections(CommonReferenceQueryResponse response, List<Connection> connections) {
         for (Connection connection : connections) {
             energy.usef.core.data.xml.bean.message.Connection connectionDto = new energy.usef.core.data.xml.bean.message.Connection();
             connectionDto.setEntityAddress(connection.getEntityAddress());
             connectionDto.setAGRDomain(connection.getAggregator() == null ? null : connection.getAggregator().getDomain());
-            connectionDto.setBRPDomain(
-                    connection.getBalanceResponsibleParty() == null ? null : connection.getBalanceResponsibleParty().getDomain());
             response.getConnection().add(connectionDto);
         }
     }
 
+    private void buildMdcConnections(CommonReferenceQueryResponse response, List<Connection> connections) {
+        for (Connection connection : connections) {
+            energy.usef.core.data.xml.bean.message.Connection connectionDto = new energy.usef.core.data.xml.bean.message.Connection();
+            connectionDto.setEntityAddress(connection.getEntityAddress());
+            connectionDto.setAGRDomain(connection.getAggregator() == null ? null : connection.getAggregator().getDomain());
+            connectionDto.setBRPDomain(connection.getBalanceResponsibleParty() == null ? null : connection.getBalanceResponsibleParty().getDomain());
+            response.getConnection().add(connectionDto);
+        }
+    }
+    private void buildBrpConnections(CommonReferenceQueryResponse response, List<Connection> connections) {
+        for (Connection connection : connections) {
+            energy.usef.core.data.xml.bean.message.Connection connectionDto = new energy.usef.core.data.xml.bean.message.Connection();
+            connectionDto.setEntityAddress(connection.getEntityAddress());
+            connectionDto.setBRPDomain(connection.getBalanceResponsibleParty() == null ? null : connection.getBalanceResponsibleParty().getDomain());
+            response.getConnection().add(connectionDto);
+        }
+    }
     /*
      * Maps data to DSO response object
      */

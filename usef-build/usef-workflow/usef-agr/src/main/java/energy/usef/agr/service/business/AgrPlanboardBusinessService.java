@@ -18,6 +18,20 @@ package energy.usef.agr.service.business;
 
 import static energy.usef.agr.model.SynchronisationConnectionStatusType.MODIFIED;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import javax.ejb.Stateless;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
+
+import org.joda.time.LocalDate;
+
 import energy.usef.agr.model.CommonReferenceOperator;
 import energy.usef.agr.model.SynchronisationConnection;
 import energy.usef.agr.repository.CommonReferenceOperatorRepository;
@@ -40,20 +54,6 @@ import energy.usef.core.repository.PtuPrognosisRepository;
 import energy.usef.core.workflow.dto.PrognosisDto;
 import energy.usef.core.workflow.transformer.PrognosisTransformer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import javax.ejb.Stateless;
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-import javax.transaction.Transactional.TxType;
-
-import org.joda.time.LocalDate;
-
 /**
  * Service class in charge of operations and validations related to the Aggregator planboard.
  */
@@ -61,22 +61,23 @@ import org.joda.time.LocalDate;
 @Stateless
 public class AgrPlanboardBusinessService {
     public static final DocumentType A_PLAN = DocumentType.A_PLAN;
+
     @Inject
     private CommonReferenceOperatorRepository commonReferenceOperatorRepository;
+    @Inject
+    private PlanboardMessageRepository planboardMessageRepository;
+    @Inject
+    private PtuContainerRepository ptuContainerRepository;
+    @Inject
+    private PtuFlexOrderRepository ptuFlexOrderRepository;
+    @Inject
+    private PtuFlexRequestRepository ptuFlexRequestRepository;
+    @Inject
+    private PtuPrognosisRepository prognosisRepository;
     @Inject
     private SynchronisationConnectionRepository synchronisationConnectionRepository;
     @Inject
     private SynchronisationConnectionStatusRepository synchronisationConnectionStatusRepository;
-    @Inject
-    private PtuContainerRepository ptuContainerRepository;
-    @Inject
-    private PtuPrognosisRepository prognosisRepository;
-    @Inject
-    private PtuFlexRequestRepository ptuFlexRequestRepository;
-    @Inject
-    private PtuFlexOrderRepository ptuFlexOrderRepository;
-    @Inject
-    private PlanboardMessageRepository planboardMessageRepository;
 
     /**
      * Find proccessable requests for a certain type.

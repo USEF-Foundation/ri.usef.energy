@@ -29,6 +29,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.joda.time.LocalDate;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -60,13 +61,22 @@ public class UdiEventRepositoryTest {
         entityManagerFactory.close();
     }
 
+
     @Before
-    public void setUp() {
+    public void before() {
         repository = new UdiEventRepository();
         setInternalState(repository, "entityManager", entityManager);
 
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
+    }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     @Test
@@ -100,6 +110,13 @@ public class UdiEventRepositoryTest {
         List<UdiEvent> udiEvents = repository.findUdiEventsForPeriod(period);
         Assert.assertNotNull(udiEvents);
         Assert.assertEquals(0, udiEvents.size());
+    }
+
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("2015-12-01")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("2015-12-01")));
     }
 
 }

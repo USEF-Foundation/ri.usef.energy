@@ -17,20 +17,24 @@
 package energy.usef.core.repository;
 
 import static org.powermock.reflect.Whitebox.setInternalState;
-import energy.usef.core.model.Message;
-import energy.usef.core.model.MessageError;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceException;
 
+import org.joda.time.LocalDate;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import energy.usef.core.model.Message;
+import energy.usef.core.model.MessageError;
 
 /**
  * JUnit test for the OutgoingMessageErrorRepository class.
@@ -62,10 +66,18 @@ public class MessageErrorRepositoryTest {
     }
 
     @Before
-    public void init() {
+    public void before() {
         repository = new MessageErrorRepository();
         repository.setEntityManager(entityManager);
         setInternalState(repository, "entityManager", entityManager);
+        entityManager.getTransaction().begin();
+    }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     /**
@@ -85,4 +97,13 @@ public class MessageErrorRepositoryTest {
         messageError.setMessage(message);
         return messageError;
     }
+
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("2014-11-22")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("2014-11-22")));
+    }
+
+
 }

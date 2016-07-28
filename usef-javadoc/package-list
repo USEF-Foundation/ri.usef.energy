@@ -17,6 +17,7 @@ energy.usef.agr.service.business
 energy.usef.agr.transformer
 energy.usef.agr.util
 energy.usef.agr.workflow
+energy.usef.agr.workflow.housekeeping
 energy.usef.agr.workflow.nonudi.dto
 energy.usef.agr.workflow.nonudi.goals
 energy.usef.agr.workflow.nonudi.initialize
@@ -50,6 +51,7 @@ energy.usef.brp.pbcfeederimpl
 energy.usef.brp.repository
 energy.usef.brp.service.business
 energy.usef.brp.workflow
+energy.usef.brp.workflow.housekeeping
 energy.usef.brp.workflow.plan.aplan.finalize
 energy.usef.brp.workflow.plan.aplan.missing
 energy.usef.brp.workflow.plan.commonreferencequery
@@ -104,6 +106,7 @@ energy.usef.cro.event.endpoint
 energy.usef.cro.model
 energy.usef.cro.repository
 energy.usef.cro.service.business
+energy.usef.cro.workflow.housekeeping
 energy.usef.dso.config
 energy.usef.dso.controller
 energy.usef.dso.controller.error
@@ -116,6 +119,7 @@ energy.usef.dso.service.business
 energy.usef.dso.workflow
 energy.usef.dso.workflow.coloring
 energy.usef.dso.workflow.dto
+energy.usef.dso.workflow.housekeeping
 energy.usef.dso.workflow.operate
 energy.usef.dso.workflow.plan.commonreferenceupdate
 energy.usef.dso.workflow.plan.connection.forecast
@@ -140,6 +144,7 @@ energy.usef.mdc.repository
 energy.usef.mdc.service.business
 energy.usef.mdc.transformer
 energy.usef.mdc.workflow
+energy.usef.mdc.workflow.housekeeping
 energy.usef.mdc.workflow.meterdata
 energy.usef.mdc.workflow.step
 energy.usef.pbcfeeder

@@ -18,9 +18,6 @@ package energy.usef.core.repository;
 
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import energy.usef.core.model.PtuFlexOffer;
-import energy.usef.core.util.DateTimeUtil;
-
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +26,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.joda.time.LocalDate;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,6 +35,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import energy.usef.core.model.PtuFlexOffer;
+import energy.usef.core.util.DateTimeUtil;
 
 /**
  * Test class in charge of the unit tests related to the {@link PtuFlexOfferRepository}.
@@ -79,6 +80,14 @@ public class PtuFlexOfferRepositoryTest {
 
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
+    }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     @Test
@@ -179,6 +188,13 @@ public class PtuFlexOfferRepositoryTest {
         // verifications and assertions
         Assert.assertNotNull(placedFlexOffers);
         Assert.assertEquals(1, placedFlexOffers.size());
+    }
+
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("1999-12-30")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("1999-12-30")));
     }
 
 }

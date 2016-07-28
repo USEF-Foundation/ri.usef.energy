@@ -16,14 +16,36 @@
 
 package energy.usef.core.repository;
 
-import energy.usef.core.model.MessageError;
+import java.sql.Date;
 
 import javax.ejb.Stateless;
+
+import org.joda.time.LocalDate;
+
+import energy.usef.core.model.MessageError;
 
 /**
  * Repository class for message errors.
  */
 @Stateless
 public class MessageErrorRepository extends BaseRepository<MessageError> {
+    /**
+     * Delete all {@link MessageError}s for a certain date.
+     *
+     * @param period
+     * @return the number of {@link MessageError}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        LocalDate endDate = period.plusDays(1);
+
+        Date start = new Date(period.toDateMidnight().getMillis());
+        Date end = new Date(endDate.toDateMidnight().getMillis());
+
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM MessageError me ");
+        sql.append("WHERE me.message IN (SELECT m FROM Message m WHERE m.creationTime >= :start AND m.creationTime < :end)");
+
+        return entityManager.createQuery(sql.toString()).setParameter("start", start).setParameter("end", end).executeUpdate();
+    }
 
 }

@@ -64,7 +64,8 @@ import org.powermock.reflect.Whitebox;
 public class DsoCreateFlexRequestCoordinatorTest {
 
     private static final String CONGESTION_POINT_ENTITY_ADDRESS = "ean.123456789012345678";
-    private static final LocalDate PTU_DATE = new LocalDate(2014, 11, 28);
+    private static final LocalDate EXPIRED_PTU_DATE = new LocalDate(2010, 11, 28);
+    private static final LocalDate PTU_DATE = new LocalDate(2030, 11, 28);
 
     @Mock
     private CorePlanboardBusinessService corePlanboardBusinessService;
@@ -132,6 +133,24 @@ public class DsoCreateFlexRequestCoordinatorTest {
         List<String> messages = messageCaptor.getAllValues();
         Assert.assertTrue(messages.get(0).contains("agr1.usef-example.com"));
         Assert.assertTrue(messages.get(1).contains("agr2.usef-example.com"));
+    }
+
+    @Test
+    public void testInvokeWorkflowExpired() {
+        ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
+        coordinator.createFlexRequests(new CreateFlexRequestEvent(CONGESTION_POINT_ENTITY_ADDRESS, EXPIRED_PTU_DATE, new Integer[] {}));
+        Mockito.verify(planboardBusinessService, Mockito.times(0))
+                .findLatestGridSafetyAnalysisWithDispositionRequested(Matchers.eq(CONGESTION_POINT_ENTITY_ADDRESS),
+                        Matchers.eq(EXPIRED_PTU_DATE));
+        Mockito.verify(workflowStubLoader, Mockito.times(0)).invoke(Mockito.eq(DSO_CREATE_FLEX_REQUEST.name()),
+                Mockito.any(WorkflowContext.class));
+        Mockito.verify(planboardBusinessService, Mockito.times(0))
+                .getAggregatorsByCongestionPointAddress(Matchers.any(String.class), Matchers.any(LocalDate.class));
+
+        Mockito.verify(jmsHelperService, Mockito.times(0)).sendMessageToOutQueue(messageCaptor.capture());
+        Mockito.verify(corePlanboardBusinessService, Mockito.times(0))
+                .storeFlexRequest(Mockito.anyString(), Matchers.any(FlexRequest.class), Matchers.eq(DocumentStatus.SENT),
+                        Matchers.anyString());
     }
 
     private List<GridSafetyAnalysis> buildGridSafetyAnalysis() {

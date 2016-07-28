@@ -18,19 +18,21 @@ package energy.usef.core.repository;
 
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import energy.usef.core.model.PtuSettlement;
-
 import java.math.BigInteger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import org.joda.time.LocalDate;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import energy.usef.core.model.PtuSettlement;
 
 public class PtuSettlementRepositoryTest {
     private static EntityManagerFactory entityManagerFactory;
@@ -55,12 +57,20 @@ public class PtuSettlementRepositoryTest {
     }
 
     @Before
-    public void init() {
+    public void before() {
         repository = new PtuSettlementRepository();
         setInternalState(repository, "entityManager", entityManager);
 
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
+    }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     @Test
@@ -70,4 +80,10 @@ public class PtuSettlementRepositoryTest {
         Assert.assertEquals(BigInteger.valueOf(1000), ptuSettlement.getPrognosisPower());
     }
 
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("1999-12-30")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("1999-12-30")));
+    }
 }

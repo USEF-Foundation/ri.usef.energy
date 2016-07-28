@@ -16,10 +16,6 @@
 
 package energy.usef.mdc.repository;
 
-import energy.usef.core.repository.BaseRepository;
-import energy.usef.core.util.DateTimeUtil;
-import energy.usef.mdc.model.AggregatorConnection;
-
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -29,6 +25,10 @@ import javax.persistence.Query;
 import javax.persistence.TemporalType;
 
 import org.joda.time.LocalDate;
+
+import energy.usef.core.repository.BaseRepository;
+import energy.usef.core.util.DateTimeUtil;
+import energy.usef.mdc.model.AggregatorConnection;
 
 /**
  * Repository class for the {@link AggregatorConnection} entity.
@@ -130,5 +130,18 @@ public class AggregatorConnectionRepository extends BaseRepository<AggregatorCon
         query.setParameter("connectionEntityAddressList", connectionEntityAddressList);
         return ((List<Object[]>) query.getResultList())
                 .stream().collect(Collectors.toMap(record -> (String) record[0], record -> (String) record[1]));
+    }
+
+    /**
+     * Delete all {@link AggregatorConnection}s for a given period.
+     *
+     * @param period
+     * @return the number of {@link AggregatorConnection}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM AggregatorConnection ac WHERE ac.validUntil = :validUntil");
+
+        return entityManager.createQuery(sql.toString()).setParameter("validUntil", period.toDateMidnight().toDate()).executeUpdate();
     }
 }

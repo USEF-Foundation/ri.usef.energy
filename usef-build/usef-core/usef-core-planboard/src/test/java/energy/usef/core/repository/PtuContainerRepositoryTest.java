@@ -20,23 +20,17 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import energy.usef.core.config.Config;
-import energy.usef.core.config.ConfigParam;
-import energy.usef.core.model.PhaseType;
-import energy.usef.core.model.PtuContainer;
-import energy.usef.core.model.PtuContainerState;
-import energy.usef.core.model.PtuFlexOffer;
-import energy.usef.core.util.DateTimeUtil;
-
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,6 +44,14 @@ import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+
+import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
+import energy.usef.core.model.PhaseType;
+import energy.usef.core.model.PtuContainer;
+import energy.usef.core.model.PtuContainerState;
+import energy.usef.core.model.PtuFlexOffer;
+import energy.usef.core.util.DateTimeUtil;
 
 /**
  * JUnit test for the GridPointRepository class.
@@ -89,7 +91,7 @@ public class PtuContainerRepositoryTest {
     }
 
     @Before
-    public void init() {
+    public void before() {
         repository = new PtuContainerRepository();
         setInternalState(repository, "entityManager", entityManager);
         Whitebox.setInternalState(repository, config);
@@ -102,7 +104,16 @@ public class PtuContainerRepositoryTest {
         PowerMockito.when(DateTimeUtil.getCurrentDate()).thenReturn(new LocalDate("2000-01-01"));
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
     }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
+    }
+
 
     @Test
     public void testFindPtuContainer() {
@@ -137,43 +148,33 @@ public class PtuContainerRepositoryTest {
 
     @Test
     public void testSyntaxPtuContainersStateWithNoPtuIndex() {
-        entityManager.getTransaction().begin();
         int result = repository.updatePtuContainersState(PtuContainerState.DayAheadClosedValidate, new LocalDate(2014, 11, 20),
                 null);
         Assert.assertEquals(4, result);
-        entityManager.getTransaction().rollback();
     }
 
     @Test
     public void testSyntaxUpdatePtuContainersStateWithPtuIndex() {
-        entityManager.getTransaction().begin();
         int result = repository.updatePtuContainersPhase(PhaseType.Plan, new LocalDate(2014, 11, 20), 1);
         Assert.assertEquals(1, result);
-        entityManager.getTransaction().rollback();
     }
 
     @Test
     public void testUpdatePtuContainersStateWithPtuIndex() {
-        entityManager.getTransaction().begin();
         int result = repository.updatePtuContainersState(PtuContainerState.DayAheadClosedValidate, new LocalDate(2014, 11, 20), 1);
         Assert.assertEquals(1, result);
-        entityManager.getTransaction().rollback();
     }
 
     @Test
     public void testNoUpdatePtuContainersStateWithPtuIndex() {
-        entityManager.getTransaction().begin();
         int result = repository.updatePtuContainersState(PtuContainerState.DayAheadClosedValidate, new LocalDate(2014, 11, 20), 4);
         Assert.assertEquals(0, result);
-        entityManager.getTransaction().rollback();
     }
 
     @Test
     public void testNoUpdatePtuContainersPhaseWithWrongDate() {
-        entityManager.getTransaction().begin();
         int result = repository.updatePtuContainersState(PtuContainerState.DayAheadClosedValidate, new LocalDate(2014, 11, 19), 2);
         Assert.assertEquals(0, result);
-        entityManager.getTransaction().rollback();
     }
 
     @Test
@@ -194,5 +195,22 @@ public class PtuContainerRepositoryTest {
         Assert.assertEquals(2, dates.size());
         Assert.assertEquals(new LocalDate("2014-02-22"), dates.get(0));
         Assert.assertEquals(new LocalDate("2014-11-20"), dates.get(1));
+    }
+
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 8, repository.cleanup(new LocalDate("1999-12-31")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("1999-12-31")));
+    }
+
+    @Test (expected = PersistenceException.class)
+    public void testCleanupNotAllowed() {
+        try {
+            repository.cleanup(new LocalDate("1999-12-30"));
+        } catch (PersistenceException e) {
+            Assert.assertEquals("org.hibernate.exception.ConstraintViolationException: could not execute statement", e.getMessage());
+            throw e;
+        }
     }
 }

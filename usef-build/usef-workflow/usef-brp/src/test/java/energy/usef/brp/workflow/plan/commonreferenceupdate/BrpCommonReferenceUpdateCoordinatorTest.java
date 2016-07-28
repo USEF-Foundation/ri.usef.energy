@@ -83,7 +83,7 @@ public class BrpCommonReferenceUpdateCoordinatorTest {
         // no data no result
         coordinator.handleEvent(new CommonReferenceUpdateEvent());
 
-        Mockito.verify(config, Mockito.times(2)).getProperty(Mockito.any(ConfigParam.class));
+        Mockito.verify(config, Mockito.times(1)).getProperty(ConfigParam.HOST_DOMAIN);
         Mockito.verify(jmsService, Mockito.times(1)).sendMessageToOutQueue(Mockito.anyString());
 
         Assert.assertNotNull(connection.getLastSynchronisationTime());

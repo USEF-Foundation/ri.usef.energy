@@ -180,7 +180,7 @@ public class DsoCreateMissingDPrognosisCoordinator {
             String congestionPointEntityAddress, LocalDate analysisDay) {
         Prognosis prognosisMessage = new Prognosis();
         prognosisMessage.setPeriod(analysisDay);
-        prognosisMessage.setSequence(sequenceGeneratorService.next());
+        prognosisMessage.setSequence(sequenceGeneratorService.next() * -1);
         prognosisMessage.setType(PrognosisType.D_PROGNOSIS);
 
         for (PtuPrognosisDto ptuPrognosisDto : prognosisDto.getPtus()) {

@@ -16,9 +16,6 @@
 
 package energy.usef.dso.repository;
 
-import energy.usef.core.repository.BaseRepository;
-import energy.usef.dso.model.NonAggregatorForecast;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -26,6 +23,9 @@ import javax.ejb.Stateless;
 import javax.persistence.Query;
 
 import org.joda.time.LocalDate;
+
+import energy.usef.core.repository.BaseRepository;
+import energy.usef.dso.model.NonAggregatorForecast;
 
 /**
  * Repository class for the DSO NonAggregatorForecast.
@@ -110,5 +110,19 @@ public class NonAggregatorForecastRepository extends BaseRepository<NonAggregato
                 .setParameter("ptuDate", ptuDate.toDateMidnight().toDate())
                 .setParameter("ptuIndex", ptuIndex)
                 .getResultList();
+    }
+
+    /**
+     * Delete all {@link NonAggregatorForecast} objects for a certain date.
+     *
+     * @param period
+     * @return the number of {@link NonAggregatorForecast} objects deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM NonAggregatorForecast naf ");
+        sql.append("WHERE naf.ptuContainer IN (SELECT pc FROM PtuContainer pc WHERE pc.ptuDate = :ptuDate)");
+
+        return entityManager.createQuery(sql.toString()).setParameter("ptuDate", period.toDateMidnight().toDate()).executeUpdate();
     }
 }

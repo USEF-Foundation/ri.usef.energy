@@ -19,18 +19,20 @@ package energy.usef.core.repository;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.powermock.reflect.Whitebox.setInternalState;
-import energy.usef.core.model.SignedMessageHash;
-import energy.usef.core.util.DateTimeUtil;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.apache.commons.codec.digest.DigestUtils;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import energy.usef.core.model.SignedMessageHash;
+import energy.usef.core.util.DateTimeUtil;
 
 public class SignedMessageHashRepositoryTest {
     private static final String HELLO_USEF_CONTENT = "Hello USEF content";
@@ -65,13 +67,18 @@ public class SignedMessageHashRepositoryTest {
 
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
+    }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     @Test
     public void testIsSignedContentHashAlreadyPresent() {
-
-        // SetUp
-        repository.getEntityManager().getTransaction().begin();
 
         SignedMessageHash signedMessageHash = new SignedMessageHash();
         signedMessageHash.setCreationTime(DateTimeUtil.getCurrentDateTime());

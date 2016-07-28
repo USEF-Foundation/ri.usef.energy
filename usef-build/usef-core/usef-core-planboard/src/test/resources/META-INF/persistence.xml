@@ -19,7 +19,7 @@
 		<class>energy.usef.core.model.Connection</class>
 		<class>energy.usef.core.model.ConnectionGroup</class>
 		<class>energy.usef.core.model.CongestionPointConnectionGroup</class>
-        <class>energy.usef.core.model.AgrConnectionGroup</class>
+		<class>energy.usef.core.model.AgrConnectionGroup</class>
 		<class>energy.usef.core.model.BrpConnectionGroup</class>
 		<class>energy.usef.core.model.ConnectionGroupState</class>
 		<class>energy.usef.core.model.PtuState</class>

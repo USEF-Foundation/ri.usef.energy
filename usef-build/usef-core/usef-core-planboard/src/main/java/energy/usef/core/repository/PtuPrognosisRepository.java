@@ -16,11 +16,6 @@
 
 package energy.usef.core.repository;
 
-import energy.usef.core.model.DocumentStatus;
-import energy.usef.core.model.PrognosisType;
-import energy.usef.core.model.PtuFlexOffer;
-import energy.usef.core.model.PtuPrognosis;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +25,11 @@ import javax.persistence.Query;
 import javax.persistence.TemporalType;
 
 import org.joda.time.LocalDate;
+
+import energy.usef.core.model.DocumentStatus;
+import energy.usef.core.model.PrognosisType;
+import energy.usef.core.model.PtuFlexOffer;
+import energy.usef.core.model.PtuPrognosis;
 
 /**
  * Repository class for the {@link PtuPrognosis} entity. This class is in charge of database operations on the tables related to
@@ -185,5 +185,19 @@ public class PtuPrognosisRepository extends BaseRepository<PtuPrognosis> {
         return getEntityManager().createQuery(sql.toString(), PtuPrognosis.class)
                 .setParameter("period", period.toDateMidnight().toDate(), TemporalType.DATE)
                 .getResultList();
+    }
+
+    /**
+     * Delete all {@link PtuPrognosis}s for a certain date.
+     *
+     * @param period
+     * @return the number of {@link PtuPrognosis}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM PtuPrognosis pp ");
+        sql.append("WHERE pp.ptuContainer IN (SELECT pc FROM PtuContainer pc WHERE pc.ptuDate = :ptuDate)");
+
+        return entityManager.createQuery(sql.toString()).setParameter("ptuDate", period.toDateMidnight().toDate()).executeUpdate();
     }
 }

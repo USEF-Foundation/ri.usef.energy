@@ -430,15 +430,16 @@ public class CommonReferenceUpdateBusinessService {
                     .findFirst();
 
             if (!optionalConnection.isPresent()) {
-                LOGGER.debug("Creating connection with entity address {} for {}", xmlConnection.getEntityAddress(), aggregator);
-                // A new connection will be created.
-                Connection connection = new Connection();
-                connection.setEntityAddress(xmlConnection.getEntityAddress());
-                connection.setAggregator(aggregator);
-                connectionRepository.persist(connection);
-
+                if (xmlConnection.isIsCustomer()) {
+                    LOGGER.debug("Creating connection with entity address {} for {}", xmlConnection.getEntityAddress(), aggregator);
+                    // A new connection will be created.
+                    Connection connection = new Connection();
+                    connection.setEntityAddress(xmlConnection.getEntityAddress());
+                    connection.setAggregator(aggregator);
+                    connectionRepository.persist(connection);
                 // Assure that the newly created connection will be found in case of duplicates
                 connections.add(connection);
+                }
             } else {
                 Connection connection = optionalConnection.get();
                 updateConnectionWithAggregator(aggregator, xmlConnection, connection);
@@ -488,7 +489,7 @@ public class CommonReferenceUpdateBusinessService {
                     .filter(a -> a.getEntityAddress().equalsIgnoreCase(xmlConnection.getEntityAddress()))
                     .findFirst();
 
-            if (!optionalConnection.isPresent() && xmlConnection.isIsCustomer()) {
+            if (!optionalConnection.isPresent()) {
                 // Connection does not exist and will be created
                 LOGGER.debug("Creating connection with entity address {} for {}", xmlConnection.getEntityAddress(),
                         balanceResponsibleParty);
@@ -501,41 +502,13 @@ public class CommonReferenceUpdateBusinessService {
                 // Assure that the newly created connection will be found in case of duplicates
                 connections.add(connection);
             } else {
+                LOGGER.debug("Updating connection with entity address {} for {}", xmlConnection.getEntityAddress(),
+                        balanceResponsibleParty);
                 // Connection exists.
                 Connection connection = optionalConnection.get();
-
-                updateConnectionWithBrp(balanceResponsibleParty, xmlConnection, connection);
+                connection.setBalanceResponsibleParty(balanceResponsibleParty);
             }
             LOGGER.debug("Updated connections for {} and connection: {}", balanceResponsibleParty, xmlConnection.getEntityAddress());
-        }
-    }
-
-    private void updateConnectionWithBrp(BalanceResponsibleParty balanceResponsibleParty,
-            energy.usef.core.data.xml.bean.message.Connection xmlConnection,
-            Connection connection) {
-        if (xmlConnection.isIsCustomer()) {
-            // If the connection's isCustomer flag is true, the Balance Responsible Party is registered/re-registered.
-            LOGGER.debug("Updating connection with entity address {} for {}", xmlConnection.getEntityAddress(),
-                    balanceResponsibleParty);
-            connection.setBalanceResponsibleParty(balanceResponsibleParty);
-        } else {
-            if (connection.getBalanceResponsibleParty() != null
-                    && connection.getBalanceResponsibleParty().getDomain().equals(balanceResponsibleParty.getDomain())) {
-                // If the connection's isCustomer flag is false and the connection is registered
-                // for the this Balance Responsible Party,
-                // the Balance Responsible Party is unregistered.
-                LOGGER.debug("Resetting BalanceResponsibleParty for Connection with entity address {}",
-                        xmlConnection.getEntityAddress());
-                connection.setBalanceResponsibleParty(null);
-                if (connection.getAggregator() == null) {
-                    connectionRepository.delete(connection);
-                }
-            } else {
-                // Nothing happens
-                LOGGER.debug(
-                        "Connection with entity address {} will not be overridden.",
-                        connection.getEntityAddress());
-            }
         }
     }
 

@@ -16,15 +16,29 @@
 
 package energy.usef.dso.repository;
 
+import javax.ejb.Stateless;
+
+import org.joda.time.LocalDate;
+
 import energy.usef.core.repository.BaseRepository;
 import energy.usef.dso.model.PrognosisUpdateDeviation;
-
-import javax.ejb.Stateless;
 
 /**
  * Repository class in charge of the {@link PrognosisUpdateDeviation} entities.
  */
 @Stateless
 public class PrognosisUpdateDeviationRepository extends BaseRepository<PrognosisUpdateDeviation> {
+    /**
+     * Delete all {@link PrognosisUpdateDeviation}s for a certain date.
+     *
+     * @param period
+     * @return the number of {@link PrognosisUpdateDeviation}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM PrognosisUpdateDeviation pud WHERE pud.ptuDate = :ptuDate");
+
+        return entityManager.createQuery(sql.toString()).setParameter("ptuDate", period.toDateMidnight().toDate()).executeUpdate();
+    }
 
 }

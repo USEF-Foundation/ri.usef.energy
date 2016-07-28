@@ -21,13 +21,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import energy.usef.core.model.CongestionPointConnectionGroup;
-import energy.usef.core.model.PtuContainer;
-import energy.usef.core.repository.PtuContainerRepository;
-import energy.usef.core.service.business.SequenceGeneratorService;
-import energy.usef.core.util.DateTimeUtil;
-import energy.usef.dso.model.PtuGridMonitor;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -36,11 +29,19 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.joda.time.LocalDate;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import energy.usef.core.model.CongestionPointConnectionGroup;
+import energy.usef.core.model.PtuContainer;
+import energy.usef.core.repository.PtuContainerRepository;
+import energy.usef.core.service.business.SequenceGeneratorService;
+import energy.usef.core.util.DateTimeUtil;
+import energy.usef.dso.model.PtuGridMonitor;
 
 /**
  * Test class in charge of the unit tests related to the {@link PtuGridMonitorRepository} class.
@@ -73,7 +74,7 @@ public class PtuGridMonitorRepositoryTest {
     }
 
     @Before
-    public void init() {
+    public void before() {
         repository = new PtuGridMonitorRepository();
         SequenceGeneratorService sequenceGeneratorService = new SequenceGeneratorService();
         setInternalState(repository, "entityManager", entityManager);
@@ -85,6 +86,14 @@ public class PtuGridMonitorRepositoryTest {
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
         ptuContainerRepository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
+    }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     @Test
@@ -109,7 +118,6 @@ public class PtuGridMonitorRepositoryTest {
 
     @Test
     public void testSetActualPowerEmptyGridMonitor() {
-        entityManager.getTransaction().begin();
         String congestionPointEntityAddress = "ea1.1992-01.com.example:gridpoint.4f76ff19-a53b-49f5-84e8";
 
         PtuContainer ptuContainer = ptuContainerRepository.findPtuContainer(new LocalDate("2014-11-19"), 1);
@@ -120,7 +128,6 @@ public class PtuGridMonitorRepositoryTest {
 
         long power = repository.getActualPower(ptuContainer, congestionPoint);
         assertEquals(1000L, power);
-        entityManager.getTransaction().rollback();
     }
 
     @Test
@@ -149,7 +156,6 @@ public class PtuGridMonitorRepositoryTest {
 
     @Test
     public void testSetLimitedPower() {
-        entityManager.getTransaction().begin();
         String congestionPointEntityAddress = "ea1.1992-01.com.example:gridpoint.4f76ff19-a53b-49f5-84e7";
 
         PtuContainer ptuContainer = ptuContainerRepository.findPtuContainer(new LocalDate("2014-11-19"), 1);
@@ -165,12 +171,10 @@ public class PtuGridMonitorRepositoryTest {
 
         power = repository.findLimitedPower(ptuContainer, congestionPoint);
         assertEquals(2000L, power.get().longValue());
-        entityManager.getTransaction().rollback();
     }
 
     @Test
     public void testSetLimitedPowerEmptyGridMonitor() {
-        entityManager.getTransaction().begin();
         String congestionPointEntityAddress = "ea1.1992-01.com.example:gridpoint.4f76ff19-a53b-49f5-84e8";
 
         PtuContainer ptuContainer = ptuContainerRepository.findPtuContainer(new LocalDate("2014-11-19"), 1);
@@ -186,6 +190,12 @@ public class PtuGridMonitorRepositoryTest {
 
         power = repository.findLimitedPower(ptuContainer, congestionPoint);
         assertEquals(2000L, power.get().longValue());
-        entityManager.getTransaction().rollback();
+    }
+
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("1999-12-30")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("1999-12-30")));
     }
 }

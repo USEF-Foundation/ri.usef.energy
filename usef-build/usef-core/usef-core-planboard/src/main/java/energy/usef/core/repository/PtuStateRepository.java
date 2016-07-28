@@ -16,13 +16,6 @@
 
 package energy.usef.core.repository;
 
-import energy.usef.core.model.ConnectionGroup;
-import energy.usef.core.model.PtuContainer;
-import energy.usef.core.model.PtuContainerState;
-import energy.usef.core.model.PtuState;
-import energy.usef.core.model.RegimeType;
-import energy.usef.core.service.business.SequenceGeneratorService;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +24,13 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 
 import org.joda.time.LocalDate;
+
+import energy.usef.core.model.ConnectionGroup;
+import energy.usef.core.model.PtuContainer;
+import energy.usef.core.model.PtuContainerState;
+import energy.usef.core.model.PtuState;
+import energy.usef.core.model.RegimeType;
+import energy.usef.core.service.business.SequenceGeneratorService;
 
 /**
  * This repository is used to manage {@link PtuState}.
@@ -111,6 +111,20 @@ public class PtuStateRepository extends BaseRepository<PtuState> {
             return ptuState;
         }
         return results.get(0);
+    }
+
+    /**
+     * Delete all {@link PtuState}s for a certain date.
+     *
+     * @param period
+     * @return the number of {@link PtuState}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM PtuState ps ");
+        sql.append("WHERE ps.ptuContainer IN (SELECT pc FROM PtuContainer pc WHERE pc.ptuDate = :ptuDate)");
+
+        return entityManager.createQuery(sql.toString()).setParameter("ptuDate", period.toDateMidnight().toDate()).executeUpdate();
     }
 
 }

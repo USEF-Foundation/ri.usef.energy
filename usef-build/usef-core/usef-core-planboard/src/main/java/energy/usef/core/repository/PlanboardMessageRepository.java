@@ -16,13 +16,6 @@
 
 package energy.usef.core.repository;
 
-import energy.usef.core.exception.TechnicalException;
-import energy.usef.core.model.ConnectionGroup;
-import energy.usef.core.model.DocumentStatus;
-import energy.usef.core.model.DocumentType;
-import energy.usef.core.model.PlanboardMessage;
-import energy.usef.core.util.DateTimeUtil;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -33,6 +26,13 @@ import javax.persistence.TemporalType;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+
+import energy.usef.core.exception.TechnicalException;
+import energy.usef.core.model.ConnectionGroup;
+import energy.usef.core.model.DocumentStatus;
+import energy.usef.core.model.DocumentType;
+import energy.usef.core.model.PlanboardMessage;
+import energy.usef.core.util.DateTimeUtil;
 
 /**
  * Repository class for the {@link PlanboardMessage} entity.
@@ -822,5 +822,18 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
                 .setParameter("today", DateTimeUtil.getCurrentDate().toDateMidnight().toDate(), TemporalType.DATE)
                 .getResultList();
 
+    }
+    /**
+     * Delete all {@link PlanboardMessage}s created for a specific period.
+     *
+     * @param period
+     * @return the number of {@link PlanboardMessage}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        // TODO: maybe (also) consider expirationDate and/or creationDateTime?
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM PlanboardMessage pm WHERE pm.period = :period");
+
+        return entityManager.createQuery(sql.toString()).setParameter("period", period.toDateMidnight().toDate()).executeUpdate();
     }
 }

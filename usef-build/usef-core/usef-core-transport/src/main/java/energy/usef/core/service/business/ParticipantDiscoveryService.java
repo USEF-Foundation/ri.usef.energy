@@ -204,7 +204,7 @@ public class ParticipantDiscoveryService {
 
         String url;
         if (recipientEndpoint == null || "".equals(recipientEndpoint)) {
-            url = "https://" + domain + "/USEF/2014/I/" + domain + "/" + participantRole.name() + "/SignedMessage";
+            url = "https://" + domain + "/USEF/2015/SignedMessage";
         } else {
             url = "https://" + domain + ":8443/" + domain + "_" + participantRole.name() + recipientEndpoint;
         }

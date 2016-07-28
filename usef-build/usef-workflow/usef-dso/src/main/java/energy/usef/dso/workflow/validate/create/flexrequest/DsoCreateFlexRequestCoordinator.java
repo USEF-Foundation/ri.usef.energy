@@ -99,31 +99,36 @@ public class DsoCreateFlexRequestCoordinator {
     @Asynchronous
     @Lock(LockType.WRITE)
     public void createFlexRequests(@Observes(during = TransactionPhase.AFTER_COMPLETION) CreateFlexRequestEvent event) {
-        LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        if (!event.isExpired()) {
 
-        // 1. Invoke step 2004: transforms the grid safety analysis of one day into flex requests
-        List<GridSafetyAnalysis> gridSafetyAnalysis = dsoPlanboardBusinessService
-                .findLatestGridSafetyAnalysisWithDispositionRequested(
+            LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+
+            // 1. Invoke step 2004: transforms the grid safety analysis of one day into flex requests
+            List<GridSafetyAnalysis> gridSafetyAnalysis = dsoPlanboardBusinessService
+                    .findLatestGridSafetyAnalysisWithDispositionRequested(
+                            event.getCongestionPointEntityAddress(), event.getPtuDate());
+            if (gridSafetyAnalysis.isEmpty()) {
+                LOGGER.info(
+                        "No grid analysis with requested disposition has been found for congestion point {} on {}. Workflow will end.",
                         event.getCongestionPointEntityAddress(), event.getPtuDate());
-        if (gridSafetyAnalysis.isEmpty()) {
-            LOGGER.info(
-                    "No grid analysis with requested disposition has been found for congestion point {} on {}. Workflow will end.",
+                return;
+            }
+            List<FlexRequestDto> flexRequestDtos = invokeCreateFlexRequestPbc(event, gridSafetyAnalysis);
+
+            if (flexRequestDtos == null || flexRequestDtos.isEmpty()) {
+                LOGGER.info("No flex requests to send. Workflow will end.");
+                return;
+            }
+
+            // 2.3 For each aggregator active on the congestion point
+            List<Aggregator> aggregators = dsoPlanboardBusinessService.getAggregatorsByCongestionPointAddress(
                     event.getCongestionPointEntityAddress(), event.getPtuDate());
-            return;
+            // 2.1 Initialize a new flex request
+            createAndSendFlexRequests(event, gridSafetyAnalysis, flexRequestDtos, aggregators);
+            LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
+        } else {
+            LOGGER.info("Ignored {}, period is in the past.", event);
         }
-        List<FlexRequestDto> flexRequestDtos = invokeCreateFlexRequestPbc(event, gridSafetyAnalysis);
-
-        if (flexRequestDtos == null || flexRequestDtos.isEmpty()) {
-            LOGGER.info("No flex requests to send. Workflow will end.");
-            return;
-        }
-
-        // 2.3 For each aggregator active on the congestion point
-        List<Aggregator> aggregators = dsoPlanboardBusinessService.getAggregatorsByCongestionPointAddress(
-                event.getCongestionPointEntityAddress(), event.getPtuDate());
-        // 2.1 Initialize a new flex request
-        createAndSendFlexRequests(event, gridSafetyAnalysis, flexRequestDtos, aggregators);
-        LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }
 
     private void createAndSendFlexRequests(CreateFlexRequestEvent event, List<GridSafetyAnalysis> gridSafetyAnalysis,
@@ -160,7 +165,8 @@ public class DsoCreateFlexRequestCoordinator {
             List<GridSafetyAnalysis> gridSafetyAnalysis) {
 
         WorkflowContext contextIn = new DefaultWorkflowContext();
-        contextIn.setValue(CreateFlexRequestStepParameter.IN.CONGESTION_POINT_ENTITY_ADDRESS.name(), event.getCongestionPointEntityAddress());
+        contextIn.setValue(CreateFlexRequestStepParameter.IN.CONGESTION_POINT_ENTITY_ADDRESS.name(),
+                event.getCongestionPointEntityAddress());
         contextIn.setValue(CreateFlexRequestStepParameter.IN.PERIOD.name(), event.getPtuDate());
 
         GridSafetyAnalysisDto gridSafetyAnalysisDto = GridSafetyAnalysisDtoTransformer.transform(gridSafetyAnalysis);
@@ -168,7 +174,8 @@ public class DsoCreateFlexRequestCoordinator {
 
         WorkflowContext contextOut = workflowStubLoader.invoke(DsoWorkflowStep.DSO_CREATE_FLEX_REQUEST.name(), contextIn);
 
-        WorkflowUtil.validateContext(DsoWorkflowStep.DSO_CREATE_FLEX_REQUEST.name(), contextOut, CreateFlexRequestStepParameter.OUT.values());
+        WorkflowUtil.validateContext(DsoWorkflowStep.DSO_CREATE_FLEX_REQUEST.name(), contextOut,
+                CreateFlexRequestStepParameter.OUT.values());
 
         return contextOut.get(CreateFlexRequestStepParameter.OUT.FLEX_REQUESTS_DTO_LIST.name(), List.class);
     }

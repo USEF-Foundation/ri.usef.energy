@@ -197,6 +197,9 @@ dso_connection_forecast_days_interval: 1
 dso_flexorder_initial_delay_in_seconds: 5
 dso_flexorder_interval_in_seconds: 900
 
+# The expiration time for the grid safety analysis PBC.
+dso_grid_safety_analysis_expiration_in_minutes: 10
+
 # Configuration for initiating the settlement process (Day of month in range [1..28] and time of day in format 'HH:mm').
 dso_initiate_settlement_day_of_month: 1
 dso_initiate_settlement_time: '11:00'
@@ -320,7 +323,7 @@ agr_non_udi_retrieve_ads_goal_realization_initial_delay_in_minutes: 15
 agr_non_udi_retrieve_ads_goal_realization_interval_in_minutes: 15
 
 # PowerMatcher rest endpoint address
-agr_powermatcher_endpoint_uri: 'http://localhost:8081'
+agr_powermatcher_endpoint_uri: 'http://localhost:8088'
 
 # The time of the day that a non-UDI aggregator initializes the PowerMatcher cluster (in format 'HH:mm')
 agr_initialize_non_udi_time_of_day: '00:01'

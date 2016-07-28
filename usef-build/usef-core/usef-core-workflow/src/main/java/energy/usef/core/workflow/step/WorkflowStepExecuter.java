@@ -16,10 +16,6 @@
 
 package energy.usef.core.workflow.step;
 
-import energy.usef.core.workflow.WorkflowContext;
-import energy.usef.core.workflow.WorkflowStep;
-
-import javax.ejb.Stateless;
 import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
@@ -28,12 +24,14 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import energy.usef.core.workflow.WorkflowContext;
+import energy.usef.core.workflow.WorkflowStep;
+
 /**
  * This class loads the workflow step classes when the application is deployed, based on the contents of a file
  * "pbc-catalog.properties". The coordinator invokes a workflow step by calling the
  * {@link WorkflowStepExecuter#invoke(String, WorkflowContext)} method to find and execute the {@link WorkflowStep}.
  */
-@Stateless
 public class WorkflowStepExecuter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(WorkflowStepExecuter.class);

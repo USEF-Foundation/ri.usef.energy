@@ -86,6 +86,16 @@ public class ConfigDso extends AbstractConfig {
     }
 
     /**
+     * Gets a property value as a {@link Long}.
+     *
+     * @param configParam the configuration parameter
+     * @return property value
+     */
+    public Long getLongProperty(ConfigDsoParam configParam) {
+        return Long.parseLong(properties.getProperty(configParam.name()));
+    }
+
+    /**
      * Gets a property value as an {@link Integer}.
      *
      * @param configParam the configuration parameter

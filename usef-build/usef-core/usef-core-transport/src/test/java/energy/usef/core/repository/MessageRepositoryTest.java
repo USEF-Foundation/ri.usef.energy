@@ -21,10 +21,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import energy.usef.core.model.Message;
-import energy.usef.core.model.MessageDirection;
-import energy.usef.core.model.MessageType;
-
 import java.util.UUID;
 
 import javax.persistence.EntityManager;
@@ -35,6 +31,7 @@ import javax.persistence.PersistenceException;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,6 +40,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import energy.usef.core.model.Message;
+import energy.usef.core.model.MessageDirection;
+import energy.usef.core.model.MessageType;
 
 /**
  * JUnit test for the IngoingMessageRepository class.
@@ -79,12 +80,20 @@ public class MessageRepositoryTest {
     }
 
     @Before
-    public void init() {
+    public void before() {
         repository = new MessageRepository();
         setInternalState(repository, "entityManager", entityManager);
 
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
+    }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     /**
@@ -96,7 +105,6 @@ public class MessageRepositoryTest {
     public void getMessageResponseByConversationId() throws Exception {
         String conversationId = "conversationId";
         // SetUp
-        repository.getEntityManager().getTransaction().begin();
         Message messageIn = createMessage();
         messageIn.setDirection(MessageDirection.INBOUND);
         messageIn.setConversationId(conversationId);
@@ -106,18 +114,12 @@ public class MessageRepositoryTest {
         messageOut.setDirection(MessageDirection.OUTBOUND);
         messageOut.setConversationId(conversationId);
         repository.persist(messageOut);
-        repository.getEntityManager().getTransaction().commit();
 
         Message foundMessage = repository.getMessageResponseByConversationId(messageIn.getConversationId());
 
         assertNotNull(foundMessage);
         assertEquals(messageIn.getId(), foundMessage.getId());
 
-        // cleanup
-        repository.getEntityManager().getTransaction().begin();
-        repository.delete(messageIn);
-        repository.delete(messageOut);
-        repository.getEntityManager().getTransaction().commit();
     }
 
     @Test
@@ -125,44 +127,29 @@ public class MessageRepositoryTest {
         String conversationId = "conversationId";
         String messageId = "12345678-1234-1234-1234567890ab";
         // SetUp
-        repository.getEntityManager().getTransaction().begin();
         Message newMessage = createMessage();
         newMessage.setDirection(MessageDirection.INBOUND);
         newMessage.setConversationId(conversationId);
         newMessage.setMessageId(messageId);
         repository.persist(newMessage);
-        repository.getEntityManager().getTransaction().commit();
 
         boolean foundMessage = repository.isMessageIdAlreadyUsed(messageId);
         assertNotNull(foundMessage);
         assertTrue(foundMessage);
-
-        // cleanup
-        repository.getEntityManager().getTransaction().begin();
-        repository.delete(newMessage);
-        repository.getEntityManager().getTransaction().commit();
     }
 
     @Test
     public void testGetMessageByMessagId() {
         String conversationId = "conversationId";
-        String messageId = "12345678-1234-1234-1234567890ab";
+        String messageId = "12345678-1234-1234-1234567890ac";
         // SetUp
-        repository.getEntityManager().getTransaction().begin();
         Message newMessage = createMessage();
         newMessage.setDirection(MessageDirection.OUTBOUND);
         newMessage.setConversationId(conversationId);
         newMessage.setMessageId(messageId);
         repository.persist(newMessage);
-        repository.getEntityManager().getTransaction().commit();
-
         Message fountMessage = repository.getMessageResponseByMessageId(messageId, MessageDirection.OUTBOUND);
         Assert.assertEquals(conversationId, fountMessage.getConversationId());
-
-        // cleanup
-        repository.getEntityManager().getTransaction().begin();
-        repository.delete(newMessage);
-        repository.getEntityManager().getTransaction().commit();
     }
 
     /**
@@ -203,13 +190,11 @@ public class MessageRepositoryTest {
         String conversationId = "12345678-1234-1234-1234-1234567890ab";
         String messageId = "12345678-1234-1234-1234-1234567890ab";
         // SetUp
-        repository.getEntityManager().getTransaction().begin();
         Message newMessage = createMessage();
         newMessage.setDirection(MessageDirection.OUTBOUND);
         newMessage.setConversationId(conversationId);
         newMessage.setMessageId(messageId);
         repository.persist(newMessage);
-        repository.getEntityManager().getTransaction().commit();
 
         // actual test
         Message message = repository.getInitialMessageOfConversation(conversationId);
@@ -217,10 +202,6 @@ public class MessageRepositoryTest {
         Assert.assertEquals("Message ID mismatch.", messageId, message.getMessageId());
         Assert.assertEquals("Conversation ID mismatch.", conversationId, message.getConversationId());
 
-        // cleanup
-        repository.getEntityManager().getTransaction().begin();
-        repository.delete(newMessage);
-        repository.getEntityManager().getTransaction().commit();
     }
 
     /**
@@ -257,6 +238,23 @@ public class MessageRepositoryTest {
         message.setMessageType(MessageType.ROUTINE);
         message.setContentHash(DigestUtils.sha256("Hash of the message"));
         return message;
+    }
+
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 2, repository.cleanup(new LocalDate("2014-11-20")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("2014-11-20")));
+    }
+
+    @Test (expected = PersistenceException.class)
+    public void testCleanupNotAllowed() {
+        try {
+            repository.cleanup(new LocalDate("2014-11-22"));
+        } catch (PersistenceException e) {
+            Assert.assertEquals("org.hibernate.exception.ConstraintViolationException: could not execute statement", e.getMessage());
+            throw e;
+        }
     }
 
 }

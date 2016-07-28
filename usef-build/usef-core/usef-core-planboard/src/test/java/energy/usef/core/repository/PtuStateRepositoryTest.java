@@ -20,14 +20,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import energy.usef.core.model.CongestionPointConnectionGroup;
-import energy.usef.core.model.ConnectionGroup;
-import energy.usef.core.model.PtuContainer;
-import energy.usef.core.model.PtuState;
-import energy.usef.core.model.RegimeType;
-import energy.usef.core.service.business.SequenceGeneratorService;
-import energy.usef.core.util.DateTimeUtil;
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -35,13 +27,23 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.joda.time.LocalDate;
+import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import energy.usef.core.model.CongestionPointConnectionGroup;
+import energy.usef.core.model.ConnectionGroup;
+import energy.usef.core.model.PtuContainer;
+import energy.usef.core.model.PtuState;
+import energy.usef.core.model.RegimeType;
+import energy.usef.core.service.business.SequenceGeneratorService;
+import energy.usef.core.util.DateTimeUtil;
 
 /**
  * JUnit test for the PtuStateRepository class.
@@ -73,7 +75,7 @@ public class PtuStateRepositoryTest {
     }
 
     @Before
-    public void init() {
+    public void before() {
         repository = new PtuStateRepository();
         SequenceGeneratorService sequenceGeneratorService = new SequenceGeneratorService();
         setInternalState(repository, "entityManager", entityManager);
@@ -81,7 +83,17 @@ public class PtuStateRepositoryTest {
 
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
     }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
+    }
+
+
 
     /**
      * Tests PtuStateRepository.findPtuStates method.
@@ -125,6 +137,13 @@ public class PtuStateRepositoryTest {
         connectionGroup.setUsefIdentifier(usefIdentifier);
         PtuState result = repository.findOrCreatePtuState(ptuContainer, connectionGroup);
         assertNotNull(result);
+    }
+
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("1999-12-30")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("1999-12-30")));
     }
 
 }

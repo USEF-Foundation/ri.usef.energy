@@ -16,12 +16,6 @@
 
 package energy.usef.dso.repository;
 
-import energy.usef.core.model.ConnectionGroup;
-import energy.usef.core.model.PtuContainer;
-import energy.usef.core.repository.BaseRepository;
-import energy.usef.core.service.business.SequenceGeneratorService;
-import energy.usef.dso.model.PtuGridMonitor;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +25,12 @@ import javax.inject.Inject;
 import javax.persistence.Query;
 
 import org.joda.time.LocalDate;
+
+import energy.usef.core.model.ConnectionGroup;
+import energy.usef.core.model.PtuContainer;
+import energy.usef.core.repository.BaseRepository;
+import energy.usef.core.service.business.SequenceGeneratorService;
+import energy.usef.dso.model.PtuGridMonitor;
 
 /**
  * Repository class in charge of the management of the {@link PtuGridMonitor} entities.
@@ -191,5 +191,20 @@ public class PtuGridMonitorRepository extends BaseRepository<PtuGridMonitor> {
         }
         persist(ptuGridMonitor);
     }
+
+    /**
+     * Delete all {@link PtuGridMonitor} objects for a certain date.
+     *
+     * @param period
+     * @return the number of {@link PtuGridMonitor} objects deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM PtuGridMonitor pgm ");
+        sql.append("WHERE pgm.ptuContainer IN (SELECT pc FROM PtuContainer pc WHERE pc.ptuDate = :ptuDate)");
+
+        return entityManager.createQuery(sql.toString()).setParameter("ptuDate", period.toDateMidnight().toDate()).executeUpdate();
+    }
+
 
 }

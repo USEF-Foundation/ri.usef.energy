@@ -273,7 +273,7 @@ public class ToolConfig {
         return System.getProperty("java.io.tmpdir");
     }
 
-    public static void checkBuildsOccured() {
+    public static void checkBuildsOccurred() {
         String agrWarFilename = ToolConfig.getUsefEnvironmentBuildAgrWarFolder() + File.separator + ToolConfig.TARGET_AGR_WAR;
         if (!FileUtil.isFileExists(agrWarFilename)) {
             LOGGER.error("Can not find file {}. Probably, the build of the AGR component has not succeeded.",

@@ -16,11 +16,6 @@
 
 package energy.usef.core.repository;
 
-import energy.usef.core.model.DocumentStatus;
-import energy.usef.core.model.DocumentType;
-import energy.usef.core.model.FlexOrderSettlement;
-import energy.usef.core.model.PlanboardMessage;
-
 import java.util.List;
 import java.util.Optional;
 
@@ -28,6 +23,11 @@ import javax.persistence.TemporalType;
 import javax.persistence.TypedQuery;
 
 import org.joda.time.LocalDate;
+
+import energy.usef.core.model.DocumentStatus;
+import energy.usef.core.model.DocumentType;
+import energy.usef.core.model.FlexOrderSettlement;
+import energy.usef.core.model.PlanboardMessage;
 
 /**
  * Repository class in charge of the operations related to the {@link FlexOrderSettlement} entities.
@@ -89,6 +89,19 @@ public class FlexOrderSettlementRepository extends BaseRepository<FlexOrderSettl
         connectionGroup.ifPresent(usefIdentifier -> query.setParameter("usefIdentifier", usefIdentifier));
         participantDomain.ifPresent(domain -> query.setParameter("participantDomain", domain));
         return query.getResultList();
+    }
+
+    /**
+     * Delete all {@link FlexOrderSettlement}s for a certain date.
+     *
+     * @param period
+     * @return the number of {@link FlexOrderSettlement}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM FlexOrderSettlement fos WHERE fos.period = :period");
+
+        return entityManager.createQuery(sql.toString()).setParameter("period", period.toDateMidnight().toDate()).executeUpdate();
     }
 
 }

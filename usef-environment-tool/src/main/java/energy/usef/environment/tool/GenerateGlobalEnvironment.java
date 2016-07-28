@@ -37,7 +37,7 @@ public class GenerateGlobalEnvironment {
     public void run() throws Exception {
         ToolConfig.checkJavaVersion();
 
-        ToolConfig.checkBuildsOccured();
+        ToolConfig.checkBuildsOccurred();
 
         String environmentYaml = ToolConfig.getUsefEnvironmentConfigFolder() + File.separator + ToolConfig.USEF_ENVIRONMENT_YAML;
 

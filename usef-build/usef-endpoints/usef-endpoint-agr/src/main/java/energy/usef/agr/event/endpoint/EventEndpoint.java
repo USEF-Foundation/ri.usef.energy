@@ -16,6 +16,18 @@
 
 package energy.usef.agr.event.endpoint;
 
+import javax.enterprise.event.Event;
+import javax.inject.Inject;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Response;
+
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import energy.usef.agr.workflow.nonudi.goals.AgrNonUdiSetAdsGoalsEvent;
 import energy.usef.agr.workflow.nonudi.initialize.AgrNonUdiInitializeEvent;
 import energy.usef.agr.workflow.nonudi.operate.AgrNonUdiRetrieveAdsGoalRealizationEvent;
@@ -40,17 +52,6 @@ import energy.usef.core.config.ConfigParam;
 import energy.usef.core.event.MoveToOperateEvent;
 import energy.usef.core.event.StartValidateEvent;
 import energy.usef.core.util.DateTimeUtil;
-import org.apache.commons.lang.StringUtils;
-import org.joda.time.LocalDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.event.Event;
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
 
 /**
  * Restful service to send events to the aggregator.
@@ -83,6 +84,7 @@ public class EventEndpoint {
 
     @Inject
     private Event<InitiateSettlementEvent> initiateSettlementEventManager;
+
     @Inject
     private Event<CheckSettlementEvent> checkSettlementEventEvent;
 

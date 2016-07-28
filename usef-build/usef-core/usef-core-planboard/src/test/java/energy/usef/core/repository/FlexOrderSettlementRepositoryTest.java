@@ -18,21 +18,23 @@ package energy.usef.core.repository;
 
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import energy.usef.core.model.FlexOrderSettlement;
-
 import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 
 import org.joda.time.LocalDate;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import energy.usef.core.model.FlexOrderSettlement;
 
 /**
  * Test class in charge of the unit tests related to the {@link FlexOrderSettlementRepository} class.
@@ -61,13 +63,22 @@ public class FlexOrderSettlementRepositoryTest {
     }
 
     @Before
-    public void init() {
+    public void before() {
         repository = new FlexOrderSettlementRepository();
         setInternalState(repository, "entityManager", entityManager);
 
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
     }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
+    }
+
 
     @Test
     public void testIsEachFlexOrderReadyForSettlement() throws Exception {
@@ -107,4 +118,21 @@ public class FlexOrderSettlementRepositoryTest {
                 Optional.of(participantDomain));
         Assert.assertEquals(1, flexOrderSettlementsForPeriod.size());
     }
+
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("1999-12-31")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("1999-12-31")));
+    }
+
+    @Test
+    public void testCleanupNotAllowed() {
+        try {
+            repository.cleanup(new LocalDate("1999-12-30"));
+        } catch (PersistenceException e) {
+            Assert.assertEquals("org.hibernate.exception.ConstraintViolationException: could not execute statement", e.getMessage());
+        }
+    }
+
 }

@@ -118,7 +118,7 @@ public class BrpCreateMissingAPlansCoordinator {
     private void storeAPlans(PrognosisDto prognosisDto, AgrConnectionGroup connectionGroup) {
         Prognosis prognosis = new Prognosis();
         prognosis.setPeriod(prognosisDto.getPeriod());
-        prognosis.setSequence(sequenceGeneratorService.next());
+        prognosis.setSequence(sequenceGeneratorService.next() * -1);
         prognosis.setType(PrognosisType.A_PLAN);
 
         for (PtuPrognosisDto ptuPrognosisDto : prognosisDto.getPtus()) {

@@ -18,9 +18,6 @@ package energy.usef.core.repository;
 
 import static javax.persistence.TemporalType.DATE;
 
-import energy.usef.core.model.AcknowledgementStatus;
-import energy.usef.core.model.PtuFlexOrder;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,9 +28,11 @@ import javax.persistence.Query;
 
 import org.joda.time.LocalDate;
 
+import energy.usef.core.model.AcknowledgementStatus;
+import energy.usef.core.model.PtuFlexOrder;
+
 /**
- * Repository class for the {@link PtuFlexOrder} entity. This class is in charge of database operations on the tables related to
- * the
+ * Repository class for the {@link PtuFlexOrder} entity. This class is in charge of database operations on the tables related to the
  * flex orders.
  */
 @Stateless
@@ -152,7 +151,7 @@ public class PtuFlexOrderRepository extends BaseRepository<PtuFlexOrder> {
     }
 
     /**
-     * Find and return all accepted FlexOrders for an usefIdentifier on a certain date that are not processed yet.
+     * Find and return all accepted {@link PtuFlexOrder}s for an usefIdentifier on a certain date that are not processed yet.
      *
      * @param usefIdentifier
      * @param ptuDate
@@ -171,5 +170,19 @@ public class PtuFlexOrderRepository extends BaseRepository<PtuFlexOrder> {
                 .setParameter("acknowledgementStatus", AcknowledgementStatus.ACCEPTED);
         usefIdentifier.ifPresent(usefIdentifierValue -> query.setParameter("usefIdentifier", usefIdentifierValue));
         return query.getResultList();
+    }
+
+    /**
+     * Delete all {@link PtuFlexOrder}s for a certain date.
+     *
+     * @param period
+     * @return the number of {@link PtuFlexOrder}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM PtuFlexOrder pfo ");
+        sql.append("WHERE pfo.ptuContainer IN (SELECT pc FROM PtuContainer pc WHERE pc.ptuDate = :ptuDate)");
+
+        return entityManager.createQuery(sql.toString()).setParameter("ptuDate", period.toDateMidnight().toDate()).executeUpdate();
     }
 }

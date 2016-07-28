@@ -18,6 +18,8 @@ package energy.usef.agr.workflow.plan.create.aplan;
 
 import org.joda.time.LocalDate;
 
+import energy.usef.core.util.DateTimeUtil;
+
 /**
  * Event class that is used to trigger the workflow of creating and sending A-Plan.
  */
@@ -43,6 +45,10 @@ public class CreateAPlanEvent {
 
     public String getUsefIdentifier() {
         return usefIdentifier;
+    }
+
+    public boolean isExpired() {
+        return (this.period.isBefore(DateTimeUtil.getCurrentDate()));
     }
 
     @Override

@@ -42,6 +42,7 @@ import energy.usef.core.service.business.SequenceGeneratorService;
 import energy.usef.core.service.helper.JMSHelperService;
 import energy.usef.core.service.helper.MessageMetadataBuilder;
 import energy.usef.core.service.validation.CorePlanboardValidatorService;
+import energy.usef.core.util.DateTimeUtil;
 import energy.usef.core.util.XMLUtil;
 
 import java.math.BigInteger;
@@ -102,16 +103,20 @@ public class AgrCreateAPlanPlanboardCoordinator {
      */
     @Asynchronous
     public void handleEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) CreateAPlanEvent event) {
-        LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        if (!event.isExpired()) {
+            LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+            ConnectionGroup connectionGroup = corePlanboardBusinessService.findConnectionGroup(event.getUsefIdentifier());
 
-        ConnectionGroup connectionGroup = corePlanboardBusinessService.findConnectionGroup(event.getUsefIdentifier());
-
-        Map<Integer, PowerContainer> powerContainersPerPtu = agrPortfolioBusinessService
-                .findActivePortfolioForConnectionGroupLevel(event.getPeriod(), Optional.of(connectionGroup))
+            Map<Integer, PowerContainer> powerContainersPerPtu = agrPortfolioBusinessService
+                    .findActivePortfolioForConnectionGroupLevel(event.getPeriod(), Optional.of(connectionGroup))
                 .get(connectionGroup);
 
-        createAndSendAPlan(event.getPeriod(), connectionGroup, powerContainersPerPtu);
-        LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
+            createAndSendAPlan(event.getPeriod(), connectionGroup, powerContainersPerPtu);
+            LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
+        }
+        else {
+            LOGGER.info("Ignored {}, period is in the past.", event);
+        }
     }
 
     private void createAndSendAPlan(LocalDate period, ConnectionGroup connectionGroup,

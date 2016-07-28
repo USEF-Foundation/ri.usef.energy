@@ -18,11 +18,6 @@ package energy.usef.core.repository;
 
 import static java.util.stream.Collectors.groupingBy;
 
-import energy.usef.core.model.AcknowledgementStatus;
-import energy.usef.core.model.DocumentStatus;
-import energy.usef.core.model.Exchange;
-import energy.usef.core.model.PtuFlexOffer;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +29,11 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 
 import org.joda.time.LocalDate;
+
+import energy.usef.core.model.AcknowledgementStatus;
+import energy.usef.core.model.DocumentStatus;
+import energy.usef.core.model.Exchange;
+import energy.usef.core.model.PtuFlexOffer;
 
 /**
  * Repository class for the {@link PtuFlexOffer} entity. This class is in charge of database operations on the tables related to
@@ -233,5 +233,19 @@ public class PtuFlexOfferRepository extends BaseRepository<PtuFlexOffer> {
                 .setParameter("period", period.toDateMidnight().toDate(), TemporalType.DATE)
                 .setParameter("statuses", Arrays.asList(DocumentStatus.ACCEPTED, DocumentStatus.SENT))
                 .getResultList();
+    }
+
+    /**
+     * Delete all {@link PtuFlexOffer}s for a certain date.
+     *
+     * @param period
+     * @return the number of {@link PtuFlexOffer}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM PtuFlexOffer pfo ");
+        sql.append("WHERE pfo.ptuContainer IN (SELECT pc FROM PtuContainer pc WHERE pc.ptuDate = :ptuDate)");
+
+        return entityManager.createQuery(sql.toString()).setParameter("ptuDate", period.toDateMidnight().toDate()).executeUpdate();
     }
 }

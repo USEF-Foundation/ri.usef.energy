@@ -137,7 +137,7 @@ if [ -z "$JBOSS_HOME" ]; then
   echo "The environment variable JBOSS_HOME can not be found."
   echo "JBoss Wildfly is not installed or the environment variable is not set."
   echo ""
-  echo "If not installed, download and install JBoss Wildfly version 9.0.2 Final from the website:"
+  echo "If not installed, download and install JBoss Wildfly version 10.0.0 Final from the website:"
   echo ""
   echo "    http://wildfly.org/downloads"
   echo ""

@@ -259,4 +259,18 @@ public class ConnectionGroupStateRepository extends BaseRepository<ConnectionGro
                 .setParameter("endDate", endDate.toDateMidnight().toDate(), TemporalType.DATE)
                 .getResultList();
     }
+
+    /**
+     * Delete all {@link ConnectionGroupState} objects for a certain date.
+     *
+     * @param period
+     * @return the number of {@link ConnectionGroupState} objects deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM ConnectionGroupState cgs ");
+        sql.append("WHERE cgs.validUntil = :validUntil)");
+
+        return entityManager.createQuery(sql.toString()).setParameter("validUntil", period.toDateMidnight().plusDays(1).toDate()).executeUpdate();
+    }
 }

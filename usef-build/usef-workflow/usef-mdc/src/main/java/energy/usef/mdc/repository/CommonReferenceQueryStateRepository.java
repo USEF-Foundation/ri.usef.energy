@@ -16,15 +16,28 @@
 
 package energy.usef.mdc.repository;
 
+import javax.ejb.Stateless;
+
+import org.joda.time.LocalDate;
+
 import energy.usef.core.repository.BaseRepository;
 import energy.usef.mdc.model.CommonReferenceQueryState;
-
-import javax.ejb.Stateless;
 
 /**
  * Repository class for the {@link CommonReferenceQueryState} entity.
  */
 @Stateless
 public class CommonReferenceQueryStateRepository extends BaseRepository<CommonReferenceQueryState> {
+    /**
+     * Delete all {@link CommonReferenceQueryState}s for a certain date.
+     *
+     * @param period
+     * @return the number of {@link CommonReferenceQueryState}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM CommonReferenceQueryState crqs WHERE crqs.period = :period");
 
+        return entityManager.createQuery(sql.toString()).setParameter("period", period.toDateMidnight().toDate()).executeUpdate();
+    }
 }

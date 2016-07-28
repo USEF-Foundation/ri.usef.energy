@@ -16,6 +16,15 @@
 
 package energy.usef.core.service.business;
 
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.inject.Inject;
+
+import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.CommonReferenceQuery;
@@ -26,17 +35,8 @@ import energy.usef.core.model.MessageError;
 import energy.usef.core.repository.MessageErrorRepository;
 import energy.usef.core.repository.MessageRepository;
 
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.inject.Inject;
-
-import org.joda.time.LocalDateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
- * Business Service class in charge of operations concerning the {@link IngoingMessage} entities.
+ * Business Service class in charge of operations concerning the {@link Message} entities.
  */
 @Stateless
 public class MessageService {

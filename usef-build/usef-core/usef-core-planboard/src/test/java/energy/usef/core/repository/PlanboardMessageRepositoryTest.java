@@ -22,18 +22,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import energy.usef.core.model.DocumentStatus;
-import energy.usef.core.model.DocumentType;
-import energy.usef.core.model.PlanboardMessage;
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,6 +40,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.modules.junit4.PowerMockRunner;
+
+import energy.usef.core.model.DocumentStatus;
+import energy.usef.core.model.DocumentType;
+import energy.usef.core.model.PlanboardMessage;
 
 /**
  * JUnit test for the PlanboardMessageRepository class.
@@ -78,7 +80,7 @@ public class PlanboardMessageRepositoryTest {
     }
 
     @Before
-    public void init() {
+    public void before() {
         repository = new PlanboardMessageRepository();
         setInternalState(repository, "entityManager", entityManager);
 
@@ -88,6 +90,14 @@ public class PlanboardMessageRepositoryTest {
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
         connectionGroupRepository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
+    }
+
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     @Test
@@ -168,9 +178,7 @@ public class PlanboardMessageRepositoryTest {
 
     @Test
     public void testUpdateOldSettlementMessageDisposition() {
-        entityManager.getTransaction().begin();
         int updatedRecords = repository.updateOldSettlementMessageDisposition();
-        entityManager.getTransaction().rollback();
         assertEquals(1, updatedRecords);
     }
 
@@ -297,5 +305,22 @@ public class PlanboardMessageRepositoryTest {
         PlanboardMessage planboardMessage = repository.findPlanboardMessagesWithOriginSequence(3333332L,
                 DocumentType.FLEX_ORDER, DocumentStatus.SENT);
         assertNotNull(planboardMessage);
+    }
+
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("1999-12-31")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("1999-12-31")));
+    }
+
+    @Test (expected = PersistenceException.class)
+    public void testCleanupNotAllowed() {
+        try {
+            repository.cleanup(new LocalDate("1999-12-29"));
+        } catch (PersistenceException e) {
+            Assert.assertEquals("org.hibernate.exception.ConstraintViolationException: could not execute statement", e.getMessage());
+            throw e;
+        }
     }
 }

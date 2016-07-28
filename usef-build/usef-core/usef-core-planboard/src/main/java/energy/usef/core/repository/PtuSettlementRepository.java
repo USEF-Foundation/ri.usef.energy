@@ -16,6 +16,8 @@
 
 package energy.usef.core.repository;
 
+import org.joda.time.LocalDate;
+
 import energy.usef.core.model.PtuSettlement;
 
 /**
@@ -23,4 +25,17 @@ import energy.usef.core.model.PtuSettlement;
  */
 public class PtuSettlementRepository extends BaseRepository<PtuSettlement> {
 
+    /**
+     * Delete all {@link PtuSettlement}s for a certain date.
+     *
+     * @param period
+     * @return the number of {@link PtuSettlement}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM PtuSettlement ps ");
+        sql.append("WHERE ps.ptuContainer IN (SELECT pc FROM PtuContainer pc WHERE pc.ptuDate = :ptuDate)");
+
+        return entityManager.createQuery(sql.toString()).setParameter("ptuDate", period.toDateMidnight().toDate()).executeUpdate();
+    }
 }

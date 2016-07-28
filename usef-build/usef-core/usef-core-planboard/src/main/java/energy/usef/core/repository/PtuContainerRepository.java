@@ -16,16 +16,6 @@
 
 package energy.usef.core.repository;
 
-import energy.usef.core.config.Config;
-import energy.usef.core.config.ConfigParam;
-import energy.usef.core.model.Document;
-import energy.usef.core.model.PhaseType;
-import energy.usef.core.model.PtuContainer;
-import energy.usef.core.model.PtuContainerState;
-import energy.usef.core.model.PtuState;
-import energy.usef.core.util.DateTimeUtil;
-import energy.usef.core.util.PtuUtil;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +30,16 @@ import javax.persistence.TemporalType;
 import javax.transaction.Transactional;
 
 import org.joda.time.LocalDate;
+
+import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
+import energy.usef.core.model.Document;
+import energy.usef.core.model.PhaseType;
+import energy.usef.core.model.PtuContainer;
+import energy.usef.core.model.PtuContainerState;
+import energy.usef.core.model.PtuState;
+import energy.usef.core.util.DateTimeUtil;
+import energy.usef.core.util.PtuUtil;
 
 /**
  * PTUContainer Repository.
@@ -79,24 +79,33 @@ public class PtuContainerRepository extends BaseRepository<PtuContainer> {
      * Finds {@link PtuContainer} entities for given period.
      *
      * @param period {@link LocalDate} period.
-     * @return a {@link Map} linking the PTU Index to its {@link PtuContainer}.
+     * @return a {@link List} of {@link PtuContainer}s.
      */
-    @SuppressWarnings("unchecked")
-    public Map<Integer, PtuContainer> findPtuContainersMap(LocalDate period) {
+    public List<PtuContainer> findPtuContainers(LocalDate period) {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT ptu ");
         sql.append("FROM PtuContainer ptu ");
         sql.append("WHERE ptu.ptuDate = :ptuDate ");
         sql.append("ORDER BY ptu.ptuIndex ");
-        List<PtuContainer> result = entityManager.createQuery(sql.toString(), PtuContainer.class)
+        return entityManager.createQuery(sql.toString(), PtuContainer.class)
                 .setParameter("ptuDate", period.toDateMidnight().toDate(), TemporalType.DATE)
                 .getResultList();
+    }
+
+    /**
+     * Finds {@link PtuContainer} entities for given period.
+     *
+     * @param period {@link LocalDate} period.
+     * @return a {@link Map} linking the PTU Index to its {@link PtuContainer}.
+     */
+    @SuppressWarnings("unchecked")
+    public Map<Integer, PtuContainer> findPtuContainersMap(LocalDate period) {
+        List<PtuContainer> result = findPtuContainers(period);
         if (result.isEmpty()) {
             return new HashMap<>();
         }
         return result.stream().collect(Collectors.toMap(PtuContainer::getPtuIndex, Function.identity()));
     }
-
     /**
      * Find the PTU Containers for a given sequence number, for a given type of document.
      *
@@ -266,4 +275,17 @@ public class PtuContainerRepository extends BaseRepository<PtuContainer> {
                 .getResultList();
         return dates.stream().map(LocalDate::new).collect(Collectors.toList());
     }
+
+    /**
+     * Delete all {@link PtuContainer}s for a certain date.
+     *
+     * @param period
+     * @return the number of {@link PtuContainer}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM PtuContainer pc WHERE pc.ptuDate = :ptuDate");
+
+        return entityManager.createQuery(sql.toString()).setParameter("ptuDate", period.toDateMidnight().toDate()).executeUpdate();
+   }
 }
