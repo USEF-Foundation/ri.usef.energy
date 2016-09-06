@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import energy.usef.agr.config.ConfigAgr;
 import energy.usef.agr.config.ConfigAgrParam;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.PtuPrognosis;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
 import energy.usef.core.workflow.DefaultWorkflowContext;
@@ -62,17 +64,20 @@ public class AgrNonUdiSetAdsGoalsCoordinator {
     @Inject
     private Config config;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
     /**
      * This method will start the initialization of the clusters.
      */
     @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public void handleEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) AgrNonUdiSetAdsGoalsEvent event) {
+    public void handleEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) AgrNonUdiSetAdsGoalsEvent event) throws BusinessValidationException {
         setGoals(event);
     }
 
-    private void setGoals(AgrNonUdiSetAdsGoalsEvent event) {
+    private void setGoals(AgrNonUdiSetAdsGoalsEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
-
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
         // Check if aggregator really is a non-udi aggregator
         if (!configAgr.getBooleanProperty(ConfigAgrParam.AGR_IS_NON_UDI_AGGREGATOR)) {
             LOGGER.warn("Aggregator that is not currently configured as a non-udi aggregator ({}) can not set ADS goals!",

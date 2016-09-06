@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,32 +18,7 @@ package energy.usef.brp.workflow.settlement.initiate;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import energy.usef.brp.config.ConfigBrp;
-import energy.usef.brp.config.ConfigBrpParam;
-import energy.usef.brp.model.MeterDataCompany;
-import energy.usef.brp.service.business.BrpBusinessService;
-import energy.usef.brp.workflow.BrpWorkflowStep;
-import energy.usef.brp.workflow.settlement.send.SendSettlementMessageEvent;
-import energy.usef.core.config.Config;
-import energy.usef.core.model.CongestionPointConnectionGroup;
-import energy.usef.core.model.Connection;
-import energy.usef.core.model.ConnectionGroup;
-import energy.usef.core.model.DocumentStatus;
-import energy.usef.core.model.DocumentType;
-import energy.usef.core.model.PlanboardMessage;
-import energy.usef.core.service.business.CorePlanboardBusinessService;
-import energy.usef.core.service.business.SequenceGeneratorService;
-import energy.usef.core.service.helper.JMSHelperService;
-import energy.usef.core.workflow.WorkflowContext;
-import energy.usef.core.workflow.dto.FlexOrderSettlementDto;
-import energy.usef.core.workflow.dto.SettlementDto;
-import energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter;
-import energy.usef.core.workflow.settlement.CoreSettlementBusinessService;
-import energy.usef.core.workflow.step.WorkflowStepExecuter;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,6 +37,29 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+
+import energy.usef.brp.config.ConfigBrp;
+import energy.usef.brp.config.ConfigBrpParam;
+import energy.usef.brp.model.MeterDataCompany;
+import energy.usef.brp.service.business.BrpBusinessService;
+import energy.usef.brp.workflow.BrpWorkflowStep;
+import energy.usef.brp.workflow.settlement.send.CheckInitiateSettlementDoneEvent;
+import energy.usef.core.config.Config;
+import energy.usef.core.model.CongestionPointConnectionGroup;
+import energy.usef.core.model.Connection;
+import energy.usef.core.model.ConnectionGroup;
+import energy.usef.core.model.DocumentStatus;
+import energy.usef.core.model.DocumentType;
+import energy.usef.core.model.PlanboardMessage;
+import energy.usef.core.service.business.CorePlanboardBusinessService;
+import energy.usef.core.service.business.SequenceGeneratorService;
+import energy.usef.core.service.helper.JMSHelperService;
+import energy.usef.core.workflow.WorkflowContext;
+import energy.usef.core.workflow.dto.FlexOrderSettlementDto;
+import energy.usef.core.workflow.dto.SettlementDto;
+import energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter;
+import energy.usef.core.workflow.settlement.CoreSettlementBusinessService;
+import energy.usef.core.workflow.step.WorkflowStepExecuter;
 
 /**
  * Test class to test BrpInitiateSettlementCoordinator.
@@ -86,7 +84,7 @@ public class BrpInitiateSettlementCoordinatorTest {
     @Mock
     private JMSHelperService jmsHelperService;
     @Mock
-    private Event<SendSettlementMessageEvent> sendSettlementMessageEventManager;
+    private Event<CheckInitiateSettlementDoneEvent> checkInitiateSettlementDoneEvent;
     @Mock
     private BrpBusinessService brpBusinessService;
 
@@ -103,7 +101,7 @@ public class BrpInitiateSettlementCoordinatorTest {
         Whitebox.setInternalState(coordinator, jmsHelperService);
         Whitebox.setInternalState(coordinator, brpBusinessService);
         Whitebox.setInternalState(coordinator, sequenceGeneratorService);
-        Whitebox.setInternalState(coordinator, "sendSettlementMessageEventManager", sendSettlementMessageEventManager);
+        Whitebox.setInternalState(coordinator, "checkInitiateSettlementDoneEvent", checkInitiateSettlementDoneEvent);
         when(coreSettlementBusinessService.findRelevantPrognoses(any(LocalDate.class),
                 any(LocalDate.class))).thenReturn(new ArrayList<>());
         when(coreSettlementBusinessService.findRelevantFlexRequests(any(LocalDate.class),
@@ -171,7 +169,7 @@ public class BrpInitiateSettlementCoordinatorTest {
                 .invoke(eq(BrpWorkflowStep.BRP_INITIATE_SETTLEMENT.name()), Matchers.any(WorkflowContext.class));
         verify(workflowStepExecuter, times(1))
                 .invoke(eq(BrpWorkflowStep.BRP_REQUEST_PENALTY_DATA.name()), Matchers.any(WorkflowContext.class));
-        verify(sendSettlementMessageEventManager, times(1)).fire(any(SendSettlementMessageEvent.class));
+        verify(checkInitiateSettlementDoneEvent, times(1)).fire(any(CheckInitiateSettlementDoneEvent.class));
     }
 
     @Test

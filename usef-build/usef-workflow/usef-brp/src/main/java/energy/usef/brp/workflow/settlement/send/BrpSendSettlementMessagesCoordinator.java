@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,34 +16,8 @@
 
 package energy.usef.brp.workflow.settlement.send;
 
-import static energy.usef.brp.service.business.BrpDefaultSettlementMessageContent.ORDER_SETTLEMENT_ORDER_REFERENCE;
-import static energy.usef.brp.service.business.BrpDefaultSettlementMessageContent.PTU_SETTLEMENT_ACTUAL_POWER;
-import static energy.usef.brp.service.business.BrpDefaultSettlementMessageContent.PTU_SETTLEMENT_DELIVERED_FLEX_POWER;
-import static energy.usef.brp.service.business.BrpDefaultSettlementMessageContent.PTU_SETTLEMENT_NET_SETTLEMENT;
-import static energy.usef.brp.service.business.BrpDefaultSettlementMessageContent.PTU_SETTLEMENT_ORDERED_FLEX_POWER;
-import static energy.usef.brp.service.business.BrpDefaultSettlementMessageContent.PTU_SETTLEMENT_PRICE;
-import static energy.usef.brp.service.business.BrpDefaultSettlementMessageContent.PTU_SETTLEMENT_PROGNOSIS_POWER;
-import static energy.usef.brp.service.business.BrpDefaultSettlementMessageContent.PTU_SETTLEMENT_START;
+import static energy.usef.brp.service.business.BrpDefaultSettlementMessageContent.*;
 import static energy.usef.core.data.xml.bean.message.MessagePrecedence.TRANSACTIONAL;
-
-import energy.usef.brp.config.ConfigBrp;
-import energy.usef.brp.config.ConfigBrpParam;
-import energy.usef.core.config.Config;
-import energy.usef.core.config.ConfigParam;
-import energy.usef.core.data.xml.bean.message.FlexOrderSettlement;
-import energy.usef.core.data.xml.bean.message.MessageMetadata;
-import energy.usef.core.data.xml.bean.message.PTUSettlement;
-import energy.usef.core.data.xml.bean.message.SettlementMessage;
-import energy.usef.core.data.xml.bean.message.USEFRole;
-import energy.usef.core.model.AgrConnectionGroup;
-import energy.usef.core.model.DocumentStatus;
-import energy.usef.core.service.business.CorePlanboardBusinessService;
-import energy.usef.core.service.business.SequenceGeneratorService;
-import energy.usef.core.service.helper.JMSHelperService;
-import energy.usef.core.service.helper.MessageMetadataBuilder;
-import energy.usef.core.util.XMLUtil;
-import energy.usef.core.workflow.settlement.CoreSettlementBusinessService;
-import energy.usef.core.workflow.transformer.SettlementTransformer;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -52,8 +26,15 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.ejb.Stateless;
+import javax.ejb.Asynchronous;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
+import javax.ejb.Singleton;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
+import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
 
 import org.joda.time.LocalDate;
@@ -62,10 +43,32 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import energy.usef.brp.config.ConfigBrp;
+import energy.usef.brp.config.ConfigBrpParam;
+import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
+import energy.usef.core.constant.USEFConstants;
+import energy.usef.core.data.xml.bean.message.FlexOrderSettlement;
+import energy.usef.core.data.xml.bean.message.MessageMetadata;
+import energy.usef.core.data.xml.bean.message.PTUSettlement;
+import energy.usef.core.data.xml.bean.message.SettlementMessage;
+import energy.usef.core.data.xml.bean.message.USEFRole;
+import energy.usef.core.model.AgrConnectionGroup;
+import energy.usef.core.model.DocumentStatus;
+import energy.usef.core.model.DocumentType;
+import energy.usef.core.service.business.CorePlanboardBusinessService;
+import energy.usef.core.service.business.SequenceGeneratorService;
+import energy.usef.core.service.helper.JMSHelperService;
+import energy.usef.core.service.helper.MessageMetadataBuilder;
+import energy.usef.core.util.XMLUtil;
+import energy.usef.core.workflow.settlement.CoreSettlementBusinessService;
+import energy.usef.core.workflow.transformer.SettlementTransformer;
+
 /**
  * This coordinator class is in charge of the workflow sending Settlement messages to aggregators.
  */
-@Stateless
+@Singleton
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class BrpSendSettlementMessagesCoordinator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BrpSendSettlementMessagesCoordinator.class);
@@ -77,11 +80,29 @@ public class BrpSendSettlementMessagesCoordinator {
     @Inject
     private JMSHelperService jmsHelperService;
     @Inject
-    private CorePlanboardBusinessService planboardBusinessService;
+    private CorePlanboardBusinessService corePlanboardBusinessService;
     @Inject
     private CoreSettlementBusinessService coreSettlementBusinessService;
     @Inject
     private SequenceGeneratorService sequenceGeneratorService;
+    @Inject
+    private Event<SendSettlementMessageEvent> sendSettlementMessageEventManager;
+
+    @Asynchronous
+    @Lock(LockType.WRITE)
+    public void isReadyToSendSettlementMessage(
+            @Observes(during = TransactionPhase.AFTER_COMPLETION) CheckInitiateSettlementDoneEvent event) {
+        LOGGER.debug(USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        LocalDate period = new LocalDate(event.getYear(), event.getMonth(), 1);
+        boolean isNotProcessed =
+                corePlanboardBusinessService
+                        .findPlanboardMessages(DocumentType.FLEX_ORDER_SETTLEMENT, period, period.plusMonths(1).minusDays(1), null)
+                        .size() == 0;
+        if (isNotProcessed && coreSettlementBusinessService.isEachFlexOrderReadyForSettlement(event.getYear(), event.getMonth())) {
+            sendSettlementMessageEventManager.fire(new SendSettlementMessageEvent(event.getYear(), event.getMonth()));
+        }
+        LOGGER.debug(USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
+    }
 
     /**
      * This method starts the workflow when triggered by an event.
@@ -89,13 +110,14 @@ public class BrpSendSettlementMessagesCoordinator {
      * @param event {@link SendSettlementMessageEvent} event which starts the workflow.
      */
     public void invokeWorkflow(@Observes SendSettlementMessageEvent event) {
+        LOGGER.debug(USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT, event);
         LocalDate dateFrom = new LocalDate(event.getYear(), event.getMonth(), 1);
         LocalDate dateUntil = dateFrom.plus(Months.ONE).minusDays(1);
 
         LOGGER.debug("SendSettlementMessageEvent for {} until {}.", dateFrom, dateUntil);
 
         // Fetch all aggregators having active connections in the period defined by [dateFrom, dateUntil] .
-        List<String> aggregators = planboardBusinessService
+        List<String> aggregators = corePlanboardBusinessService
                 .findConnectionGroupWithConnectionsWithOverlappingValidity(dateFrom, dateUntil)
                 .values().stream().flatMap(map -> map.keySet().stream())
                 .map(connectionGroup -> ((AgrConnectionGroup) connectionGroup).getAggregatorDomain())
@@ -119,6 +141,7 @@ public class BrpSendSettlementMessagesCoordinator {
             storeSettlementMessage(aggregator, flexOrderSettlementPerAggregator.get(aggregator));
             jmsHelperService.sendMessageToOutQueue(XMLUtil.messageObjectToXml(settlementMessage));
         }
+        LOGGER.debug(USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }
 
     private SettlementMessage buildSettlementMessage(List<energy.usef.core.model.FlexOrderSettlement> flexOrderSettlements,
@@ -148,8 +171,9 @@ public class BrpSendSettlementMessagesCoordinator {
         settlementMessage.setReference(config.getProperty(ConfigParam.HOST_DOMAIN) + sequenceGeneratorService.next());
     }
 
-    private void storeSettlementMessage(String participantDomain, List<energy.usef.core.model.FlexOrderSettlement> flexOrderSettlements) {
-        planboardBusinessService.storeFlexOrderSettlementsPlanboardMessage(flexOrderSettlements,
+    private void storeSettlementMessage(String participantDomain,
+            List<energy.usef.core.model.FlexOrderSettlement> flexOrderSettlements) {
+        corePlanboardBusinessService.storeFlexOrderSettlementsPlanboardMessage(flexOrderSettlements,
                 configBrp.getIntegerProperty(ConfigBrpParam.BRP_SETTLEMENT_RESPONSE_WAITING_DURATION), DocumentStatus.SENT,
                 participantDomain, null);
     }

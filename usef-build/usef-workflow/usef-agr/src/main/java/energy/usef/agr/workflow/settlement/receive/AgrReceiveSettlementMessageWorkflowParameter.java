@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ public abstract class AgrReceiveSettlementMessageWorkflowParameter {
      * All input variables.
      */
     public enum IN {
+        PTU_DURATION,
         ORDER_REFERENCE,
         PREPARED_FLEX_ORDER_SETTLEMENTS,
         RECEIVED_FLEX_ORDER_SETTLEMENT,

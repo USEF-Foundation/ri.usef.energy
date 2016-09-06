@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,13 +19,12 @@ package energy.usef.agr.repository;
 import energy.usef.agr.model.DeviceMessage;
 import energy.usef.agr.model.DeviceMessageStatus;
 import energy.usef.core.repository.BaseRepository;
-
-import java.util.List;
+import org.apache.commons.lang.StringUtils;
+import org.joda.time.LocalDate;
 
 import javax.ejb.Stateless;
 import javax.persistence.TypedQuery;
-
-import org.apache.commons.lang.StringUtils;
+import java.util.List;
 
 /**
  * Repository class for the {@link DeviceMessage} entity. This class provides methods to interact with the aggregator database.
@@ -70,4 +69,17 @@ public class DeviceMessageRepository extends BaseRepository<DeviceMessage> {
         return query.getResultList();
     }
 
+    /**
+     * Delete all {@link DeviceMessage}s for a certain date.
+     *
+     * @param period
+     * @return the number of {@link DeviceMessage}s deleted.
+     */
+    public int cleanup(LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM DeviceMessage dm ");
+        sql.append("WHERE dm.udi IN (SELECT u FROM Udi u WHERE u.validUntil = :validUntil)");
+
+        return entityManager.createQuery(sql.toString()).setParameter("validUntil", period.toDateMidnight().plusDays(1).toDate()).executeUpdate();
+    }
 }

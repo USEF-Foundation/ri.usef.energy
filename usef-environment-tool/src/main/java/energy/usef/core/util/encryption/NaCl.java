@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import jnr.ffi.types.u_int64_t;
  */
 public class NaCl {
     private static final String LIBRARY_NAME = "sodium";
-
+    private static final String VERSION = "1.0.10";
     /**
      * Creates a sodium instance.
      *
@@ -36,13 +36,13 @@ public class NaCl {
     public static Sodium sodium() {
         Sodium sodium = SingletonHolder.SODIUM_INSTANCE;
 
-        if (!(sodium.sodium_version_string().compareTo("0.7.0") >= 0)) {
-            String message = String.format("Unsupported libsodium version: %s. Please update",
-                    sodium.sodium_version_string());
+        if (!(sodium.sodium_version_string().compareTo(VERSION) == 0)) {
+            String message = String.format("Unsupported libsodium version: %s. Please USE version %s",
+                    sodium.sodium_version_string(), VERSION);
             throw new UnsupportedOperationException(message);
         }
         return sodium;
-    }
+   }
 
     private static final class SingletonHolder {
         public static final Sodium SODIUM_INSTANCE = LibraryLoader.create(Sodium.class).load(LIBRARY_NAME);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ import org.hibernate.jpa.AvailableSettings;
  */
 public class SchemaObjectCreator {
 
-    public static void execute(String persistenceUnitName, String dialect, String destination) {
+    public static void execute(String persistenceUnitName, String dialect, String destination, String datasourceName) {
 
         try {
             // Create initial context
@@ -52,7 +52,7 @@ public class SchemaObjectCreator {
             ds.setUser("");
             ds.setPassword("");
 
-            ic.bind("java:jboss/datasources/USEF_DS", ds);
+            ic.bind("java:jboss/datasources/"+datasourceName, ds);
         } catch (NamingException ex) {
             System.err.println("Caught exception" + ex);
         }
@@ -69,7 +69,7 @@ public class SchemaObjectCreator {
     }
 
     public static void main(String[] args) throws IOException {
-        execute(args[0], args[1], args[2]);
+        execute(args[0], args[1], args[2], args[3]);
         System.exit(0);
     }
 }

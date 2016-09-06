@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.event.RequestMoveToValidateEvent;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.BrpConnectionGroup;
 import energy.usef.core.model.ConnectionGroup;
 import energy.usef.core.model.DocumentStatus;
@@ -95,14 +97,18 @@ public class AgrReCreatePrognosesCoordinator {
     @Inject
     private Event<RequestMoveToValidateEvent> moveToValidateEventManager;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
     /**
      * Handles the {@link ReCreatePrognosesEvent}.
      *
      * @param event {@link ReCreatePrognosesEvent}.
      */
     @Lock(LockType.WRITE)
-    public void handleEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) ReCreatePrognosesEvent event) {
+    public void handleEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) ReCreatePrognosesEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
         boolean moveToValidate = invokePbc(event);
         // try to move to validate
         if (moveToValidate) {

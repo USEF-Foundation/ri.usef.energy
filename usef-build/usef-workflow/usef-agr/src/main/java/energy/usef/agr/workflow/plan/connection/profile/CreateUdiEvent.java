@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,33 @@
 
 package energy.usef.agr.workflow.plan.connection.profile;
 
+import energy.usef.core.event.ExpirableEvent;
 import org.joda.time.LocalDate;
 
 /**
  * Event to trigger the workflow populating the Udis for the connection portfolio.
  */
-public class CreateUdiEvent {
+public class CreateUdiEvent implements ExpirableEvent {
 
-    private final LocalDate initializationDate;
+    private final LocalDate period;
 
     /**
      * Constructor with the date of initialization of the planboard, which will be used as reference to begin the creation of UDIs
      *
-     * @param initializationDate {@link LocalDate} period.
+     * @param period {@link LocalDate} period.
      */
-    public CreateUdiEvent(LocalDate initializationDate) {
-        this.initializationDate = initializationDate;
+    public CreateUdiEvent(LocalDate period) {
+        this.period = period;
     }
 
-    public LocalDate getInitializationDate() {
-        return initializationDate;
+    public LocalDate getPeriod() {
+        return period;
     }
 
     @Override
     public String toString() {
         return "CreateUdiEvent" + "[" +
-                "initializationDate=" + initializationDate +
+                "period=" + period +
                 "]";
     }
 }

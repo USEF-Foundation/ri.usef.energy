@@ -1,0 +1,32 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>info.usef.hoogdalem</groupId>
+		<artifactId>usef-workflow-hd</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+	<artifactId>usef-hd-dso</artifactId>
+
+	<dependencies>
+		<dependency>
+			<groupId>info.usef</groupId>
+			<artifactId>usef-dso</artifactId>
+			<version>${usef.version}</version>
+		</dependency>
+
+		<!-- Only needed if you want to use the RI PBC's -->
+        <dependency>
+            <groupId>info.usef</groupId>
+            <artifactId>usef-simulation-dso</artifactId>
+            <version>${usef.version}</version>
+        </dependency>
+
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>sqljdbc42</artifactId>
+			<version>4.2</version>
+		</dependency>
+
+	</dependencies>
+</project>

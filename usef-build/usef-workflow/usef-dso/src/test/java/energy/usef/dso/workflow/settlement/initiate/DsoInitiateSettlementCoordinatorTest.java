@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,7 @@ package energy.usef.dso.workflow.settlement.initiate;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -75,7 +73,7 @@ import energy.usef.dso.model.PtuGridMonitor;
 import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 import energy.usef.dso.workflow.DsoWorkflowStep;
 import energy.usef.dso.workflow.dto.GridMonitoringDto;
-import energy.usef.dso.workflow.settlement.send.SendSettlementMessageEvent;
+import energy.usef.dso.workflow.settlement.send.CheckInitiateSettlementDoneEvent;
 
 /**
  * Test class in charge of the unit tests related to the {@link DsoInitiateSettlementCoordinator}.
@@ -103,7 +101,7 @@ public class DsoInitiateSettlementCoordinatorTest {
     @Mock
     private Event<FinalizeInitiateSettlementEvent> finalizeInitiateSettlementEventManager;
     @Mock
-    private Event<SendSettlementMessageEvent> sendSettlementMessageEventManager;
+    private Event<CheckInitiateSettlementDoneEvent> checkInitiateSettlementDoneEvent;
 
     @Before
     public void setUp() {
@@ -118,7 +116,7 @@ public class DsoInitiateSettlementCoordinatorTest {
         Whitebox.setInternalState(coordinator, jmsHelperService);
         Whitebox.setInternalState(coordinator, sequenceGeneratorService);
         Whitebox.setInternalState(coordinator, "finalizeInitiateSettlementEventManager", finalizeInitiateSettlementEventManager);
-        Whitebox.setInternalState(coordinator, "sendSettlementMessageEventManager", sendSettlementMessageEventManager);
+        Whitebox.setInternalState(coordinator, "checkInitiateSettlementDoneEvent", checkInitiateSettlementDoneEvent);
         when(coreSettlementBusinessService.findRelevantPrognoses(any(LocalDate.class),
                 any(LocalDate.class))).thenReturn(new ArrayList<>());
         when(coreSettlementBusinessService.findRelevantFlexRequests(any(LocalDate.class),
@@ -237,7 +235,7 @@ public class DsoInitiateSettlementCoordinatorTest {
         verify(workflowStepExecuter, times(1))
                 .invoke(eq(DsoWorkflowStep.DSO_REQUEST_PENALTY_DATA.name()), Matchers.any(WorkflowContext.class));
         verify(coreSettlementBusinessService, times(1)).createFlexOrderSettlements(any(List.class));
-        verify(sendSettlementMessageEventManager, times(1)).fire(any(SendSettlementMessageEvent.class));
+        verify(checkInitiateSettlementDoneEvent, times(1)).fire(any(CheckInitiateSettlementDoneEvent.class));
     }
 
     @Test

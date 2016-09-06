@@ -9,7 +9,7 @@ Param
   $instance
 )
 
-${spec-version} = "      spec-version: ""2014:I"""
+${spec-version} = "      spec-version: ""2014"""
 ${public-keys} = "        - public-keys: ""cs1.GuuL6Z0iQlqpylcy4KmcQ6Y+C9Ljtq8BcKhCzJxBL5Y="""
 ${role-line} = "      ${role}-role:"
 ${domain-name} = "    - domain-name: ""${role}${instance}.usef-example.com"""

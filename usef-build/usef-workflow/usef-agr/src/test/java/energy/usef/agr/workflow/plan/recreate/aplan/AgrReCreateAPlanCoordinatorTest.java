@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 package energy.usef.agr.workflow.plan.recreate.aplan;
 
 import energy.usef.agr.workflow.plan.create.aplan.CreateAPlanEvent;
+import energy.usef.core.event.validation.EventValidationService;
 import energy.usef.core.model.BrpConnectionGroup;
 import energy.usef.core.model.ConnectionGroup;
 import energy.usef.core.model.DocumentStatus;
@@ -55,12 +56,15 @@ public class AgrReCreateAPlanCoordinatorTest {
     private Event<CreateAPlanEvent> createAPlanEventManager;
     @Mock
     private CorePlanboardBusinessService corePlanboardBusinessService;
+    @Mock
+    private EventValidationService eventValidationService;
 
     @Before
     public void setUp() throws Exception {
         coordinator = new AgrReCreateAPlanCoordinator();
         Whitebox.setInternalState(coordinator, createAPlanEventManager);
         Whitebox.setInternalState(coordinator, corePlanboardBusinessService);
+        Whitebox.setInternalState(coordinator, eventValidationService);
     }
 
     @Test

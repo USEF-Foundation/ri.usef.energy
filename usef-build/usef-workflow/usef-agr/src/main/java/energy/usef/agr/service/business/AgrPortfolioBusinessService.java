@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,27 @@
  */
 
 package energy.usef.agr.service.business;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+
+import energy.usef.core.util.DateTimeUtil;
+import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import energy.usef.agr.config.ConfigAgr;
 import energy.usef.agr.config.ConfigAgrParam;
@@ -59,26 +80,6 @@ import energy.usef.core.model.ConnectionGroup;
 import energy.usef.core.model.ConnectionGroupState;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
 import energy.usef.core.util.PtuUtil;
-
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-
-import org.joda.time.LocalDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Service class in charge of operations related to the Aggregator portfolio.
@@ -158,15 +159,18 @@ public class AgrPortfolioBusinessService {
         Map<String, Connection> connectionMap = corePlanboardBusinessService.findActiveConnections(period, Optional.empty())
                 .stream().collect(Collectors.toMap(Connection::getEntityAddress, Function.identity()));
         List<Object> toBePersisted = new ArrayList<>();
-        Map<String, Udi> activeUdis = udiRepository.findActiveUdisMappedPerEndpoint(period);
+        Map<String, Udi> activeUdis = udiRepository.findActiveUdisMappedPerEndpoint(DateTimeUtil.getCurrentDate());
+        Integer initializationDuration = configAgr.getIntegerProperty(ConfigAgrParam.AGR_INITIALIZE_PLANBOARD_DAYS_INTERVAL);
+        LocalDate validUntil = period.plusDays(initializationDuration);
 
         for (ConnectionPortfolioDto connectionPortfolioDTO : connectionPortfolioDTOs) {
             Connection connection = connectionMap.get(connectionPortfolioDTO.getConnectionEntityAddress());
             for (UdiPortfolioDto udiPortfolioDto : connectionPortfolioDTO.getUdis()) {
                 if (activeUdis.containsKey(udiPortfolioDto.getEndpoint())) {
+                    activeUdis.get(udiPortfolioDto.getEndpoint()).setValidUntil(validUntil);
                     continue;
                 }
-                toBePersisted.add(createUdi(udiPortfolioDto, connection));
+                toBePersisted.add(createUdi(udiPortfolioDto, connection, period, validUntil));
             }
         }
         udiRepository.persistBatch(toBePersisted);
@@ -235,8 +239,10 @@ public class AgrPortfolioBusinessService {
         return powerContainers.stream().collect(Collectors.toMap(PowerContainer::getTimeIndex, Function.identity()));
     }
 
-    private Udi createUdi(UdiPortfolioDto udiPortfolioDto, Connection connection) {
+    private Udi createUdi(UdiPortfolioDto udiPortfolioDto, Connection connection, LocalDate validFrom, LocalDate validUntil) {
         Udi udi = new Udi();
+        udi.setValidFrom(validFrom);
+        udi.setValidUntil(validUntil);
         udi.setConnection(connection);
         udi.setProfile(udiPortfolioDto.getProfile());
         udi.setEndpoint(udiPortfolioDto.getEndpoint());
@@ -253,7 +259,7 @@ public class AgrPortfolioBusinessService {
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void updateConnectionGroupPowerContainers(List<ConnectionGroupPortfolioDto> connectionGroupPortfolioDtos,
-            LocalDate period) {
+                                                     LocalDate period) {
         // get ConnectionGroup level data with lambda functions to apply on the connection portfolio.
         Function<Map.Entry<ConnectionGroup, List<PowerContainer>>, String> getUsefIdentifier = entry -> entry.getKey()
                 .getUsefIdentifier();
@@ -355,7 +361,7 @@ public class AgrPortfolioBusinessService {
     }
 
     private void updatePowerContainer(Map<Integer, PowerContainerDto> connectionPowerPerPTU,
-            List<PowerContainer> powerContainers) {
+                                      List<PowerContainer> powerContainers) {
         powerContainers.stream()
                 .filter(powerContainer -> connectionPowerPerPTU.containsKey(powerContainer.getTimeIndex()))
                 .forEach(powerContainer -> {
@@ -398,7 +404,7 @@ public class AgrPortfolioBusinessService {
     }
 
     private void updateProductionConsumption(Map<Integer, PowerContainerDto> connectionPowerPerPTU,
-            List<? extends PowerContainer> powerContainers) {
+                                             List<? extends PowerContainer> powerContainers) {
         powerContainers.stream()
                 .filter(powerContainer -> connectionPowerPerPTU.containsKey(powerContainer.getTimeIndex()))
                 .forEach(powerContainer -> {
@@ -437,7 +443,7 @@ public class AgrPortfolioBusinessService {
      */
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     public Map<ConnectionGroup, Map<Integer, PowerContainer>> findActivePortfolioForConnectionGroupLevel(LocalDate period,
-            Optional<ConnectionGroup> optionalConnectionGroup) {
+                                                                                                         Optional<ConnectionGroup> optionalConnectionGroup) {
 
         boolean aggregatorInABox = configAgr.getBooleanProperty(ConfigAgrParam.AGR_IS_NON_UDI_AGGREGATOR);
         Integer ptuDuration = config.getIntegerProperty(ConfigParam.PTU_DURATION);
@@ -536,7 +542,7 @@ public class AgrPortfolioBusinessService {
     }
 
     private Map<ConnectionGroup, List<Connection>> buildConnectionGroupWithConnectionsMap(LocalDate period,
-            Optional<ConnectionGroup> optionalConnectionGroup) {
+                                                                                          Optional<ConnectionGroup> optionalConnectionGroup) {
         Map<ConnectionGroup, List<Connection>> activeConnectionGroupsWithConnections;
         if (optionalConnectionGroup.isPresent()) {
             activeConnectionGroupsWithConnections = new HashMap<>();
@@ -564,7 +570,7 @@ public class AgrPortfolioBusinessService {
     }
 
     private Map<Connection, Map<Integer, PowerContainer>> findAndSumUdisPerPtuPerConnection(LocalDate period, Integer ptuDuration,
-            Integer ptusInDay) {
+                                                                                            Integer ptusInDay) {
         Map<Connection, Map<Integer, PowerContainer>> summedUdisPerConnectionPerPtu = new HashMap<>();
 
         Map<Connection, List<Udi>> udisPerConnection = udiRepository.findActiveUdisPerConnection(period);
@@ -606,7 +612,7 @@ public class AgrPortfolioBusinessService {
      * @return A {@link List} of {@link ConnectionGroupPortfolioDto} objects
      */
     public List<ConnectionGroupPortfolioDto> findConnectionGroupPortfolioDto(LocalDate period,
-            Optional<ConnectionGroup> optionalConnectionGroup) {
+                                                                             Optional<ConnectionGroup> optionalConnectionGroup) {
 
         Map<ConnectionGroup, List<PowerContainer>> connectionGroupPowerContainers = powerContainerRepository
                 .findConnectionGroupPowerContainers(period, optionalConnectionGroup);

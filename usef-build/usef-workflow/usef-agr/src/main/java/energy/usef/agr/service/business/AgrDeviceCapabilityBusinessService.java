@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +92,7 @@ public class AgrDeviceCapabilityBusinessService {
         // 1. Update or create UdiEvents
         for (UdiEventDto udiEventDto : updatedUdiEvents) {
             if (!udiEventsPerId.containsKey(udiEventDto.getId())) {
-                createUdiEventFromDto(udiEventDto);
+                createUdiEventFromDto(udiEventDto, period);
             } else {
                 updateUdiEventFromDto(udiEventsPerId.get(udiEventDto.getId()), udiEventDto);
             }
@@ -107,8 +107,8 @@ public class AgrDeviceCapabilityBusinessService {
                 });
     }
 
-    private void createUdiEventFromDto(UdiEventDto udiEventDto) {
-        Udi udi = udiRepository.findByEndpoint(udiEventDto.getUdiEndpoint());
+    private void createUdiEventFromDto(UdiEventDto udiEventDto,LocalDate period) {
+        Udi udi = udiRepository.findByEndpoint(udiEventDto.getUdiEndpoint(), period);
         UdiEvent udiEvent = UdiEventTransformer.transformToModel(udiEventDto, udi);
         udiEventRepository.persist(udiEvent);
         LOGGER.debug("Created new udi event with id [{}]", udiEvent.getId());

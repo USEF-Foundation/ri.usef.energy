@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,6 +83,7 @@ public class AgrControlActiveDemandSupplyCoordinatorTest {
     @Before
     public void init() {
         coordinator = new AgrControlActiveDemandSupplyCoordinator();
+        Whitebox.setInternalState(coordinator, config);
         Whitebox.setInternalState(coordinator, workflowStepExecuter);
         Whitebox.setInternalState(coordinator, agrPortfolioBusinessService);
         Whitebox.setInternalState(coordinator, eventManager);

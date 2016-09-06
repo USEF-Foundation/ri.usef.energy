@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@
 
 package energy.usef.agr.model;
 
-import energy.usef.core.model.Connection;
-
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -33,13 +32,19 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
+
+import org.joda.time.LocalDate;
+
+import energy.usef.core.model.Connection;
 
 /**
  * {@link Udi} entity class represents the UDI device which forecasts have been received.
  */
 @Entity
-@Table(name = "UDI", uniqueConstraints = @UniqueConstraint(columnNames = { "endpoint" }, name = "UDI_UK"))
+@Table(name = "UDI")
 public class Udi {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -49,7 +54,7 @@ public class Udi {
     @Column(name = "DTU_SIZE", nullable = false)
     private Integer dtuSize;
 
-    @Column(name = "ENDPOINT", nullable = false, unique = true)
+    @Column(name = "ENDPOINT", nullable = false)
     private String endpoint;
 
     @Column(name = "PROFILE")
@@ -61,6 +66,17 @@ public class Udi {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "udi", cascade = CascadeType.ALL)
     private List<UdiEvent> udiEvents;
+
+    @Column(name = "VALID_FROM", nullable = false)
+    @Temporal(TemporalType.DATE)
+    private Date validFrom;
+
+    @Column(name = "VALID_UNTIL", nullable = false)
+    @Temporal(TemporalType.DATE)
+    private Date validUntil;
+
+    public Udi() {
+    }
 
     public Long getId() {
         return id;
@@ -107,12 +123,46 @@ public class Udi {
         return udiEvents;
     }
 
-    @Override
-    public String toString() {
+    public LocalDate getValidFrom() {
+        if (validFrom == null) {
+            return null;
+        }
+        return new LocalDate(validFrom);
+    }
+
+    public void setValidFrom(LocalDate validFrom) {
+        if (validFrom == null) {
+            this.validFrom = null;
+        } else {
+            this.validFrom = validFrom.toDateMidnight().toDate();
+        }
+    }
+
+    public LocalDate getValidUntil() {
+        if (validUntil == null) {
+            return null;
+        }
+        return new LocalDate(validUntil);
+    }
+
+    public void setValidUntil(LocalDate validUntil) {
+        if (validUntil == null) {
+            this.validUntil = null;
+        } else {
+            this.validUntil = validUntil.toDateMidnight().toDate();
+        }
+    }
+
+    @Override public String toString() {
         return "Udi" + "[" +
                 "id=" + id +
                 ", dtuSize=" + dtuSize +
                 ", endpoint='" + endpoint + "'" +
+                ", profile='" + profile + "'" +
+                ", connection=" + connection +
+                ", udiEvents=" + udiEvents +
+                ", validFrom=" + validFrom +
+                ", validUntil=" + validUntil +
                 "]";
     }
 

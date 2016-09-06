@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ import energy.usef.agr.service.business.AgrPortfolioBusinessService;
 import energy.usef.agr.transformer.DeviceMessageTransformer;
 import energy.usef.agr.workflow.operate.control.ads.ControlActiveDemandSupplyStepParameter.IN;
 import energy.usef.agr.workflow.operate.control.ads.ControlActiveDemandSupplyStepParameter.OUT;
+import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
 import energy.usef.core.exception.TechnicalException;
 import energy.usef.core.workflow.DefaultWorkflowContext;
 import energy.usef.core.workflow.WorkflowContext;
@@ -61,6 +63,8 @@ public class AgrControlActiveDemandSupplyCoordinator {
 
     private static final int THREAD_POOL_SIZE = 10;
 
+    @Inject
+    private Config config;
     @Inject
     private ConfigAgr configAgr;
     @Inject
@@ -102,6 +106,9 @@ public class AgrControlActiveDemandSupplyCoordinator {
         agrPortfolioBusinessService.updateDeviceMessageStatus(deviceMessage, DeviceMessageStatus.IN_PROCESS);
 
         WorkflowContext context = new DefaultWorkflowContext();
+        int ptuDuration = config.getIntegerProperty(ConfigParam.PTU_DURATION);
+
+        context.setValue(IN.PTU_DURATION.name(), ptuDuration);
         context.setValue(IN.DEVICE_MESSAGE_DTO.name(), DeviceMessageTransformer.transformToDto(deviceMessage));
 
         WorkflowContext returnedContext = workflowStepExecuter.invoke(AGR_CONTROL_ACTIVE_DEMAND_SUPPLY.name(), context);

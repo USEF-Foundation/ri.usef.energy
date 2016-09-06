@@ -1,6 +1,6 @@
 @echo off
 rem
-rem Copyright 2015 USEF Foundation
+rem Copyright 2015-2016 USEF Foundation
 rem
 rem Licensed under the Apache License, Version 2.0 (the "License");
 rem you may not use this file except in compliance with the License.

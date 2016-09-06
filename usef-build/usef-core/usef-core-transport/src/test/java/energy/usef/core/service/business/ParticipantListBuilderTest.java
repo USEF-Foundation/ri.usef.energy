@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,8 @@ public class ParticipantListBuilderTest {
 
         Participant p1 = participants.get(0);
         assertEquals("example.com", p1.getDomainName());
-        assertEquals("2014:I", p1.getSpecVersion());
+        assertEquals("2015", p1.getSpecVersion());
+        assertEquals("pNUU96U5br6ZFTpyFs18N7wIveBl+rc5gHNYS473RKI=", p1.getPublicKeys().get(0));
         assertEquals(1, p1.getRoles().size());
 
         ParticipantRole p1r1 = p1.getRoles().get(0);
@@ -71,7 +72,8 @@ public class ParticipantListBuilderTest {
         Participant p2 = participants.get(1);
         assertNotNull(p2);
         assertEquals("usef.energy", p2.getDomainName());
-        assertEquals("2014:I", p2.getSpecVersion());
+        assertEquals("2015", p2.getSpecVersion());
+        assertEquals("pNUU96U5br6ZFTpyFs18N7wIveBl+rc5gHNYS473RKI=", p2.getPublicKeys().get(0));
         assertEquals(1, p2.getRoles().size());
 
         ParticipantRole p2r1 = p2.getRoles().get(0);
@@ -82,6 +84,8 @@ public class ParticipantListBuilderTest {
 
         Participant p3 = participants.get(4);
         Assert.assertNotNull(p3);
+        assertEquals("2015", p3.getSpecVersion());
+        assertEquals("pNUU96U5br6ZFTpyFs18N7wIveBl+rc5gHNYS473RKI=", p2.getPublicKeys().get(0));
         ParticipantRole p3r1 = p3.getRoles().get(0);
         assertEquals("http://usef.energy/usef.energy_mdc/something", p3r1.getUrl());
         assertEquals(USEFRole.MDC, p3r1.getUsefRole());

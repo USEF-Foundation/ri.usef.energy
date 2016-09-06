@@ -1,0 +1,395 @@
+{
+  "response": {
+    "version":"0.1",
+    "termsofService":"http://www.wunderground.com/weather/api/d/terms.html",
+    "features": {
+      "forecast": 1
+    }
+  }
+,
+  "forecast":{
+    "txt_forecast": {
+      "date":"1:54 PM CET",
+      "forecastday": [
+        {
+          "period":0,
+          "icon":"rain",
+          "icon_url":"http://icons.wxug.com/i/c/k/rain.gif",
+          "title":"Tuesday",
+          "fcttext":"Periods of rain. High 43F. Winds SSW at 15 to 25 mph. Chance of rain 100%. Rainfall near a quarter of an inch.",
+          "fcttext_metric":"Periods of rain. High 6C. Winds SSW at 25 to 40 km/h. Chance of rain 100%.",
+          "pop":"100"
+        }
+      ,
+        {
+          "period":1,
+          "icon":"nt_chancerain",
+          "icon_url":"http://icons.wxug.com/i/c/k/nt_chancerain.gif",
+          "title":"Tuesday Night",
+          "fcttext":"Cloudy with periods of light rain. Low 42F. Winds SW at 15 to 25 mph. Chance of rain 70%.",
+          "fcttext_metric":"Cloudy with periods of light rain. Low around 5C. Winds SW at 25 to 40 km/h. Chance of rain 70%.",
+          "pop":"70"
+        }
+      ,
+        {
+          "period":2,
+          "icon":"chancerain",
+          "icon_url":"http://icons.wxug.com/i/c/k/chancerain.gif",
+          "title":"Wednesday",
+          "fcttext":"Rain showers in the morning then thundershowers in the afternoon. High 46F. Winds WSW at 15 to 25 mph. Chance of rain 60%.",
+          "fcttext_metric":"Showers early then thundershowers developing later in the day. High 8C. Winds WSW at 25 to 40 km/h. Chance of rain 60%.",
+          "pop":"60"
+        }
+      ,
+        {
+          "period":3,
+          "icon":"nt_chancerain",
+          "icon_url":"http://icons.wxug.com/i/c/k/nt_chancerain.gif",
+          "title":"Wednesday Night",
+          "fcttext":"Considerable cloudiness with occasional rain showers. Thunder possible. Low near 35F. Winds WSW at 10 to 15 mph. Chance of rain 60%.",
+          "fcttext_metric":"Overcast with rain showers at times. Thunder possible. Low 1C. Winds WSW at 15 to 25 km/h. Chance of rain 60%.",
+          "pop":"60"
+        }
+      ,
+        {
+          "period":4,
+          "icon":"snow",
+          "icon_url":"http://icons.wxug.com/i/c/k/snow.gif",
+          "title":"Thursday",
+          "fcttext":"Cloudy with rain and snow showers in the morning. Partial clearing in the afternoon. High around 45F. Winds WNW at 5 to 10 mph. Chance of rain 50%.",
+          "fcttext_metric":"Rain or snow showers in the morning will give way to partly cloudy skies in the afternoon. High 7C. Winds WNW at 10 to 15 km/h. Chance of rain 50%.",
+          "pop":"50"
+        }
+      ,
+        {
+          "period":5,
+          "icon":"nt_chancerain",
+          "icon_url":"http://icons.wxug.com/i/c/k/nt_chancerain.gif",
+          "title":"Thursday Night",
+          "fcttext":"Cloudy in the evening, then off and on rain showers after midnight. Low 34F. Winds S at 5 to 10 mph. Chance of rain 50%.",
+          "fcttext_metric":"Cloudy skies early with showers later at night. Low 1C. Winds SSE at 10 to 15 km/h. Chance of rain 50%.",
+          "pop":"50"
+        }
+      ,
+        {
+          "period":6,
+          "icon":"chancerain",
+          "icon_url":"http://icons.wxug.com/i/c/k/chancerain.gif",
+          "title":"Friday",
+          "fcttext":"Cloudy with occasional rain showers. High 41F. Winds ESE at 10 to 20 mph. Chance of rain 60%.",
+          "fcttext_metric":"Cloudy with occasional rain showers. High near 5C. Winds ESE at 15 to 30 km/h. Chance of rain 60%.",
+          "pop":"60"
+        }
+      ,
+        {
+          "period":7,
+          "icon":"nt_mostlycloudy",
+          "icon_url":"http://icons.wxug.com/i/c/k/nt_mostlycloudy.gif",
+          "title":"Friday Night",
+          "fcttext":"Partly cloudy skies during the evening will give way to cloudy skies overnight. Low 29F. Winds light and variable.",
+          "fcttext_metric":"Partly cloudy skies in the evening, then becoming cloudy overnight. Low -2C. Winds light and variable.",
+          "pop":"20"
+        }
+      ]
+    },
+    "simpleforecast": {
+      "forecastday": [
+        {"date":{
+          "epoch":"1456855200",
+          "pretty":"7:00 PM CET on March 01, 2016",
+          "day":1,
+          "month":3,
+          "year":2016,
+          "yday":60,
+          "hour":19,
+          "min":"00",
+          "sec":0,
+          "isdst":"0",
+          "monthname":"March",
+          "monthname_short":"Mar",
+          "weekday_short":"Tue",
+          "weekday":"Tuesday",
+          "ampm":"PM",
+          "tz_short":"CET",
+          "tz_long":"Europe/Amsterdam"
+        },
+          "period":1,
+          "high": {
+            "fahrenheit":"43",
+            "celsius":"6"
+          },
+          "low": {
+            "fahrenheit":"42",
+            "celsius":"6"
+          },
+          "conditions":"Rain",
+          "icon":"rain",
+          "icon_url":"http://icons.wxug.com/i/c/k/rain.gif",
+          "skyicon":"",
+          "pop":100,
+          "qpf_allday": {
+            "in": 0.29,
+            "mm": 7
+          },
+          "qpf_day": {
+            "in": 0.20,
+            "mm": 5
+          },
+          "qpf_night": {
+            "in": 0.09,
+            "mm": 2
+          },
+          "snow_allday": {
+            "in": 0.0,
+            "cm": 0.0
+          },
+          "snow_day": {
+            "in": 0.0,
+            "cm": 0.0
+          },
+          "snow_night": {
+            "in": 0.0,
+            "cm": 0.0
+          },
+          "maxwind": {
+            "mph": 25,
+            "kph": 40,
+            "dir": "SSW",
+            "degrees": 199
+          },
+          "avewind": {
+            "mph": 18,
+            "kph": 29,
+            "dir": "SSW",
+            "degrees": 199
+          },
+          "avehumidity": 91,
+          "maxhumidity": 0,
+          "minhumidity": 0
+        }
+      ,
+        {"date":{
+          "epoch":"1456941600",
+          "pretty":"7:00 PM CET on March 02, 2016",
+          "day":2,
+          "month":3,
+          "year":2016,
+          "yday":61,
+          "hour":19,
+          "min":"00",
+          "sec":0,
+          "isdst":"0",
+          "monthname":"March",
+          "monthname_short":"Mar",
+          "weekday_short":"Wed",
+          "weekday":"Wednesday",
+          "ampm":"PM",
+          "tz_short":"CET",
+          "tz_long":"Europe/Amsterdam"
+        },
+          "period":2,
+          "high": {
+            "fahrenheit":"46",
+            "celsius":"8"
+          },
+          "low": {
+            "fahrenheit":"35",
+            "celsius":"2"
+          },
+          "conditions":"Chance of Rain",
+          "icon":"chancerain",
+          "icon_url":"http://icons.wxug.com/i/c/k/chancerain.gif",
+          "skyicon":"",
+          "pop":60,
+          "qpf_allday": {
+            "in": 0.17,
+            "mm": 4
+          },
+          "qpf_day": {
+            "in": 0.09,
+            "mm": 2
+          },
+          "qpf_night": {
+            "in": 0.07,
+            "mm": 2
+          },
+          "snow_allday": {
+            "in": 0.0,
+            "cm": 0.0
+          },
+          "snow_day": {
+            "in": 0.0,
+            "cm": 0.0
+          },
+          "snow_night": {
+            "in": 0.0,
+            "cm": 0.0
+          },
+          "maxwind": {
+            "mph": 25,
+            "kph": 40,
+            "dir": "WSW",
+            "degrees": 250
+          },
+          "avewind": {
+            "mph": 18,
+            "kph": 29,
+            "dir": "WSW",
+            "degrees": 250
+          },
+          "avehumidity": 76,
+          "maxhumidity": 0,
+          "minhumidity": 0
+        }
+      ,
+        {"date":{
+          "epoch":"1457028000",
+          "pretty":"7:00 PM CET on March 03, 2016",
+          "day":3,
+          "month":3,
+          "year":2016,
+          "yday":62,
+          "hour":19,
+          "min":"00",
+          "sec":0,
+          "isdst":"0",
+          "monthname":"March",
+          "monthname_short":"Mar",
+          "weekday_short":"Thu",
+          "weekday":"Thursday",
+          "ampm":"PM",
+          "tz_short":"CET",
+          "tz_long":"Europe/Amsterdam"
+        },
+          "period":3,
+          "high": {
+            "fahrenheit":"45",
+            "celsius":"7"
+          },
+          "low": {
+            "fahrenheit":"34",
+            "celsius":"1"
+          },
+          "conditions":"Snow",
+          "icon":"snow",
+          "icon_url":"http://icons.wxug.com/i/c/k/snow.gif",
+          "skyicon":"",
+          "pop":50,
+          "qpf_allday": {
+            "in": 0.16,
+            "mm": 4
+          },
+          "qpf_day": {
+            "in": 0.06,
+            "mm": 2
+          },
+          "qpf_night": {
+            "in": 0.10,
+            "mm": 3
+          },
+          "snow_allday": {
+            "in": 0.0,
+            "cm": 0.0
+          },
+          "snow_day": {
+            "in": 0.0,
+            "cm": 0.0
+          },
+          "snow_night": {
+            "in": 0.0,
+            "cm": 0.0
+          },
+          "maxwind": {
+            "mph": 10,
+            "kph": 16,
+            "dir": "WNW",
+            "degrees": 290
+          },
+          "avewind": {
+            "mph": 9,
+            "kph": 14,
+            "dir": "WNW",
+            "degrees": 290
+          },
+          "avehumidity": 81,
+          "maxhumidity": 0,
+          "minhumidity": 0
+        }
+      ,
+        {"date":{
+          "epoch":"1457114400",
+          "pretty":"7:00 PM CET on March 04, 2016",
+          "day":4,
+          "month":3,
+          "year":2016,
+          "yday":63,
+          "hour":19,
+          "min":"00",
+          "sec":0,
+          "isdst":"0",
+          "monthname":"March",
+          "monthname_short":"Mar",
+          "weekday_short":"Fri",
+          "weekday":"Friday",
+          "ampm":"PM",
+          "tz_short":"CET",
+          "tz_long":"Europe/Amsterdam"
+        },
+          "period":4,
+          "high": {
+            "fahrenheit":"41",
+            "celsius":"5"
+          },
+          "low": {
+            "fahrenheit":"29",
+            "celsius":"-2"
+          },
+          "conditions":"Chance of Rain",
+          "icon":"chancerain",
+          "icon_url":"http://icons.wxug.com/i/c/k/chancerain.gif",
+          "skyicon":"",
+          "pop":60,
+          "qpf_allday": {
+            "in": 0.18,
+            "mm": 5
+          },
+          "qpf_day": {
+            "in": 0.17,
+            "mm": 4
+          },
+          "qpf_night": {
+            "in": 0.00,
+            "mm": 0
+          },
+          "snow_allday": {
+            "in": 0.0,
+            "cm": 0.0
+          },
+          "snow_day": {
+            "in": 0.0,
+            "cm": 0.0
+          },
+          "snow_night": {
+            "in": 0.0,
+            "cm": 0.0
+          },
+          "maxwind": {
+            "mph": 20,
+            "kph": 32,
+            "dir": "ESE",
+            "degrees": 102
+          },
+          "avewind": {
+            "mph": 14,
+            "kph": 23,
+            "dir": "ESE",
+            "degrees": 102
+          },
+          "avehumidity": 82,
+          "maxhumidity": 0,
+          "minhumidity": 0
+        }
+      ]
+    }
+  }
+}

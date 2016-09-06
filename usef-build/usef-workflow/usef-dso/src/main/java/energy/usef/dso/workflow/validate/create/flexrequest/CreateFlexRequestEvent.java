@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package energy.usef.dso.workflow.validate.create.flexrequest;
 
 import java.util.Arrays;
 
+import energy.usef.core.event.ExpirableEvent;
 import org.joda.time.LocalDate;
 
 import energy.usef.core.util.DateTimeUtil;
@@ -25,22 +26,22 @@ import energy.usef.core.util.DateTimeUtil;
 /**
  * Event class used to trigger the 'Create Flew Request' DSO workflow.
  */
-public class CreateFlexRequestEvent {
+public class CreateFlexRequestEvent implements ExpirableEvent {
 
     private final String congestionPointEntityAddress;
-    private final LocalDate ptuDate;
+    private final LocalDate period;
     private final Integer[] ptuIndexes;
 
     /**
      * Specific constructor for the {@link CreateFlexRequestEvent}. Initiliazes the workflow name as well.
      * 
      * @param congestionPointEntityAddress {@link String} Entity Address of the related congestion point.
-     * @param ptuDate {@link LocalDate} period for which flex request is created.
+     * @param period {@link LocalDate} period for which flex request is created.
      * @param ptuIndexes Array of {@link Integer} with the indexes of the PTUs involved in the flex request creation.
      */
-    public CreateFlexRequestEvent(String congestionPointEntityAddress, LocalDate ptuDate, Integer[] ptuIndexes) {
+    public CreateFlexRequestEvent(String congestionPointEntityAddress, LocalDate period, Integer[] ptuIndexes) {
         this.congestionPointEntityAddress = congestionPointEntityAddress;
-        this.ptuDate = ptuDate;
+        this.period = period;
         this.ptuIndexes = Arrays.copyOf(ptuIndexes, ptuIndexes.length);
     }
 
@@ -48,25 +49,19 @@ public class CreateFlexRequestEvent {
         return congestionPointEntityAddress;
     }
 
-    public LocalDate getPtuDate() {
-        return ptuDate;
+    public LocalDate getPeriod() {
+        return period;
     }
 
     public Integer[] getPtuIndexes() {
         return ptuIndexes;
     }
 
-
-    public boolean isExpired() {
-        return (this.ptuDate.isBefore(DateTimeUtil.getCurrentDate()));
-    }
-
-
     @Override
     public String toString() {
         return "CreateFlexRequestEvent" + "[" +
                 "congestionPointEntityAddress='" + congestionPointEntityAddress + "'" +
-                ", ptuDate=" + ptuDate +
+                ", ptuDate=" + period +
                 "]";
     }
 }

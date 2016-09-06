@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,10 +29,11 @@ public final class CreateGridSafetyAnalysisStepParameter {
      * The ingoing parameters for the create grid safety analysis step.
      */
     public enum IN {
+        PTU_DURATION,
         CONGESTION_POINT_ENTITY_ADDRESS,
         D_PROGNOSIS_LIST,
         NON_AGGREGATOR_FORECAST,
-        PERIOD
+        PERIOD;
     }
 
     /**

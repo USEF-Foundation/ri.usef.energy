@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package energy.usef.agr.workflow.operate.recreate.prognoses;
 
+import energy.usef.core.event.ExpirableEvent;
 import org.joda.time.LocalDate;
 
 import energy.usef.agr.workflow.operate.control.ads.ControlActiveDemandSupplyEvent;
@@ -23,7 +24,7 @@ import energy.usef.agr.workflow.operate.control.ads.ControlActiveDemandSupplyEve
 /**
  * Event class which will call a PBC that will decided to re-create new A-Plans and/or new D-Prognoses or not.
  */
-public class ReCreatePrognosesEvent {
+public class ReCreatePrognosesEvent implements ExpirableEvent {
 
     private final LocalDate period;
 

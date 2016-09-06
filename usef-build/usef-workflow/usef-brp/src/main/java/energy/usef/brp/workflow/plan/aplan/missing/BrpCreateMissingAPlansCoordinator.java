@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ import energy.usef.core.data.xml.bean.message.PTU;
 import energy.usef.core.data.xml.bean.message.Prognosis;
 import energy.usef.core.data.xml.bean.message.PrognosisType;
 import energy.usef.core.event.DayAheadClosureEvent;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.AgrConnectionGroup;
 import energy.usef.core.model.Connection;
 import energy.usef.core.model.ConnectionGroup;
@@ -80,13 +82,17 @@ public class BrpCreateMissingAPlansCoordinator {
     @Inject
     private SequenceGeneratorService sequenceGeneratorService;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
     /**
      * This method handles the DayAheadClosureEvent. Missing A-Plans can be created.
      *
      * @param event the {@link DayAheadClosureEvent} that triggers the process.
      */
-    public void handleEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) DayAheadClosureEvent event) {
+    public void handleEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) DayAheadClosureEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodInFuture(event);
 
         LocalDate period = event.getPeriod();
 

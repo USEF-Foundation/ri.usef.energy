@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,10 @@ import static energy.usef.dso.workflow.DsoWorkflowStep.DSO_PREPARE_STEPWISE_LIMI
 import java.util.ArrayList;
 import java.util.List;
 
+import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,6 +63,9 @@ public class DsoColoringProcessCoordinatorTest {
     private Logger LOGGER;
 
     @Mock
+    private Config config;
+
+    @Mock
     private DsoPlanboardBusinessService dsoPlanboardBusinessService;
 
     @Mock
@@ -67,6 +74,9 @@ public class DsoColoringProcessCoordinatorTest {
     @Mock
     private WorkflowStepExecuter workflowStepExecuter;
 
+    @Mock
+    private EventValidationService eventValidationService;
+
     private DsoColoringProcessCoordinator coordinator;
 
     @Before
@@ -74,17 +84,20 @@ public class DsoColoringProcessCoordinatorTest {
         coordinator = new DsoColoringProcessCoordinator();
 
         ReflectionUtil.setFinalStatic(DsoColoringProcessCoordinator.class.getDeclaredField("LOGGER"), LOGGER);
+        Whitebox.setInternalState(coordinator, "config", config);
         Whitebox.setInternalState(coordinator, "workflowStepExecuter", workflowStepExecuter);
         Whitebox.setInternalState(coordinator, "corePlanboardBusinessService", corePlanboardBusinessService);
         Whitebox.setInternalState(coordinator, "dsoPlanboardBusinessService", dsoPlanboardBusinessService);
+        Whitebox.setInternalState(coordinator, "eventValidationService", eventValidationService);
     }
 
     @Test
-    public void testHandleEvent() {
+    public void testHandleEvent() throws BusinessValidationException {
         CongestionPointConnectionGroup connectionGroup = new CongestionPointConnectionGroup();
         connectionGroup.setUsefIdentifier(CONGESTION_POINT);
         connectionGroup.setDsoDomain(DSO_DOMAIN);
 
+        Mockito.when(config.getIntegerProperty(ConfigParam.PTU_DURATION)).thenReturn(15);
         Mockito.when(corePlanboardBusinessService.findConnectionGroup(Matchers.any())).thenReturn(connectionGroup);
         Mockito.when(
                 dsoPlanboardBusinessService.findLatestGridSafetyAnalysisWithDispositionRequested(Matchers.any(), Matchers.any()))
@@ -111,7 +124,7 @@ public class DsoColoringProcessCoordinatorTest {
     }
 
     @Test
-    public void testHandleEventWithConnectionGroupNull() {
+    public void testHandleEventWithConnectionGroupNull() throws BusinessValidationException {
         Mockito.when(corePlanboardBusinessService.findConnectionGroup(Matchers.any())).thenReturn(null);
         Mockito.when(
                 dsoPlanboardBusinessService.findLatestGridSafetyAnalysisWithDispositionRequested(Matchers.any(), Matchers.any()))
@@ -124,7 +137,7 @@ public class DsoColoringProcessCoordinatorTest {
     }
 
     @Test
-    public void testHandleEventWithNoGridSafetyAnalysis() {
+    public void testHandleEventWithNoGridSafetyAnalysis() throws BusinessValidationException {
         CongestionPointConnectionGroup connectionGroup = new CongestionPointConnectionGroup();
         connectionGroup.setUsefIdentifier(CONGESTION_POINT);
         connectionGroup.setDsoDomain(DSO_DOMAIN);

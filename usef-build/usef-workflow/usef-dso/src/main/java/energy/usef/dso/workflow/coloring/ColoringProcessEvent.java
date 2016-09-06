@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,34 @@
 
 package energy.usef.dso.workflow.coloring;
 
+import energy.usef.core.event.ExpirableEvent;
 import org.joda.time.LocalDate;
 
 /**
  * Event implementation for starting the Coloring Process workflow to determine if PTU(s) become orange.
  */
-public class ColoringProcessEvent {
+public class ColoringProcessEvent implements ExpirableEvent {
 
-    private LocalDate date;
+    private LocalDate period;
     private String congestionPoint;
 
     /**
      * Constructor for ColoringProcessEvent for given date and congestionPoint.
      *
-     * @param date
+     * @param period
      * @param congestionPoint
      */
-    public ColoringProcessEvent(LocalDate date, String congestionPoint) {
-        this.date = date;
+    public ColoringProcessEvent(LocalDate period, String congestionPoint) {
+        this.period = period;
         this.congestionPoint = congestionPoint;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public LocalDate getPeriod() {
+        return period;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setPeriod(LocalDate period) {
+        this.period = period;
     }
 
     public String getCongestionPoint() {
@@ -56,7 +57,7 @@ public class ColoringProcessEvent {
     @Override
     public String toString() {
         return "ColoringProcessEvent" + "[" +
-                "date=" + date +
+                "date=" + period +
                 ", congestionPoint='" + congestionPoint + "'" +
                 "]";
     }

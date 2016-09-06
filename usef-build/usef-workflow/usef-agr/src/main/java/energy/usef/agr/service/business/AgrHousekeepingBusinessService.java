@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,11 @@ package energy.usef.agr.service.business;
 
 import javax.inject.Inject;
 
+import energy.usef.agr.repository.*;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import energy.usef.agr.repository.PowerContainerRepository;
-import energy.usef.agr.repository.UdiEventRepository;
 import energy.usef.agr.repository.device.capability.DeviceCapabilityRepository;
 
 /**
@@ -41,6 +40,15 @@ public class AgrHousekeepingBusinessService {
 
     @Inject
     private UdiEventRepository udiEventRepository;
+
+    @Inject
+    private DeviceRequestRepository deviceRequestRepository;
+
+    @Inject
+    private DeviceMessageRepository deviceMessageRepository;
+
+    @Inject
+    private UdiRepository udiRepository;
     /**
      * Cleanup database for a given period.
      *
@@ -55,5 +63,14 @@ public class AgrHousekeepingBusinessService {
 
         int udiEventRepositoryCount = udiEventRepository.cleanup(period);
         LOGGER.info("Cleaned up {} UdiEvent objects.", udiEventRepositoryCount);
+
+        int deviceRequestRepositoryCount = deviceRequestRepository.cleanup(period);
+        LOGGER.info("Cleaned up {} DeviceRequest objects.", deviceRequestRepositoryCount);
+
+        int deviceMessageRepositoryCount = deviceMessageRepository.cleanup(period);
+        LOGGER.info("Cleaned up {} DeviceMessage objects.", deviceMessageRepositoryCount);
+
+        int udiRepositoryCount = udiRepository.cleanup(period);
+        LOGGER.info("Cleaned up {} Udi objects.", udiRepositoryCount);
     }
 }

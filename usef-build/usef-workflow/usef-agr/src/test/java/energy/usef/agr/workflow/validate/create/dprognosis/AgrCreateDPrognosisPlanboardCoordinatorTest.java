@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import energy.usef.agr.workflow.nonudi.goals.AgrNonUdiSetAdsGoalsEvent;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.Prognosis;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.CongestionPointConnectionGroup;
 import energy.usef.core.model.ConnectionGroup;
 import energy.usef.core.model.DocumentStatus;
@@ -100,6 +102,8 @@ public class AgrCreateDPrognosisPlanboardCoordinatorTest {
     private Config config;
     @Mock
     private ConfigAgr configAgr;
+    @Mock
+    private EventValidationService eventValidationService;
 
     @Before
     public void init() {
@@ -116,6 +120,7 @@ public class AgrCreateDPrognosisPlanboardCoordinatorTest {
         Whitebox.setInternalState(coordinator, configAgr);
         Whitebox.setInternalState(coordinator, "agrSetAdsGoalsEventManager", agrSetAdsGoalsEventManager);
         Whitebox.setInternalState(coordinator, sequenceGeneratorService);
+        Whitebox.setInternalState(coordinator, eventValidationService);
 
         PowerMockito.when(configAgr.getBooleanProperty(ConfigAgrParam.AGR_IS_NON_UDI_AGGREGATOR)).thenReturn(true);
     }
@@ -123,7 +128,7 @@ public class AgrCreateDPrognosisPlanboardCoordinatorTest {
     // This test gives unpredictable results. TODO: fix this.
     @Ignore
     @Test
-    public void testInvokeWorkflowReturns2PTUs() throws SAXException, IOException, XpathException {
+    public void testInvokeWorkflowReturns2PTUs() throws SAXException, IOException, XpathException, BusinessValidationException {
         XMLUnit.setIgnoreWhitespace(true);
 
         CongestionPointConnectionGroup congestionPoint = buildCongestionPointCG();
@@ -161,7 +166,7 @@ public class AgrCreateDPrognosisPlanboardCoordinatorTest {
     }
 
     @Test
-    public void testInvokeWorkflowDoesNotReturnPTUs() throws SAXException, IOException, XpathException {
+    public void testInvokeWorkflowDoesNotReturnPTUs() throws SAXException, IOException, XpathException, BusinessValidationException {
         XMLUnit.setIgnoreWhitespace(true);
 
         CongestionPointConnectionGroup congestionPoint = buildCongestionPointCG();

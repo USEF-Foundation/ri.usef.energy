@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package energy.usef.agr.workflow.nonudi.initialize;
 
 import energy.usef.agr.config.ConfigAgr;
 import energy.usef.agr.config.ConfigAgrParam;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
 import energy.usef.core.util.DateTimeUtil;
 import energy.usef.core.workflow.step.WorkflowStepExecuter;
@@ -47,6 +49,9 @@ public class AgrNonUdiInitializeCoordinatorTest {
     @Mock
     private ConfigAgr configAgr;
 
+    @Mock
+    private EventValidationService eventValidationService;
+
     private AgrNonUdiInitializeCoordinator coordinator;
 
     @Before
@@ -55,13 +60,14 @@ public class AgrNonUdiInitializeCoordinatorTest {
         Whitebox.setInternalState(coordinator, configAgr);
         Whitebox.setInternalState(coordinator, corePlanboardBusinessService);
         Whitebox.setInternalState(coordinator, workflowStepExecuter);
+        Whitebox.setInternalState(coordinator, eventValidationService);
     }
 
     /**
      * Test if coordinator doesn't do anything for udi enabled aggregators.
      */
     @Test
-    public void testInitializeClusterWithUdiAgr() {
+    public void testInitializeClusterWithUdiAgr() throws BusinessValidationException {
         PowerMockito.when(configAgr.getBooleanProperty(ConfigAgrParam.AGR_IS_NON_UDI_AGGREGATOR)).thenReturn(false);
 
         coordinator.initializeCluster(new AgrNonUdiInitializeEvent(DateTimeUtil.getCurrentDate()));
@@ -73,7 +79,7 @@ public class AgrNonUdiInitializeCoordinatorTest {
      * Test if coordinator triggers the PBC for non-udi enabled aggregators.
      */
     @Test
-    public void testInitializeClusterWithNonUdiAgr() {
+    public void testInitializeClusterWithNonUdiAgr() throws BusinessValidationException {
         PowerMockito.when(configAgr.getBooleanProperty(ConfigAgrParam.AGR_IS_NON_UDI_AGGREGATOR)).thenReturn(true);
 
         coordinator.initializeCluster(new AgrNonUdiInitializeEvent(DateTimeUtil.getCurrentDate()));

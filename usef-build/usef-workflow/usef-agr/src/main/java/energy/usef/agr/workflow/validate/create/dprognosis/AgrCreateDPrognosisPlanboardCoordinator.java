@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ import energy.usef.core.data.xml.bean.message.Prognosis;
 import energy.usef.core.data.xml.bean.message.PrognosisType;
 import energy.usef.core.data.xml.bean.message.USEFRole;
 import energy.usef.core.event.StartValidateEvent;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.CongestionPointConnectionGroup;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
@@ -112,6 +114,9 @@ public class AgrCreateDPrognosisPlanboardCoordinator {
     @Inject
     private SequenceGeneratorService sequenceGeneratorService;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
     /**
      * Handles a {@link StartValidateEvent} which contains the period for which D-Prognoses should be recreated.
      * <p>
@@ -121,8 +126,9 @@ public class AgrCreateDPrognosisPlanboardCoordinator {
      */
 
     @Asynchronous
-    public void handleStartValidateEvent(@Observes StartValidateEvent event) {
+    public void handleStartValidateEvent(@Observes StartValidateEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodInFuture(event);
         handleReCreateDPrognosisEvent(new ReCreateDPrognosisEvent(event.getPeriod()));
         LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }
@@ -136,8 +142,9 @@ public class AgrCreateDPrognosisPlanboardCoordinator {
      * @param event
      */
     @Asynchronous
-    public void handleReCreateDPrognosisEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) ReCreateDPrognosisEvent event) {
+    public void handleReCreateDPrognosisEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) ReCreateDPrognosisEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
         doHandleReCreateDPrognosisEvent(event);
         LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }
@@ -175,8 +182,9 @@ public class AgrCreateDPrognosisPlanboardCoordinator {
      * @param event
      */
     @Asynchronous
-    public void handleEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) CreateDPrognosisEvent event) {
+    public void handleEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) CreateDPrognosisEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
         doHandleEvent(event);
         LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }

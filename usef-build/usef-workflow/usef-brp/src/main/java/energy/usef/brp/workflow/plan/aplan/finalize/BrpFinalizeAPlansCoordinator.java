@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ import javax.ejb.Stateless;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +43,9 @@ public class BrpFinalizeAPlansCoordinator {
     @Inject
     private BrpPlanboardBusinessService brpPlanboardBusinessService;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
     /**
      * Handles the event {@link FinalizeAPlansEvent}.
      *
@@ -48,8 +53,9 @@ public class BrpFinalizeAPlansCoordinator {
      */
     @Asynchronous
     @Lock(LockType.WRITE)
-    public void handleEvent(@Observes FinalizeAPlansEvent event) {
+    public void handleEvent(@Observes FinalizeAPlansEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
 
         brpPlanboardBusinessService.finalizePendingAPlans(event.getPeriod());
 

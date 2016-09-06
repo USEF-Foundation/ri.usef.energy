@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.constant.USEFConstants;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.workflow.DefaultWorkflowContext;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.step.WorkflowStepExecuter;
@@ -76,6 +78,9 @@ public class AgrCreateConnectionProfileCoordinator {
     @Inject
     private Event<CreateUdiEvent> createUdiEventManager;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
     /**
      * Create the connection profile power values for the connection portfolio for the period starting the next day and ending
      * {@link ConfigAgrParam#AGR_INITIALIZE_PLANBOARD_DAYS_INTERVAL} later.
@@ -86,9 +91,11 @@ public class AgrCreateConnectionProfileCoordinator {
     @Lock(LockType.WRITE)
     @SuppressWarnings("unchecked")
     public void createConnectionProfile(
-            @Observes(during = TransactionPhase.AFTER_COMPLETION) CreateConnectionProfileEvent createConnectionProfileEvent) {
+            @Observes(during = TransactionPhase.AFTER_COMPLETION) CreateConnectionProfileEvent createConnectionProfileEvent) throws BusinessValidationException {
         LOGGER.info(USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT, createConnectionProfileEvent);
-        LocalDate initializationDate = createConnectionProfileEvent.getInitializationDate();
+        eventValidationService.validateEventPeriodInFuture(createConnectionProfileEvent);
+
+        LocalDate initializationDate = createConnectionProfileEvent.getPeriod();
         Integer ptuDuration = config.getIntegerProperty(ConfigParam.PTU_DURATION);
         Integer initializeDaysInterval = configAgr.getIntegerProperty(ConfigAgrParam.AGR_INITIALIZE_PLANBOARD_DAYS_INTERVAL);
         for (int i = 0; i < initializeDaysInterval; ++i) {
@@ -111,7 +118,7 @@ public class AgrCreateConnectionProfileCoordinator {
         }
 
         if(!configAgr.getBooleanProperty(ConfigAgrParam.AGR_IS_NON_UDI_AGGREGATOR)) {
-            createUdiEventManager.fire(new CreateUdiEvent(createConnectionProfileEvent.getInitializationDate()));
+            createUdiEventManager.fire(new CreateUdiEvent(createConnectionProfileEvent.getPeriod()));
         }
         LOGGER.info(USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT, createConnectionProfileEvent);
     }

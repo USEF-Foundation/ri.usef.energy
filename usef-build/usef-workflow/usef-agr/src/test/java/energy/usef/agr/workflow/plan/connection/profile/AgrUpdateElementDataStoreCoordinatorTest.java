@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import energy.usef.agr.service.business.AgrElementBusinessService;
 import energy.usef.agr.service.business.AgrPortfolioBusinessService;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
+import energy.usef.core.event.validation.EventValidationService;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.step.WorkflowStepExecuter;
 
@@ -66,6 +67,9 @@ public class AgrUpdateElementDataStoreCoordinatorTest {
     @Mock
     private Event<CreateConnectionProfileEvent> createConnectionProfileEventManager;
 
+    @Mock
+    private EventValidationService eventValidationService;
+
     @Before
     public void init() {
         coordinator = new AgrUpdateElementDataStoreCoordinator();
@@ -74,6 +78,7 @@ public class AgrUpdateElementDataStoreCoordinatorTest {
         Whitebox.setInternalState(coordinator, "agrPortfolioBusinessService", agrPortfolioBusinessService);
         Whitebox.setInternalState(coordinator, "createConnectionProfileEventManager", createConnectionProfileEventManager);
         Whitebox.setInternalState(coordinator, "agrElementBusinessService", agrElementBusinessService);
+        Whitebox.setInternalState(coordinator, eventValidationService);
     }
 
     @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,26 +18,7 @@ package energy.usef.brp.workflow.settlement.send;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
-import energy.usef.brp.config.ConfigBrp;
-import energy.usef.brp.config.ConfigBrpParam;
-import energy.usef.core.config.Config;
-import energy.usef.core.config.ConfigParam;
-import energy.usef.core.model.AgrConnectionGroup;
-import energy.usef.core.model.Connection;
-import energy.usef.core.model.DocumentStatus;
-import energy.usef.core.model.FlexOrderSettlement;
-import energy.usef.core.model.Message;
-import energy.usef.core.model.PlanboardMessage;
-import energy.usef.core.model.PtuContainer;
-import energy.usef.core.model.PtuSettlement;
-import energy.usef.core.service.business.CorePlanboardBusinessService;
-import energy.usef.core.service.business.SequenceGeneratorService;
-import energy.usef.core.service.helper.JMSHelperService;
-import energy.usef.core.workflow.settlement.CoreSettlementBusinessService;
+import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -60,6 +41,23 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import energy.usef.brp.config.ConfigBrp;
+import energy.usef.brp.config.ConfigBrpParam;
+import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
+import energy.usef.core.model.AgrConnectionGroup;
+import energy.usef.core.model.Connection;
+import energy.usef.core.model.DocumentStatus;
+import energy.usef.core.model.FlexOrderSettlement;
+import energy.usef.core.model.Message;
+import energy.usef.core.model.PlanboardMessage;
+import energy.usef.core.model.PtuContainer;
+import energy.usef.core.model.PtuSettlement;
+import energy.usef.core.service.business.CorePlanboardBusinessService;
+import energy.usef.core.service.business.SequenceGeneratorService;
+import energy.usef.core.service.helper.JMSHelperService;
+import energy.usef.core.workflow.settlement.CoreSettlementBusinessService;
 
 /**
  * Test class in charge of the unit tests related to the {@link BrpSendSettlementMessagesCoordinator} class.
@@ -84,7 +82,7 @@ public class BrpSendSettlementMessagesCoordinatorTest {
     @Mock
     private CoreSettlementBusinessService coreSettlementBusinessService;
     @Mock
-    private CorePlanboardBusinessService planboardBusinessService;
+    private CorePlanboardBusinessService corePlanboardBusinessService;
 
     @Before
     public void setUp() throws Exception {
@@ -95,13 +93,13 @@ public class BrpSendSettlementMessagesCoordinatorTest {
         Whitebox.setInternalState(coordinator, configBrp);
         Whitebox.setInternalState(coordinator, jmsHelperService);
         Whitebox.setInternalState(coordinator, coreSettlementBusinessService);
-        Whitebox.setInternalState(coordinator, planboardBusinessService);
+        Whitebox.setInternalState(coordinator, corePlanboardBusinessService);
         Whitebox.setInternalState(coordinator, sequenceGeneratorService);
 
         when(configBrp.getIntegerProperty(ConfigBrpParam.BRP_SETTLEMENT_RESPONSE_WAITING_DURATION)).thenReturn(EXPIRATION_DAYS);
         when(config.getProperty(ConfigParam.HOST_DOMAIN)).thenReturn("brp.usef-example.com");
 
-        when(planboardBusinessService.findConnectionGroupWithConnectionsWithOverlappingValidity(eq(new LocalDate(YEAR, MONTH, 1)),
+        when(corePlanboardBusinessService.findConnectionGroupWithConnectionsWithOverlappingValidity(eq(new LocalDate(YEAR, MONTH, 1)),
                 Matchers.any(LocalDate.class))).then(call -> {
             Connection connection = new Connection("ean.000000000001");
             AgrConnectionGroup agrConnectionGroup = new AgrConnectionGroup(AGR_DOMAIN);
@@ -112,7 +110,7 @@ public class BrpSendSettlementMessagesCoordinatorTest {
 
     @Test
     public void testInvokeWorkflowEmptyAggregators() {
-        when(planboardBusinessService.findConnectionGroupWithConnectionsWithOverlappingValidity(eq(new LocalDate(YEAR, MONTH, 1)),
+        when(corePlanboardBusinessService.findConnectionGroupWithConnectionsWithOverlappingValidity(eq(new LocalDate(YEAR, MONTH, 1)),
                 Matchers.any(LocalDate.class))).thenReturn(new HashMap<>());
 
         // actual call
@@ -131,7 +129,7 @@ public class BrpSendSettlementMessagesCoordinatorTest {
         coordinator.invokeWorkflow(new SendSettlementMessageEvent(YEAR, MONTH));
         // verifications
         verify(configBrp, times(1)).getIntegerProperty(ConfigBrpParam.BRP_SETTLEMENT_RESPONSE_WAITING_DURATION);
-        verify(planboardBusinessService, times(1))
+        verify(corePlanboardBusinessService, times(1))
                 .storeFlexOrderSettlementsPlanboardMessage(Matchers.anyListOf(FlexOrderSettlement.class), eq(EXPIRATION_DAYS),
                         eq(DocumentStatus.SENT), eq(AGR_DOMAIN), Matchers.any(Message.class));
         ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
@@ -149,7 +147,7 @@ public class BrpSendSettlementMessagesCoordinatorTest {
         coordinator.invokeWorkflow(new SendSettlementMessageEvent(YEAR, MONTH));
         // verifications
         verify(configBrp, times(1)).getIntegerProperty(ConfigBrpParam.BRP_SETTLEMENT_RESPONSE_WAITING_DURATION);
-        verify(planboardBusinessService, times(1))
+        verify(corePlanboardBusinessService, times(1))
                 .storeFlexOrderSettlementsPlanboardMessage(Matchers.anyListOf(FlexOrderSettlement.class), eq(EXPIRATION_DAYS),
                         eq(DocumentStatus.SENT), eq(AGR_DOMAIN), Matchers.any(Message.class));
         ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);

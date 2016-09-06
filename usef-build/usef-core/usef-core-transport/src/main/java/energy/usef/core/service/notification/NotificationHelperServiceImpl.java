@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,6 @@
 
 package energy.usef.core.service.notification;
 
-import energy.usef.core.config.Config;
-import energy.usef.core.config.ConfigParam;
-import energy.usef.core.data.xml.bean.message.Message;
-import energy.usef.core.data.xml.bean.message.MessageMetadata;
-import energy.usef.core.data.xml.bean.message.MessagePrecedence;
-import energy.usef.core.model.MessageType;
-import energy.usef.core.service.business.MessageService;
-import energy.usef.core.service.helper.JMSHelperService;
-import energy.usef.core.service.helper.NotificationHelperService;
-
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.ejb.Timeout;
@@ -35,6 +25,17 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
+import energy.usef.core.data.xml.bean.message.Message;
+import energy.usef.core.data.xml.bean.message.MessageMetadata;
+import energy.usef.core.data.xml.bean.message.MessagePrecedence;
+import energy.usef.core.model.MessageType;
+import energy.usef.core.service.business.MessageService;
+import energy.usef.core.service.helper.JMSHelperService;
+import energy.usef.core.service.helper.NotificationHelperService;
+import energy.usef.core.util.DateTimeUtil;
 
 /**
  * Simple implementation of the failed message notification hook.
@@ -95,6 +96,7 @@ public class NotificationHelperServiceImpl implements NotificationHelperService 
         LOGGER.info("Setting a programmatic timeout for {} milliseconds from now.", delay);
         NotificationInfo info = new NotificationInfo(MessageType.fromValue(messageMetadata.getPrecedence()),
                 messageMetadata.getConversationID(), xml);
+        delay = delay / DateTimeUtil.getTimeFactor();
         timerService.createTimer(delay, info);
     }
 

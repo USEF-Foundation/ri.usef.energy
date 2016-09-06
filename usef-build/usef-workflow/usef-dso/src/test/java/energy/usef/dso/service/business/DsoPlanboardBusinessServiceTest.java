@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -773,10 +773,18 @@ public class DsoPlanboardBusinessServiceTest {
         planboardService.storeGridSafetyAnalysis(entity);
         Mockito.verify(gridSafetyAnalysisRepository, Mockito.times(1)).persist(Matchers.eq(entity));
     }
+
     @Test
     public void testFindGridSafetyAnalysis() {
         LocalDate ptuDate = new LocalDate(2014, 11, 28);
         planboardService.findGridSafetyAnalysis(CONGESTION_POINT, ptuDate);
         verify(gridSafetyAnalysisRepository, times(1)).findGridSafetyAnalysis(Matchers.eq(CONGESTION_POINT), Matchers.eq(ptuDate));
+    }
+
+    @Test
+    public void testDeletePreviousGridSafetyAnalysis() {
+        LocalDate ptuDate = new LocalDate(2014, 11, 28);
+        planboardService.deletePreviousGridSafetyAnalysis(CONGESTION_POINT, ptuDate);
+        verify(gridSafetyAnalysisRepository, times(1)).deletePreviousGridSafetyAnalysis(Matchers.eq(CONGESTION_POINT), Matchers.eq(ptuDate));
     }
 }

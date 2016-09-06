@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,9 @@ public final class PlaceOperateFlexOrdersStepParameter {
      * The in going parameters for this step.
      */
     public enum IN {
-        FLEX_OFFER_DTO_LIST, GRID_SAFETY_ANALYSIS_DTO
+        PTU_DURATION,
+        FLEX_OFFER_DTO_LIST,
+        GRID_SAFETY_ANALYSIS_DTO;
     }
 
     /**

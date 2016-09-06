@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import energy.usef.core.event.RequestMoveToValidateEvent;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
 
 import javax.enterprise.event.Event;
@@ -48,15 +50,19 @@ public class AgrUpdateAPlanPlanboardCoordinatorTest {
     @Mock
     private Event<RequestMoveToValidateEvent> moveToValidateEventManager;
 
+    @Mock
+    private EventValidationService eventValidationService;
+
     @Before
     public void init() throws Exception {
         coordinator = new AgrUpdateAPlanPlanboardCoordinator();
         Whitebox.setInternalState(coordinator, corePlanboardBusinessService);
         Whitebox.setInternalState(coordinator, moveToValidateEventManager);
+        Whitebox.setInternalState(coordinator, eventValidationService);
     }
 
     @Test
-    public void testHandleEvent() {
+    public void testHandleEvent() throws BusinessValidationException {
         coordinator.handleEvent(new FinalizeAPlansEvent(TEST_DATE));
 
         verify(corePlanboardBusinessService, times(1)).finalizeAPlans(TEST_DATE);

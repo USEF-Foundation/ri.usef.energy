@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -216,7 +216,10 @@ public class BrpFlexOrderCoordinator {
     @SuppressWarnings("unchecked")
     private List<Long> invokePBCGetNotDesirableFlexOffers(List<FlexOfferDto> offerDtos, String connectionGroupIdentifier) {
         WorkflowContext inputContext = new DefaultWorkflowContext();
+        int ptuDuration = config.getIntegerProperty(ConfigParam.PTU_DURATION);
+
         // Creating input context
+        inputContext.setValue(GetNotDesirableFlexOffersParameter.IN.PTU_DURATION.name(), ptuDuration);
         inputContext.setValue(GetNotDesirableFlexOffersParameter.IN.CONNECTION_GROUP_IDENTIFIER.name(),
                 connectionGroupIdentifier);
         inputContext.setValue(GetNotDesirableFlexOffersParameter.IN.FLEX_OFFER_DTO_LIST.name(), offerDtos);

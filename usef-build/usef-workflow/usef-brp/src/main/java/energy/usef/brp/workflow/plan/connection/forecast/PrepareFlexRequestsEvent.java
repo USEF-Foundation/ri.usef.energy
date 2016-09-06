@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 package energy.usef.brp.workflow.plan.connection.forecast;
 
+import energy.usef.core.event.ExpirableEvent;
 import org.joda.time.LocalDate;
 
 /**
  * Event class to trigger the preparation of the workflow in charge of creating actual flex requests.
  */
-public class PrepareFlexRequestsEvent {
+public class PrepareFlexRequestsEvent implements ExpirableEvent {
 
     private final LocalDate period;
 

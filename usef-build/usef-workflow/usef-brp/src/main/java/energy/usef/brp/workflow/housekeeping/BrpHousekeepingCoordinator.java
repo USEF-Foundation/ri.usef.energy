@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +42,8 @@ public class BrpHousekeepingCoordinator {
     private PlanboardHousekeepingBusinessService planboardHousekeepingBusinessService;
     @Inject
     private TransportHousekeepingBusinessService transportHousekeepingBusinessService;
-
+    @Inject
+    private EventValidationService eventValidationService;
 
     /**
      * Handle a {@Link HousekeepingEvent}.
@@ -48,8 +51,10 @@ public class BrpHousekeepingCoordinator {
      * @param {@Link HousekeepingEvent}
      */
     @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public void cleanDatabase(@Observes HousekeepingEvent event) {
+    public void cleanDatabase(@Observes HousekeepingEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriod(event);
+
         planboardHousekeepingBusinessService.cleanup(event.getPeriod());
         transportHousekeepingBusinessService.cleanup(event.getPeriod());
         LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,33 +16,34 @@
 
 package energy.usef.agr.workflow.plan.connection.profile;
 
+import energy.usef.core.event.ExpirableEvent;
 import org.joda.time.LocalDate;
 
 /**
  * Event to trigger the workflow populating the Porfile power values for the connection portfolio.
  */
-public class CreateConnectionProfileEvent {
+public class CreateConnectionProfileEvent implements ExpirableEvent {
 
-    private final LocalDate initializationDate;
+    private final LocalDate period;
 
     /**
      * Constructor with the date of initialization of the planboard, which will be used as reference to begin the creation of
      * profile power values.
      *
-     * @param initializationDate {@link LocalDate} period.
+     * @param period {@link LocalDate} period.
      */
-    public CreateConnectionProfileEvent(LocalDate initializationDate) {
-        this.initializationDate = initializationDate;
+    public CreateConnectionProfileEvent(LocalDate period) {
+        this.period = period;
     }
 
-    public LocalDate getInitializationDate() {
-        return initializationDate;
+    public LocalDate getPeriod() {
+        return period;
     }
 
     @Override
     public String toString() {
         return "CreateConnectionProfileEvent" + "[" +
-                "initializationDate=" + initializationDate +
+                "period=" + period +
                 "]";
     }
 }

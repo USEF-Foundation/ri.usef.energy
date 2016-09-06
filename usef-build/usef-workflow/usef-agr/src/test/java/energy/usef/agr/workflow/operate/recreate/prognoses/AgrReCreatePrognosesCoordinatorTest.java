@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ import energy.usef.agr.workflow.plan.recreate.aplan.ReCreateAPlanEvent;
 import energy.usef.agr.workflow.validate.create.dprognosis.ReCreateDPrognosisEvent;
 import energy.usef.core.config.Config;
 import energy.usef.core.event.RequestMoveToValidateEvent;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.BrpConnectionGroup;
 import energy.usef.core.model.CongestionPointConnectionGroup;
 import energy.usef.core.model.Connection;
@@ -96,6 +98,8 @@ public class AgrReCreatePrognosesCoordinatorTest {
     @Mock
     private Event<RequestMoveToValidateEvent> moveToValidateEventManager;
     @Mock
+    private EventValidationService eventValidationService;
+    @Mock
     private Config config;
 
     @Before
@@ -106,6 +110,7 @@ public class AgrReCreatePrognosesCoordinatorTest {
         Whitebox.setInternalState(coordinator, agrPortfolioBusinessService);
         Whitebox.setInternalState(coordinator, workflowStepExecuter);
         Whitebox.setInternalState(coordinator, config);
+        Whitebox.setInternalState(coordinator, eventValidationService);
 
         Whitebox.setInternalState(coordinator, "reCreateAPlanEventManager", reCreateAPlanEventManager);
         Whitebox.setInternalState(coordinator, "createAPlanEventManager", createAPlanEventManager);
@@ -115,7 +120,7 @@ public class AgrReCreatePrognosesCoordinatorTest {
     }
 
     @Test
-    public void testHandleEventIsSuccessful() {
+    public void testHandleEventIsSuccessful() throws BusinessValidationException {
         Long[] dprognosisSequences = new Long[] { 3l, 4l, 5l };
 
         List<PrognosisDto> latestDPrognoses = buildLatestDPrognoses(dprognosisSequences);
@@ -149,7 +154,7 @@ public class AgrReCreatePrognosesCoordinatorTest {
     }
 
     @Test
-    public void testHandleEventIsSuccessfulForPlanPhase() {
+    public void testHandleEventIsSuccessfulForPlanPhase() throws BusinessValidationException {
         ArgumentCaptor<WorkflowContext> contextCaptor = ArgumentCaptor.forClass(WorkflowContext.class);
         Long[] dprognosisSequences = new Long[] { 3l, 4l, 5l };
         Long[] aplansSequences = new Long[] { 1l, 2l };

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,22 +25,33 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.ejb.Stateless;
+import javax.ejb.Asynchronous;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
+import javax.ejb.Singleton;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
+import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
+import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
 
 import org.joda.time.LocalDate;
 import org.joda.time.Months;
 import org.joda.time.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
+import energy.usef.core.constant.USEFConstants;
 import energy.usef.core.data.xml.bean.message.FlexOrderSettlement;
 import energy.usef.core.data.xml.bean.message.MessageMetadata;
 import energy.usef.core.data.xml.bean.message.PTUSettlement;
 import energy.usef.core.data.xml.bean.message.SettlementMessage;
 import energy.usef.core.data.xml.bean.message.USEFRole;
 import energy.usef.core.model.DocumentStatus;
+import energy.usef.core.model.DocumentType;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
 import energy.usef.core.service.business.SequenceGeneratorService;
 import energy.usef.core.service.helper.JMSHelperService;
@@ -58,8 +69,11 @@ import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 /**
  * This coordinator class is in charge of the workflow sending Settlement messages to aggregators.
  */
-@Stateless
+@Singleton
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class DsoSendSettlementMessagesCoordinator {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DsoSendSettlementMessagesCoordinator.class);
 
     @Inject
     private Config config;
@@ -75,6 +89,25 @@ public class DsoSendSettlementMessagesCoordinator {
     private CoreSettlementBusinessService coreSettlementBusinessService;
     @Inject
     private SequenceGeneratorService sequenceGeneratorService;
+    @Inject
+    private Event<SendSettlementMessageEvent> sendSettlementMessageEventManager;
+
+    @Asynchronous
+    @Lock(LockType.WRITE)
+    public void isReadyToSendSettlementMessage(
+            @Observes(during = TransactionPhase.AFTER_COMPLETION) CheckInitiateSettlementDoneEvent event) {
+        LOGGER.debug(USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT, event);
+
+        LocalDate period = new LocalDate(event.getYear(), event.getMonth(), 1);
+        boolean isNotProcessed =
+                corePlanboardBusinessService
+                        .findPlanboardMessages(DocumentType.FLEX_ORDER_SETTLEMENT, period, period.plusMonths(1).minusDays(1), null)
+                        .size() == 0;
+        if (isNotProcessed && coreSettlementBusinessService.isEachFlexOrderReadyForSettlement(event.getYear(), event.getMonth())) {
+            sendSettlementMessageEventManager.fire(new SendSettlementMessageEvent(event.getYear(), event.getMonth()));
+        }
+        LOGGER.debug(USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
+    }
 
     /**
      * This method starts the workflow when triggered by an event.
@@ -82,6 +115,8 @@ public class DsoSendSettlementMessagesCoordinator {
      * @param event {@link SendSettlementMessageEvent} event which starts the workflow.
      */
     public void invokeWorkflow(@Observes SendSettlementMessageEvent event) {
+        LOGGER.debug(USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT, event);
+
         LocalDate dateFrom = new LocalDate(event.getYear(), event.getMonth(), 1);
         LocalDate dateUntil = dateFrom.plus(Months.ONE).minusDays(1);
 
@@ -104,6 +139,7 @@ public class DsoSendSettlementMessagesCoordinator {
             storeSettlementMessage(aggregator, flexOrderSettlementPerAggregator.get(aggregator));
             jmsHelperService.sendMessageToOutQueue(XMLUtil.messageObjectToXml(settlementMessage));
         }
+        LOGGER.debug(USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }
 
     private SettlementMessage buildSettlementMessage(List<energy.usef.core.model.FlexOrderSettlement> flexOrderSettlements,
@@ -150,16 +186,21 @@ public class DsoSendSettlementMessagesCoordinator {
 
         FlexOrderSettlement defaultFlexOrderSettlement = new FlexOrderSettlement();
         defaultFlexOrderSettlement.setPeriod(dateFrom);
-        defaultFlexOrderSettlement.setOrderReference(DsoDefaultSettlementMessageContent.ORDER_SETTLEMENT_ORDER_REFERENCE.getValue());
+        defaultFlexOrderSettlement
+                .setOrderReference(DsoDefaultSettlementMessageContent.ORDER_SETTLEMENT_ORDER_REFERENCE.getValue());
         settlementMessage.getFlexOrderSettlement().add(defaultFlexOrderSettlement);
 
         PTUSettlement defaultPtuSettlement = new PTUSettlement();
-        defaultPtuSettlement.setActualPower(new BigInteger(DsoDefaultSettlementMessageContent.PTU_SETTLEMENT_ACTUAL_POWER.getValue()));
+        defaultPtuSettlement
+                .setActualPower(new BigInteger(DsoDefaultSettlementMessageContent.PTU_SETTLEMENT_ACTUAL_POWER.getValue()));
         defaultPtuSettlement.setDeliveredFlexPower(new BigInteger(
                 DsoDefaultSettlementMessageContent.PTU_SETTLEMENT_DELIVERED_FLEX_POWER.getValue()));
-        defaultPtuSettlement.setNetSettlement(new BigDecimal(DsoDefaultSettlementMessageContent.PTU_SETTLEMENT_NET_SETTLEMENT.getValue()));
-        defaultPtuSettlement.setOrderedFlexPower(new BigInteger(DsoDefaultSettlementMessageContent.PTU_SETTLEMENT_ORDERED_FLEX_POWER.getValue()));
-        defaultPtuSettlement.setPrognosisPower(new BigInteger(DsoDefaultSettlementMessageContent.PTU_SETTLEMENT_PROGNOSIS_POWER.getValue()));
+        defaultPtuSettlement
+                .setNetSettlement(new BigDecimal(DsoDefaultSettlementMessageContent.PTU_SETTLEMENT_NET_SETTLEMENT.getValue()));
+        defaultPtuSettlement.setOrderedFlexPower(
+                new BigInteger(DsoDefaultSettlementMessageContent.PTU_SETTLEMENT_ORDERED_FLEX_POWER.getValue()));
+        defaultPtuSettlement
+                .setPrognosisPower(new BigInteger(DsoDefaultSettlementMessageContent.PTU_SETTLEMENT_PROGNOSIS_POWER.getValue()));
         defaultPtuSettlement.setPrice(new BigDecimal(DsoDefaultSettlementMessageContent.PTU_SETTLEMENT_PRICE.getValue()));
         defaultPtuSettlement.setStart(new BigInteger(DsoDefaultSettlementMessageContent.PTU_SETTLEMENT_START.getValue()));
         defaultFlexOrderSettlement.getPTUSettlement().add(defaultPtuSettlement);

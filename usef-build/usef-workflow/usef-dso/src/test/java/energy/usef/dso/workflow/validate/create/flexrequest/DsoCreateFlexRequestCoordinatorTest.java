@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import static energy.usef.dso.workflow.DsoWorkflowStep.DSO_CREATE_FLEX_REQUEST;
 
 import energy.usef.core.config.Config;
 import energy.usef.core.data.xml.bean.message.FlexRequest;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.CongestionPointConnectionGroup;
 import energy.usef.core.model.DispositionAvailableRequested;
 import energy.usef.core.model.DocumentStatus;
@@ -80,6 +82,8 @@ public class DsoCreateFlexRequestCoordinatorTest {
     private ConfigDso configDso;
     @Mock
     private JMSHelperService jmsHelperService;
+    @Mock
+    private EventValidationService eventValidationService;
 
     private SequenceGeneratorService sequenceGeneratorService;
 
@@ -96,6 +100,7 @@ public class DsoCreateFlexRequestCoordinatorTest {
         Whitebox.setInternalState(coordinator, configDso);
         Whitebox.setInternalState(coordinator, jmsHelperService);
         Whitebox.setInternalState(coordinator, sequenceGeneratorService);
+        Whitebox.setInternalState(coordinator, eventValidationService);
 
         PowerMockito.when(workflowStubLoader.invoke(Mockito.eq(DSO_CREATE_FLEX_REQUEST.name()),
                 Mockito.any(WorkflowContext.class)))
@@ -114,7 +119,7 @@ public class DsoCreateFlexRequestCoordinatorTest {
     }
 
     @Test
-    public void testInvokeWorkflow() {
+    public void testInvokeWorkflow() throws BusinessValidationException {
         ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
         coordinator.createFlexRequests(new CreateFlexRequestEvent(CONGESTION_POINT_ENTITY_ADDRESS, PTU_DATE, new Integer[] {}));
         Mockito.verify(planboardBusinessService, Mockito.times(1))
@@ -136,21 +141,9 @@ public class DsoCreateFlexRequestCoordinatorTest {
     }
 
     @Test
-    public void testInvokeWorkflowExpired() {
-        ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
+    public void testInvokeWorkflowExpired() throws BusinessValidationException {
         coordinator.createFlexRequests(new CreateFlexRequestEvent(CONGESTION_POINT_ENTITY_ADDRESS, EXPIRED_PTU_DATE, new Integer[] {}));
-        Mockito.verify(planboardBusinessService, Mockito.times(0))
-                .findLatestGridSafetyAnalysisWithDispositionRequested(Matchers.eq(CONGESTION_POINT_ENTITY_ADDRESS),
-                        Matchers.eq(EXPIRED_PTU_DATE));
-        Mockito.verify(workflowStubLoader, Mockito.times(0)).invoke(Mockito.eq(DSO_CREATE_FLEX_REQUEST.name()),
-                Mockito.any(WorkflowContext.class));
-        Mockito.verify(planboardBusinessService, Mockito.times(0))
-                .getAggregatorsByCongestionPointAddress(Matchers.any(String.class), Matchers.any(LocalDate.class));
-
-        Mockito.verify(jmsHelperService, Mockito.times(0)).sendMessageToOutQueue(messageCaptor.capture());
-        Mockito.verify(corePlanboardBusinessService, Mockito.times(0))
-                .storeFlexRequest(Mockito.anyString(), Matchers.any(FlexRequest.class), Matchers.eq(DocumentStatus.SENT),
-                        Matchers.anyString());
+        Mockito.verify(eventValidationService, Mockito.times(1));
     }
 
     private List<GridSafetyAnalysis> buildGridSafetyAnalysis() {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,15 @@
 
 package energy.usef.dso.service.business;
 
-        import javax.inject.Inject;
-        import javax.transaction.Transactional;
+import energy.usef.dso.repository.GridSafetyAnalysisRepository;
+import energy.usef.dso.repository.NonAggregatorForecastRepository;
+import energy.usef.dso.repository.PrognosisUpdateDeviationRepository;
+import energy.usef.dso.repository.PtuGridMonitorRepository;
+import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-        import org.joda.time.LocalDate;
-        import org.slf4j.Logger;
-        import org.slf4j.LoggerFactory;
-
-        import energy.usef.core.service.business.PlanboardHousekeepingBusinessService;
-        import energy.usef.core.service.business.TransportHousekeepingBusinessService;
-        import energy.usef.dso.repository.GridSafetyAnalysisRepository;
-        import energy.usef.dso.repository.NonAggregatorForecastRepository;
-        import energy.usef.dso.repository.PrognosisUpdateDeviationRepository;
-        import energy.usef.dso.repository.PtuGridMonitorRepository;
+import javax.inject.Inject;
 
 /**
  * Service class in charge of housekeeping operations for the Distribution System Operator.

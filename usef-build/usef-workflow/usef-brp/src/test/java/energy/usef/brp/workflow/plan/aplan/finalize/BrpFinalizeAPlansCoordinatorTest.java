@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package energy.usef.brp.workflow.plan.aplan.finalize;
 
 import energy.usef.brp.service.business.BrpPlanboardBusinessService;
 
+import energy.usef.core.event.validation.EventValidationService;
 import org.joda.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,12 +38,16 @@ public class BrpFinalizeAPlansCoordinatorTest {
     @Mock
     private BrpPlanboardBusinessService brpPlanboardBusinessService;
 
+    @Mock
+    private EventValidationService eventValidationService;
+
     private BrpFinalizeAPlansCoordinator coordinator;
 
     @Before
     public void init() throws Exception {
         coordinator = new BrpFinalizeAPlansCoordinator();
         Whitebox.setInternalState(coordinator, brpPlanboardBusinessService);
+        Whitebox.setInternalState(coordinator, eventValidationService);
     }
 
     @Test

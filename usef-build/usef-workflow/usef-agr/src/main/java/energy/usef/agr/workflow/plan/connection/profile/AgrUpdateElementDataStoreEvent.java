@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 package energy.usef.agr.workflow.plan.connection.profile;
 
+import energy.usef.core.event.ExpirableEvent;
 import org.joda.time.LocalDate;
 
 /**
  * Event to trigger the workflow to update the element data store.
  */
-public class AgrUpdateElementDataStoreEvent {
+public class AgrUpdateElementDataStoreEvent implements ExpirableEvent {
 
     private LocalDate period;
 

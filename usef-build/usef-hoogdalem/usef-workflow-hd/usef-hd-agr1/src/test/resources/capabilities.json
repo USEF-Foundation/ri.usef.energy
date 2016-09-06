@@ -1,0 +1,16 @@
+{
+  "BATTERY_ZIH":
+  {
+    "capabilities":
+    [
+      { "type": "ShiftCapability", "id": null}
+    ]
+  }
+  ,"BATTERY_NOD":
+  {
+    "capabilities":
+    [
+      { "type": "ShiftCapability", "id": null}
+    ]
+  }
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,6 @@ package energy.usef.agr.repository;
 
 import static org.powermock.reflect.Whitebox.setInternalState;
 
-import energy.usef.agr.model.Udi;
-import energy.usef.core.model.Connection;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +28,10 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
 import org.joda.time.LocalDate;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
+
+import energy.usef.agr.model.Udi;
+import energy.usef.core.model.Connection;
 
 /**
  * Test class in charge of the unit tests related to the {@link UdiRepository} class.
@@ -76,13 +72,14 @@ public class UdiRepositoryTest {
 
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
     }
 
-
-    @Test
-    public void testFindUdiByConnection() throws Exception {
-        List<Udi> udiByConnection = repository.findUdiByConnection("ean.673685900012623654");
-        Assert.assertEquals(2, udiByConnection.size());
+    @After
+    public void after() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     @Test
@@ -98,7 +95,7 @@ public class UdiRepositoryTest {
 
     @Test
     public void testFindActiveUdisWithoutResults() {
-        final LocalDate period = new LocalDate(2015, 1, 19);
+        final LocalDate period = new LocalDate(2015, 1, 18);
         Map<String, Udi> activeUdis = repository.findActiveUdisMappedPerEndpoint(period);
         Assert.assertNotNull(activeUdis);
         Assert.assertEquals(0, activeUdis.size());
@@ -106,7 +103,8 @@ public class UdiRepositoryTest {
 
     @Test
     public void testFindByEndpoint() {
-        Udi udi = repository.findByEndpoint("ean.12168590001263699.UDI");
+        final LocalDate period = new LocalDate(2015, 1, 20);
+        Udi udi = repository.findByEndpoint("ean.12168590001263699.UDI", period);
         Assert.assertNotNull(udi);
         Assert.assertEquals(1, udi.getId().intValue());
         Assert.assertEquals(1, udi.getDtuSize().intValue());
@@ -140,4 +138,10 @@ public class UdiRepositoryTest {
         Assert.assertEquals(1, udisPerConnection.size());
     }
 
+    @Test
+    public void testCleanup() {
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("2015-11-30")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("2015-11-30")));
+    }
 }

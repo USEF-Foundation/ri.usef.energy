@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,15 @@
 
 package energy.usef.core.service.business;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.fail;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.participant.Participant;
 import energy.usef.core.data.participant.ParticipantRole;
 import energy.usef.core.data.participant.ParticipantType;
-import energy.usef.core.data.xml.bean.message.Message;
-import energy.usef.core.data.xml.bean.message.MessageMetadata;
-import energy.usef.core.data.xml.bean.message.SignedMessage;
-import energy.usef.core.data.xml.bean.message.TestMessage;
-import energy.usef.core.data.xml.bean.message.USEFRole;
+import energy.usef.core.data.xml.bean.message.*;
 import energy.usef.core.exception.BusinessException;
 import energy.usef.core.service.business.error.ParticipantDiscoveryError;
-
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
@@ -54,6 +39,14 @@ import org.xbill.DNS.Resolver;
 import org.xbill.DNS.Section;
 import org.xbill.DNS.TXTRecord;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.Assert.*;
+
 /**
  * This test class verifies that the {@link ParticipantDiscoveryService} class works properly.
  */
@@ -62,10 +55,10 @@ public class ParticipantDiscoveryServiceTest {
 
     private static final String MISSING_DOMAIN = "not-existing.usef-example.com";
     private static final String SENDER_DOMAIN = "usef-example.com";
-    private static final String agrKey = "nHKbxKyPW3IPVecs/ycGe+3j3K91RaRROr0EhdSZKNo=";
-    private static final String dsoKey = "82IDHPcYSl4s0S/8d9+4umtPlN+m9ouPZN+T8hTr0ZQ=";
+    private static final String UNSEALING_KEY = "cs1.nHKbxKyPW3IPVecs/ycGe+3j3K91RaRROr0EhdSZKNo=";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ParticipantDiscoveryServiceTest.class);
+    public static final String USEF_EXAMPLE_COM_ENDPOINT = "http://usef-example.com/USEF/2015/SignedMessage";
 
     @Mock
     private ParticipantListBuilder listBuilder;
@@ -85,10 +78,6 @@ public class ParticipantDiscoveryServiceTest {
         Whitebox.setInternalState(service, "config", config);
         Whitebox.setInternalState(service, "resolver", resolver);
 
-        org.xbill.DNS.Message responseMessage = new org.xbill.DNS.Message();
-        responseMessage.addRecord(new TXTRecord(new Name("@."), 0, 100L, "2014:I"), Section.ANSWER);
-
-        Mockito.when(resolver.send(Matchers.any(org.xbill.DNS.Message.class))).thenReturn(responseMessage);
         Mockito.when(config.getBooleanProperty(ConfigParam.BYPASS_DNS_VERIFICATION)).thenReturn(true);
 
         Mockito.when(listBuilder.buildParticipantList(Matchers.anyString()))
@@ -125,9 +114,19 @@ public class ParticipantDiscoveryServiceTest {
         try {
             Participant participant = service.discoverParticipant(buildIncomingMessage(SENDER_DOMAIN, USEFRole.AGR),
                     ParticipantType.SENDER);
-            assertEquals("usef-example.com", participant.getDomainName());
+            assertNotNull(participant);
+            assertEquals("Domain", "usef-example.com", participant.getDomainName());
+            assertEquals("Role", USEFRole.AGR, participant.getUsefRole());
+            assertEquals("Version", "2015", participant.getSpecVersion());
+            assertEquals("Endpoint", USEF_EXAMPLE_COM_ENDPOINT, participant.getUrl());
+            assertEquals("Unsealing key", UNSEALING_KEY, participant.getPublicKeys().get(0));
+
+
             assertEquals(USEFRole.AGR, participant.getRoles().get(0).getUsefRole());
-            assertEquals("http://usef-example.com", participant.getRoles().get(0).getUrl());
+            assertEquals(USEF_EXAMPLE_COM_ENDPOINT, participant.getRoles().get(0).getUrl());
+
+
+
         } catch (BusinessException e) {
             LOGGER.error("Exception has been caught during the execution of the test.", e);
             fail("Test should not have resulted in the following exception: "
@@ -152,9 +151,16 @@ public class ParticipantDiscoveryServiceTest {
     }
 
     @Test
-    public void testFindUnsealingPublicKeySucceeds() throws BusinessException {
-        String actualKey = service.findUnsealingPublicKey(buildSignedMessage(SENDER_DOMAIN, USEFRole.AGR));
-        assertEquals("Public key mismatch.", agrKey, actualKey);
+    public void testFindUnsealingPublicKey() throws BusinessException, IOException {
+        org.xbill.DNS.Message responseMessage = new org.xbill.DNS.Message();
+        responseMessage.addRecord(new TXTRecord(new Name("@."), 0, 100L, UNSEALING_KEY), Section.ANSWER);
+        Mockito.when(resolver.send(Matchers.any(org.xbill.DNS.Message.class))).thenReturn(responseMessage);
+
+        assertEquals("Public key mismatch.", UNSEALING_KEY, service.getPublicUnsealingKey(SENDER_DOMAIN, USEFRole.AGR));
+        assertEquals("Public key mismatch.", UNSEALING_KEY, service.getPublicUnsealingKey(SENDER_DOMAIN, USEFRole.BRP));
+        assertEquals("Public key mismatch.", UNSEALING_KEY, service.getPublicUnsealingKey(SENDER_DOMAIN, USEFRole.CRO));
+        assertEquals("Public key mismatch.", UNSEALING_KEY, service.getPublicUnsealingKey(SENDER_DOMAIN, USEFRole.DSO));
+        assertEquals("Public key mismatch.", UNSEALING_KEY, service.getPublicUnsealingKey(SENDER_DOMAIN, USEFRole.MDC));
     }
 
     @Test
@@ -164,36 +170,12 @@ public class ParticipantDiscoveryServiceTest {
     }
 
     @Test
-    public void testGetUsefKeySucceeds() throws BusinessException, IOException {
+    public void testGetUsefVersionSucceeds() throws BusinessException, IOException {
+        org.xbill.DNS.Message responseMessage = new org.xbill.DNS.Message();
+        responseMessage.addRecord(new TXTRecord(new Name("@."), 0, 100L, "2015"), Section.ANSWER);
+        Mockito.when(resolver.send(Matchers.any(org.xbill.DNS.Message.class))).thenReturn(responseMessage);
 
-        // This is actually an integration test
-        String address = service.getUsefText(SENDER_DOMAIN, null);
-        assertEquals("2014:I", address);
-    }
-
-    @Ignore
-    // No longer works because all roles are now in DNS
-    public void testGetUsefTextFails() throws BusinessException {
-        String text = service.getUsefText(SENDER_DOMAIN, USEFRole.CRO);
-        assertNull(text);
-    }
-
-    // should be mocked or something (dependent on external configuration)
-    @Ignore
-    public void testGetUsefKey1Succeeds() throws BusinessException {
-        // This is actually an integration test
-        String key = service.getUsefText(SENDER_DOMAIN, USEFRole.AGR);
-
-        assertEquals("cs1." + agrKey, key);
-    }
-
-    // should be mocked or something (dependent on external configuration)
-    @Ignore
-    public void testGetUsefKey2Succeeds() throws BusinessException {
-        // This is actually an integration test
-        String key = service.getUsefText(SENDER_DOMAIN, USEFRole.DSO);
-
-        assertEquals("cs1." + dsoKey, key);
+        assertEquals("2015", service.getUsefVersion(SENDER_DOMAIN));
     }
 
     private Message buildIncomingMessage(String senderDomain, USEFRole senderRole) {
@@ -216,11 +198,13 @@ public class ParticipantDiscoveryServiceTest {
     private List<Participant> buildParticipantList() {
         Participant participant = new Participant();
         participant.setDomainName(SENDER_DOMAIN);
-        participant.setSpecVersion("2014:I");
+        participant.setSpecVersion("2015");
+        participant.setPublicKeys(Arrays.asList(UNSEALING_KEY, "KEY2"));
+        participant.setUrl(USEF_EXAMPLE_COM_ENDPOINT);
 
         ParticipantRole role = new ParticipantRole(USEFRole.AGR);
-        role.setUrl("http://" + SENDER_DOMAIN);
-        role.setPublicKeys(Arrays.asList("cs1." + agrKey, "KEY2"));
+        role.setUrl(USEF_EXAMPLE_COM_ENDPOINT);
+        role.setPublicKeys(Arrays.asList( UNSEALING_KEY, "KEY2"));
 
         participant.setRoles(Collections.singletonList(role));
         return Collections.singletonList(participant);

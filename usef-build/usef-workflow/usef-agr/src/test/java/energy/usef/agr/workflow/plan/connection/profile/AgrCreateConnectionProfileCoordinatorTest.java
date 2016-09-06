@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import energy.usef.agr.service.business.AgrPortfolioBusinessService;
 import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.workflow.DefaultWorkflowContext;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.exception.WorkflowException;
@@ -68,6 +70,8 @@ public class AgrCreateConnectionProfileCoordinatorTest {
     private WorkflowStepExecuter workflowStepExecuter;
     @Mock
     private Event<CreateUdiEvent> createUdiEventManager;
+    @Mock
+    private EventValidationService eventValidationService;
 
     private AgrCreateConnectionProfileCoordinator coordinator;
 
@@ -80,12 +84,13 @@ public class AgrCreateConnectionProfileCoordinatorTest {
         Whitebox.setInternalState(coordinator, agrElementBusinessService);
         Whitebox.setInternalState(coordinator, workflowStepExecuter);
         Whitebox.setInternalState(coordinator, createUdiEventManager);
+        Whitebox.setInternalState(coordinator, eventValidationService);
         Mockito.when(configAgr.getBooleanProperty(ConfigAgrParam.AGR_IS_NON_UDI_AGGREGATOR)).thenReturn(false);
 
     }
 
     @Test
-    public void testCreateConnectionProfileHappyFlow() {
+    public void testCreateConnectionProfileHappyFlow() throws BusinessValidationException {
         // mocking and variables
         final LocalDate initializationDate = new LocalDate(2015, 8, 21);
         mockAgrPortfolioBusinessService();
@@ -108,7 +113,7 @@ public class AgrCreateConnectionProfileCoordinatorTest {
     }
 
     @Test
-    public void testCreateConnectionProfileWithNoConnections() {
+    public void testCreateConnectionProfileWithNoConnections() throws BusinessValidationException {
         // mocking and variables
         final LocalDate initializationDate = new LocalDate(2015, 8, 21);
         mockAgrPortfolioBusinessServiceWithNoConnections();
@@ -130,7 +135,7 @@ public class AgrCreateConnectionProfileCoordinatorTest {
     }
 
     @Test
-    public void testCreateConnectionProfileWithWrongPBCOutcome() {
+    public void testCreateConnectionProfileWithWrongPBCOutcome() throws BusinessValidationException {
         // mocking and variables
         final LocalDate initializationDate = new LocalDate(2015, 8, 21);
         mockAgrPortfolioBusinessService();

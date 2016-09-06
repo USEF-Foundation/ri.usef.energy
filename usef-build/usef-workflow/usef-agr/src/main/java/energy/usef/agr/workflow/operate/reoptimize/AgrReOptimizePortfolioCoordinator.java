@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,8 @@ import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.event.BackToPlanEvent;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.AcknowledgementStatus;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
@@ -107,11 +109,15 @@ public class AgrReOptimizePortfolioCoordinator {
 
     @Inject
     private Config config;
+
     @Inject
     private ConfigAgr configAgr;
 
     @Inject
     private ReOptimizeFlagHolder reOptimizeFlagHolder;
+
+    @Inject
+    private EventValidationService eventValidationService;
 
     /**
      * The {@link ReOptimizePortfolioEvent} is handled here and used in the other parts of the application.
@@ -119,12 +125,13 @@ public class AgrReOptimizePortfolioCoordinator {
      * @param event the {@link ReOptimizePortfolioEvent} triggering the process.
      */
     @Asynchronous
-    public void trigger(@Observes(during = TransactionPhase.AFTER_COMPLETION) ReOptimizePortfolioEvent event) {
+    public void trigger(@Observes(during = TransactionPhase.AFTER_COMPLETION) ReOptimizePortfolioEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
-        if (reOptimizeFlagHolder.isRunning(event.getPtuDate())) {
-            reOptimizeFlagHolder.setToBeReoptimized(event.getPtuDate(), true);
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
+        if (reOptimizeFlagHolder.isRunning(event.getPeriod())) {
+            reOptimizeFlagHolder.setToBeReoptimized(event.getPeriod(), true);
         } else {
-            executeReOptimizePortfolioEventEventManager.fire(new ExecuteReOptimizePortfolioEvent(event.getPtuDate()));
+            executeReOptimizePortfolioEventEventManager.fire(new ExecuteReOptimizePortfolioEvent(event.getPeriod()));
         }
         LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }

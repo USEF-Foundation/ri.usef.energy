@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -195,7 +195,10 @@ public class DsoOperateCoordinator {
     private WorkflowContext invokeMonitorGridPbc(LocalDateTime currentDateTime, int currentPtuIndex,
             CongestionPointConnectionGroup congestionPoint, Long sumOfPower) {
         WorkflowContext contextIn = new DefaultWorkflowContext();
-        contextIn.setValue(CONGESTION_POINT_ENTITY_ADDRESS.name(), congestionPoint.getUsefIdentifier());
+        int ptuDuration = config.getIntegerProperty(ConfigParam.PTU_DURATION);
+
+        contextIn.setValue(DsoMonitorGridStepParameter.IN.PTU_DURATION.name(), ptuDuration);
+        contextIn.setValue(DsoMonitorGridStepParameter.IN.CONGESTION_POINT_ENTITY_ADDRESS.name(), congestionPoint.getUsefIdentifier());
         contextIn.setValue(DsoMonitorGridStepParameter.IN.LIMITED_POWER.name(), sumOfPower);
         Long numConnections = dsoPlanboardBusinessService.findConnectionCountByUsefIdentifier(congestionPoint.getUsefIdentifier());
         contextIn.setValue(DsoMonitorGridStepParameter.IN.NUM_CONNECTIONS.name(), numConnections);
@@ -283,6 +286,9 @@ public class DsoOperateCoordinator {
     private List<FlexOfferDto> invokePlaceOperateFlexOrdersPbc(GridSafetyAnalysisDto gridSafetyAnalysisDto,
             List<FlexOfferDto> offerDtos) {
         WorkflowContext inContext = new DefaultWorkflowContext();
+        int ptuDuration = config.getIntegerProperty(ConfigParam.PTU_DURATION);
+
+        inContext.setValue(PlaceOperateFlexOrdersStepParameter.IN.PTU_DURATION.name(), ptuDuration);
         inContext.setValue(PlaceOperateFlexOrdersStepParameter.IN.FLEX_OFFER_DTO_LIST.name(), offerDtos);
         inContext.setValue(PlaceOperateFlexOrdersStepParameter.IN.GRID_SAFETY_ANALYSIS_DTO.name(), gridSafetyAnalysisDto);
 
@@ -295,6 +301,9 @@ public class DsoOperateCoordinator {
 
     private long invokeLimitedConnectionsPBC(String usefIdentifier, LocalDate ptuDate, int ptuIndex) {
         WorkflowContext workflowContext = new DefaultWorkflowContext();
+        int ptuDuration = config.getIntegerProperty(ConfigParam.PTU_DURATION);
+
+        workflowContext.setValue(DsoLimitConnectionsStepParameter.IN.PTU_DURATION.name(), ptuDuration);
         workflowContext.setValue(DsoLimitConnectionsStepParameter.IN.CONGESTION_POINT_ENTITY_ADDRESS.name(), usefIdentifier);
         workflowContext.setValue(DsoLimitConnectionsStepParameter.IN.PERIOD.name(), ptuDate);
         workflowContext.setValue(DsoLimitConnectionsStepParameter.IN.PTU_INDEX.name(), ptuIndex);
@@ -305,6 +314,9 @@ public class DsoOperateCoordinator {
 
     private void invokeRestoreLimitedConnectionsPBC(String usefIdentifier, LocalDate ptuDate, int ptuIndex) {
         WorkflowContext workflowContext = new DefaultWorkflowContext();
+        int ptuDuration = config.getIntegerProperty(ConfigParam.PTU_DURATION);
+
+        workflowContext.setValue(RestoreConnectionsStepParameter.IN.PTU_DURATION.name(), ptuDuration);
         workflowContext.setValue(RestoreConnectionsStepParameter.IN.CONGESTION_POINT_ENTITY_ADDRESS.name(), usefIdentifier);
         workflowContext.setValue(RestoreConnectionsStepParameter.IN.PERIOD.name(), ptuDate);
         workflowContext.setValue(RestoreConnectionsStepParameter.IN.PTU_INDEX.name(), ptuIndex);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_H
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 
 import energy.usef.agr.workflow.plan.create.aplan.CreateAPlanEvent;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
 import energy.usef.core.model.PlanboardMessage;
@@ -56,6 +58,9 @@ public class AgrReCreateAPlanCoordinator {
     @Inject
     private CorePlanboardBusinessService corePlanboardBusinessService;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
     /**
      * Handles a {@link ReCreateAPlanEvent}.
      * <p>
@@ -66,8 +71,9 @@ public class AgrReCreateAPlanCoordinator {
      */
     @Asynchronous
     @Lock(LockType.WRITE)
-    public void handleEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) ReCreateAPlanEvent event) {
+    public void handleEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) ReCreateAPlanEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
 
         invokeCreateAPlanEvent(event.getPeriod());
 

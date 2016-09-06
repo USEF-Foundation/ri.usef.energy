@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ejb.Asynchronous;
@@ -38,6 +37,8 @@ import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -113,6 +114,9 @@ public class DsoGridSafetyAnalysisCoordinator {
     @Inject
     private Event<ColoringProcessEvent> coloringEventManager;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
     /**
      * This method handles the GridSafetyAnalysisEvent. This Event creates GridSafetyAnalysis / CongestionPoint.
      *
@@ -120,40 +124,41 @@ public class DsoGridSafetyAnalysisCoordinator {
      */
 
     @Asynchronous
-    public void startGridSafetyAnalysis(@Observes(during = TransactionPhase.AFTER_COMPLETION) GridSafetyAnalysisEvent event) {
+    public void startGridSafetyAnalysis(@Observes(during = TransactionPhase.AFTER_COMPLETION) GridSafetyAnalysisEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
+
         String entityAddress = event.getCongestionPointEntityAddress();
-        LocalDate period = event.getAnalysisDay();
+        LocalDate period = event.getPeriod();
 
-        if (isEventAllowed(event)) {
-            // PrognosisDto List, one for each participant
-            List<PtuPrognosis> prognosisList = findLastPrognoses(period, entityAddress);
-            WorkflowContext inContext = prepareInContext(event, prognosisList);
-            Long timeout = configDso.getLongProperty(ConfigDsoParam.DSO_GRID_SAFETY_ANALYSIS_EXPIRATION_IN_MINUTES);
+        // PrognosisDto List, one for each participant
+        List<PtuPrognosis> prognosisList = findLastPrognoses(period, entityAddress);
+        WorkflowContext inContext = prepareInContext(event, prognosisList);
+        Long timeout = configDso.getLongProperty(ConfigDsoParam.DSO_GRID_SAFETY_ANALYSIS_EXPIRATION_IN_MINUTES);
 
-            CompletableFuture<WorkflowContext> completableFuture = CompletableFuture
-                    .supplyAsync(() -> callPluggableBusinessComponent(inContext));
+        CompletableFuture<WorkflowContext> completableFuture = CompletableFuture
+                .supplyAsync(() -> callPluggableBusinessComponent(inContext));
 
-            if (timeout != null && timeout > 0) {
-                completableFuture = concurrentUtil.within(completableFuture, Duration.ofMinutes(timeout),
-                        String.format("Grid Safety Analysis for %s on %s timed out after ",
-                                entityAddress, period.toString("yyyy-MM-dd")));
-            }
-
-            completableFuture.whenCompleteAsync((result, throwable) -> {
-                LOGGER.info("Processing Grid Gafety Analysis for {}", result.getValue(IN.CONGESTION_POINT_ENTITY_ADDRESS.name()));
-                WorkflowUtil
-                        .validateContext(DSO_CREATE_GRID_SAFETY_ANALYSIS.name(), result, CreateGridSafetyAnalysisStepParameter.OUT
-                                .values());
-                GridSafetyAnalysisDto dto = result
-                        .get(CreateGridSafetyAnalysisStepParameter.OUT.GRID_SAFETY_ANALYSIS.name(), GridSafetyAnalysisDto.class);
-
-                storeGridSafetyEventManager.fire(new StoreGridSafetyAnalysisEvent(entityAddress, period, dto));
-            }).exceptionally(throwable -> {
-                LOGGER.error(throwable.getMessage());
-                return null;
-            });
+        if (timeout != null && timeout > 0) {
+            completableFuture = concurrentUtil.within(completableFuture, Duration.ofMinutes(timeout),
+                    String.format("Grid Safety Analysis for %s on %s timed out after ",
+                            entityAddress, period.toString("yyyy-MM-dd")));
         }
+
+        completableFuture.whenCompleteAsync((result, throwable) -> {
+            LOGGER.info("Processing Grid Gafety Analysis for {}", result.getValue(IN.CONGESTION_POINT_ENTITY_ADDRESS.name()));
+            WorkflowUtil
+                    .validateContext(DSO_CREATE_GRID_SAFETY_ANALYSIS.name(), result, CreateGridSafetyAnalysisStepParameter.OUT
+                            .values());
+            GridSafetyAnalysisDto dto = result
+                    .get(CreateGridSafetyAnalysisStepParameter.OUT.GRID_SAFETY_ANALYSIS.name(), GridSafetyAnalysisDto.class);
+
+            storeGridSafetyEventManager.fire(new StoreGridSafetyAnalysisEvent(entityAddress, period, dto));
+        }).exceptionally(throwable -> {
+            LOGGER.error(throwable.getMessage());
+            return null;
+        });
+
         LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }
 
@@ -169,8 +174,9 @@ public class DsoGridSafetyAnalysisCoordinator {
      * @param event
      */
     @Asynchronous
-    public void saveAndProcessGridSafetyAnalysis(@Observes StoreGridSafetyAnalysisEvent event) {
-        LocalDate period = event.getAnalysisDay();
+    public void saveAndProcessGridSafetyAnalysis(@Observes StoreGridSafetyAnalysisEvent event) throws BusinessValidationException {
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
+        LocalDate period = event.getPeriod();
         String entityAddress = event.getCongestionPointEntityAddress();
         List<PtuPrognosis> lastPrognosisList = findLastPrognoses(period, entityAddress);
 
@@ -191,18 +197,16 @@ public class DsoGridSafetyAnalysisCoordinator {
         ConnectionGroup connectionGroup = corePlanboardBusinessService.findConnectionGroup(entityAddress);
         Map<Integer, PtuContainer> ptuContainers = dsoPlanboardBusinessService.findPTUContainersForPeriod(period);
 
-        Map<Integer, GridSafetyAnalysis> previousGridSafetyAnalysis = dsoPlanboardBusinessService.findGridSafetyAnalysis(
-                entityAddress, period)
-                .stream()
-                .collect(Collectors.toMap(gsa -> gsa.getPtuContainer().getPtuIndex(), Function.identity()));
+        int numberOfRowsDeleted = dsoPlanboardBusinessService.deletePreviousGridSafetyAnalysis(entityAddress, period);
+        LOGGER.debug("Number of previous GSA records deleted {}",numberOfRowsDeleted);
+
         int currentPtuIndex = PtuUtil.getPtuIndex(DateTimeUtil.getCurrentDateTime(),
                 config.getIntegerProperty(ConfigParam.PTU_DURATION));
         LocalDate today = DateTimeUtil.getCurrentDate();
-        boolean noPreviousGridSafetyAnalysis = previousGridSafetyAnalysis.isEmpty();
         boolean futurePeriod = period.isAfter(today);
 
         int startPtu;
-        if (noPreviousGridSafetyAnalysis || futurePeriod) {
+        if (futurePeriod) {
             startPtu = 1;
         } else {
             startPtu = currentPtuIndex;
@@ -212,21 +216,10 @@ public class DsoGridSafetyAnalysisCoordinator {
         for (int ptuIndex = startPtu; ptuIndex <= gridSafetyAnalysisDto.getPtus().size(); ptuIndex++) {
             PtuGridSafetyAnalysisDto ptuGridSafetyAnalysisDto = gridSafetyAnalysisDto.getPtus().get(ptuIndex - 1);
             GridSafetyAnalysis gridSafetyAnalysis;
-            if (noPreviousGridSafetyAnalysis) {
-                gridSafetyAnalysis = createGridSafetyAnalysis(sequence, prognosisByPtuIndex, connectionGroup, ptuContainers,
-                        ptuGridSafetyAnalysisDto);
+            gridSafetyAnalysis = createGridSafetyAnalysis(sequence, prognosisByPtuIndex, connectionGroup, ptuContainers,
+                    ptuGridSafetyAnalysisDto);
 
-                dsoPlanboardBusinessService.storeGridSafetyAnalysis(gridSafetyAnalysis);
-            } else {
-                gridSafetyAnalysis = previousGridSafetyAnalysis.get(ptuGridSafetyAnalysisDto.getPtuIndex());
-                if (DispositionTypeDto.AVAILABLE.equals(ptuGridSafetyAnalysisDto.getDisposition())) {
-                    gridSafetyAnalysis.setDisposition(DispositionAvailableRequested.AVAILABLE);
-                } else {
-                    gridSafetyAnalysis.setDisposition(DispositionAvailableRequested.REQUESTED);
-                }
-                gridSafetyAnalysis.setPower(ptuGridSafetyAnalysisDto.getPower());
-                gridSafetyAnalysis.setPrognoses(prognosisByPtuIndex.get(ptuGridSafetyAnalysisDto.getPtuIndex()));
-            }
+            dsoPlanboardBusinessService.storeGridSafetyAnalysis(gridSafetyAnalysis);
 
             PtuState ptuState = corePlanboardBusinessService.findOrCreatePtuState(gridSafetyAnalysis.getPtuContainer(),
                     gridSafetyAnalysis.getConnectionGroup());
@@ -254,22 +247,16 @@ public class DsoGridSafetyAnalysisCoordinator {
         return corePlanboardBusinessService.findLastPrognoses(period, PrognosisType.D_PROGNOSIS, usefIdentifier);
     }
 
-    private boolean isEventAllowed(GridSafetyAnalysisEvent event) {
-        if (event.isExpired()) {
-            LOGGER.warn("Grid safety analysis is not allowed for the date {}, the workflow is stopped.", event.getAnalysisDay());
-            return false;
-        }
-        return true;
-    }
-
     private WorkflowContext prepareInContext(GridSafetyAnalysisEvent event, List<PtuPrognosis> prognosisList) {
         WorkflowContext inContext = new DefaultWorkflowContext();
+        int ptuDuration = config.getIntegerProperty(ConfigParam.PTU_DURATION);
 
+        inContext.setValue(IN.PTU_DURATION.name(), ptuDuration);
         inContext.setValue(IN.CONGESTION_POINT_ENTITY_ADDRESS.name(), event.getCongestionPointEntityAddress());
         // Getting non aggregator connection forecast
         NonAggregatorForecastDto nonAggregatorForecastDto = createNonAggregatorForecastInputMap(event);
         inContext.setValue(IN.NON_AGGREGATOR_FORECAST.name(), nonAggregatorForecastDto);
-        inContext.setValue(IN.PERIOD.name(), event.getAnalysisDay());
+        inContext.setValue(IN.PERIOD.name(), event.getPeriod());
         List<PrognosisDto> dPrognosisDtos = prognosisList.stream()
                 .collect(Collectors.groupingBy(PtuPrognosis::getParticipantDomain)).values().stream()
                 .map(PrognosisTransformer::mapToPrognosis)
@@ -281,7 +268,7 @@ public class DsoGridSafetyAnalysisCoordinator {
 
     private NonAggregatorForecastDto createNonAggregatorForecastInputMap(GridSafetyAnalysisEvent event) {
         NonAggregatorForecastDto nonAggregatorForecastDto = NonAggregatorForecastDtoTransformer.transform(
-                dsoPlanboardBusinessService.findLastNonAggregatorForecasts(event.getAnalysisDay(),
+                dsoPlanboardBusinessService.findLastNonAggregatorForecasts(event.getPeriod(),
                         Optional.of(event.getCongestionPointEntityAddress())).stream()
                         .collect(Collectors.toList()));
 
@@ -317,7 +304,7 @@ public class DsoGridSafetyAnalysisCoordinator {
      * @param event
      */
     private void startColoringProcess(StoreGridSafetyAnalysisEvent event) {
-        coloringEventManager.fire(new ColoringProcessEvent(event.getAnalysisDay(), event.getCongestionPointEntityAddress()));
+        coloringEventManager.fire(new ColoringProcessEvent(event.getPeriod(), event.getCongestionPointEntityAddress()));
     }
 
     /*
@@ -334,8 +321,8 @@ public class DsoGridSafetyAnalysisCoordinator {
                 .toArray(Integer[]::new);
 
         LOGGER.debug("Sending a flexibility request for Entity Adress: {}, PTU Date: {}, PTU Index array length: {}",
-                event.getCongestionPointEntityAddress(), event.getAnalysisDay(), ptuIndexes.length);
+                event.getCongestionPointEntityAddress(), event.getPeriod(), ptuIndexes.length);
         flexRequestEventManager
-                .fire(new CreateFlexRequestEvent(event.getCongestionPointEntityAddress(), event.getAnalysisDay(), ptuIndexes));
+                .fire(new CreateFlexRequestEvent(event.getCongestionPointEntityAddress(), event.getPeriod(), ptuIndexes));
     }
 }

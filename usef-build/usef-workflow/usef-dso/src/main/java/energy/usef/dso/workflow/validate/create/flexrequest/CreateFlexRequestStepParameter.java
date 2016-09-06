@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,9 +29,10 @@ public class CreateFlexRequestStepParameter {
      * The input parameters for this step.
      */
     public enum IN {
+        PTU_DURATION,
         CONGESTION_POINT_ENTITY_ADDRESS,
         PERIOD,
-        GRID_SAFETY_ANALYSIS_DTO
+        GRID_SAFETY_ANALYSIS_DTO;
     }
 
     /**

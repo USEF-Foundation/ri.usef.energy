@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.Prognosis;
 import energy.usef.core.event.DayAheadClosureEvent;
+import energy.usef.core.event.validation.EventValidationService;
 import energy.usef.core.model.AgrConnectionGroup;
 import energy.usef.core.model.Connection;
 import energy.usef.core.model.ConnectionGroup;
@@ -73,6 +74,9 @@ public class BrpCreateMissingAPlansCoordinatorTest {
     private BrpPlanboardBusinessService brpPlanboardBusinessService;
 
     @Mock
+    private EventValidationService eventValidationService;
+
+    @Mock
     private Config config;
 
     BrpCreateMissingAPlansCoordinator coordinator;
@@ -87,6 +91,7 @@ public class BrpCreateMissingAPlansCoordinatorTest {
         Whitebox.setInternalState(coordinator, corePlanboardBusinessService);
         Whitebox.setInternalState(coordinator, brpPlanboardBusinessService);
         Whitebox.setInternalState(coordinator, sequenceGeneratorService);
+        Whitebox.setInternalState(coordinator, eventValidationService);
 
         Mockito.when(config.getIntegerProperty(ConfigParam.PTU_DURATION)).thenReturn(15);
         Mockito.when(config.getProperty(ConfigParam.HOST_DOMAIN)).thenReturn("brp.usef-example.com");

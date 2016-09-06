@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -181,8 +181,10 @@ public class AgrReceiveSettlementMessageCoordinator {
     private WorkflowContext buildWorkflowContext(FlexOrderSettlementDto receivedFlexOrderSettlementDto,
             List<FlexOrderSettlementDto> preparedFlexOrderSettlementDtos, MessageMetadata messageMetaData) {
         USEFRoleDto counterPartyRole = USEFRoleTransformer.transform(messageMetaData.getSenderRole());
+        int ptuDuration = config.getIntegerProperty(ConfigParam.PTU_DURATION);
 
         WorkflowContext context = new DefaultWorkflowContext();
+        context.setValue(AgrReceiveSettlementMessageWorkflowParameter.IN.PTU_DURATION.name(), ptuDuration);
         context.setValue(AgrReceiveSettlementMessageWorkflowParameter.IN.ORDER_REFERENCE.name(), receivedFlexOrderSettlementDto.getFlexOrder().getSequenceNumber());
         context.setValue(AgrReceiveSettlementMessageWorkflowParameter.IN.COUNTER_PARTY_ROLE.name(), counterPartyRole);
         context.setValue(AgrReceiveSettlementMessageWorkflowParameter.IN.PREPARED_FLEX_ORDER_SETTLEMENTS.name(), preparedFlexOrderSettlementDtos);

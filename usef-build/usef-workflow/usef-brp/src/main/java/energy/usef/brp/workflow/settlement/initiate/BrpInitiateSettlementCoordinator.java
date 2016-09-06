@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,35 @@ package energy.usef.brp.workflow.settlement.initiate;
 
 import static energy.usef.brp.workflow.BrpWorkflowStep.BRP_REQUEST_PENALTY_DATA;
 import static energy.usef.core.data.xml.bean.message.MessagePrecedence.TRANSACTIONAL;
-import static energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter.IN.END_DATE;
-import static energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter.IN.FLEX_OFFER_DTO_LIST;
-import static energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter.IN.FLEX_ORDER_DTO_LIST;
-import static energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter.IN.FLEX_REQUEST_DTO_LIST;
-import static energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter.IN.PROGNOSIS_DTO_LIST;
-import static energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter.IN.START_DATE;
+import static energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter.IN.*;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.ejb.Asynchronous;
+import javax.ejb.LocalBean;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
+import javax.ejb.Stateless;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.enterprise.event.TransactionPhase;
+import javax.inject.Inject;
+
+import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import energy.usef.brp.config.ConfigBrp;
 import energy.usef.brp.config.ConfigBrpParam;
+import energy.usef.brp.controller.MeterDataQueryResponseController;
 import energy.usef.brp.model.MeterDataCompany;
 import energy.usef.brp.service.business.BrpBusinessService;
 import energy.usef.brp.workflow.BrpWorkflowStep;
 import energy.usef.brp.workflow.settlement.initiate.RequestPenaltyDataParameter.IN;
-import energy.usef.brp.workflow.settlement.send.SendSettlementMessageEvent;
-import energy.usef.brp.controller.MeterDataQueryResponseController;
+import energy.usef.brp.workflow.settlement.send.CheckInitiateSettlementDoneEvent;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.constant.USEFConstants;
 import energy.usef.core.data.xml.bean.message.Connections;
@@ -58,25 +72,6 @@ import energy.usef.core.workflow.dto.SettlementDto;
 import energy.usef.core.workflow.transformer.MeterDataTransformer;
 import energy.usef.core.workflow.util.WorkflowUtil;
 
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import javax.ejb.Asynchronous;
-import javax.ejb.LocalBean;
-import javax.ejb.Lock;
-import javax.ejb.LockType;
-import javax.ejb.Stateless;
-import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
-import javax.enterprise.event.TransactionPhase;
-import javax.inject.Inject;
-
-import org.joda.time.LocalDate;
-import org.joda.time.LocalDateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * BRP Initiate Settlement workflow coordinator. This workflow is cut into two parts:
  * <p>
@@ -97,7 +92,7 @@ public class BrpInitiateSettlementCoordinator extends AbstractSettlementCoordina
     private BrpBusinessService brpBusinessService;
 
     @Inject
-    private Event<SendSettlementMessageEvent> sendSettlementMessageEventManager;
+    private Event<CheckInitiateSettlementDoneEvent> checkInitiateSettlementDoneEvent;
 
     @Inject
     private JMSHelperService jmsHelperService;
@@ -129,7 +124,7 @@ public class BrpInitiateSettlementCoordinator extends AbstractSettlementCoordina
                 .findPlanboardMessages(DocumentType.FLEX_ORDER, startDate, endDate, DocumentStatus.ACCEPTED).stream()
                 .map(PlanboardMessage::getPeriod).distinct().collect(Collectors.toList());
         if (daysWithOrders.isEmpty()) {
-            sendSettlementMessageEventManager.fire(new SendSettlementMessageEvent(startDate.getYear(), startDate.getMonthOfYear()));
+            checkInitiateSettlementDoneEvent.fire(new CheckInitiateSettlementDoneEvent(startDate.getYear(), startDate.getMonthOfYear()));
             LOGGER.debug(USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
             return;
         }
@@ -235,9 +230,7 @@ public class BrpInitiateSettlementCoordinator extends AbstractSettlementCoordina
         // save the settlement dtos.
         saveSettlement(settlementDto);
         LOGGER.info("Settlements are stored in the DB.");
-        if (coreSettlementBusinessService.isEachFlexOrderReadyForSettlement(startDate.getYear(), startDate.getMonthOfYear())) {
-            sendSettlementMessageEventManager.fire(new SendSettlementMessageEvent(startDate.getYear(), startDate.getMonthOfYear()));
-        }
+        checkInitiateSettlementDoneEvent.fire(new CheckInitiateSettlementDoneEvent(startDate.getYear(), startDate.getMonthOfYear()));
         LOGGER.debug(USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT, finalizeInitiateSettlementEvent);
     }
 

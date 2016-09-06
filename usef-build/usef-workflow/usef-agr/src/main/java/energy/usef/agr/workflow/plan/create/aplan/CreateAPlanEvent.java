@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package energy.usef.agr.workflow.plan.create.aplan;
 
+import energy.usef.core.event.ExpirableEvent;
 import org.joda.time.LocalDate;
 
 import energy.usef.core.util.DateTimeUtil;
@@ -23,7 +24,7 @@ import energy.usef.core.util.DateTimeUtil;
 /**
  * Event class that is used to trigger the workflow of creating and sending A-Plan.
  */
-public class CreateAPlanEvent {
+public class CreateAPlanEvent implements ExpirableEvent {
 
     private final LocalDate period;
     private final String usefIdentifier;

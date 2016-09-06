@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.joda.time.LocalDate;
 /**
  * Event which will trigger a process to move the PTUs of the specified day in a state <code>Day_Ahead_Closed</code>.
  */
-public class DayAheadClosureEvent {
+public class DayAheadClosureEvent implements ExpirableEvent{
 
     private final LocalDate period;
 

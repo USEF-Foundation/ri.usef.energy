@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ import energy.usef.core.data.xml.bean.message.PTU;
 import energy.usef.core.data.xml.bean.message.Prognosis;
 import energy.usef.core.data.xml.bean.message.PrognosisType;
 import energy.usef.core.data.xml.bean.message.USEFRole;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.ConnectionGroup;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
@@ -96,27 +98,27 @@ public class AgrCreateAPlanPlanboardCoordinator {
     @Inject
     private SequenceGeneratorService sequenceGeneratorService;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
     /**
      * This method implements the logic to create A-Plan.
      *
      * @param event A {@link CreateAPlanEvent}
      */
     @Asynchronous
-    public void handleEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) CreateAPlanEvent event) {
-        if (!event.isExpired()) {
-            LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
-            ConnectionGroup connectionGroup = corePlanboardBusinessService.findConnectionGroup(event.getUsefIdentifier());
+    public void handleEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) CreateAPlanEvent event) throws BusinessValidationException {
+        LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
 
-            Map<Integer, PowerContainer> powerContainersPerPtu = agrPortfolioBusinessService
-                    .findActivePortfolioForConnectionGroupLevel(event.getPeriod(), Optional.of(connectionGroup))
-                .get(connectionGroup);
+        ConnectionGroup connectionGroup = corePlanboardBusinessService.findConnectionGroup(event.getUsefIdentifier());
 
-            createAndSendAPlan(event.getPeriod(), connectionGroup, powerContainersPerPtu);
-            LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
-        }
-        else {
-            LOGGER.info("Ignored {}, period is in the past.", event);
-        }
+        Map<Integer, PowerContainer> powerContainersPerPtu = agrPortfolioBusinessService
+                .findActivePortfolioForConnectionGroupLevel(event.getPeriod(), Optional.of(connectionGroup))
+            .get(connectionGroup);
+
+        createAndSendAPlan(event.getPeriod(), connectionGroup, powerContainersPerPtu);
+        LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }
 
     private void createAndSendAPlan(LocalDate period, ConnectionGroup connectionGroup,

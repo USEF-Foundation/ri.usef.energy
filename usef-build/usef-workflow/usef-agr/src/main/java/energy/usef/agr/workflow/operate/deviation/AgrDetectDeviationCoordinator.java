@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ import energy.usef.agr.workflow.operate.reoptimize.ReOptimizePortfolioEvent;
 import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
 import energy.usef.core.util.DateTimeUtil;
 import energy.usef.core.util.PtuUtil;
@@ -79,6 +81,9 @@ public class AgrDetectDeviationCoordinator {
     @Inject
     private Event<ReOptimizePortfolioEvent> eventManager;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
     /**
      * Handles the DetectDeviationEvent.
      *
@@ -86,8 +91,9 @@ public class AgrDetectDeviationCoordinator {
      */
     @SuppressWarnings("unchecked")
     @Asynchronous
-    public void handleEvent(@Observes DetectDeviationEvent event) {
+    public void handleEvent(@Observes DetectDeviationEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
 
         LocalDate period = event.getPeriod();
 

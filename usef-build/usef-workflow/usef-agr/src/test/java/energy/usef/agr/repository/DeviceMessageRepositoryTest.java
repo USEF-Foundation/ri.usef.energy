@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,17 @@
 
 package energy.usef.agr.repository;
 
-import static org.powermock.reflect.Whitebox.setInternalState;
-
 import energy.usef.agr.model.DeviceMessage;
 import energy.usef.agr.model.DeviceMessageStatus;
-
-import java.util.List;
+import org.joda.time.LocalDate;
+import org.junit.*;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import java.util.List;
 
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.powermock.reflect.Whitebox.setInternalState;
 
 public class DeviceMessageRepositoryTest {
 
@@ -69,6 +64,14 @@ public class DeviceMessageRepositoryTest {
 
         // clear the entity manager to avoid unexpected results
         repository.getEntityManager().clear();
+        entityManager.getTransaction().begin();
+    }
+
+    @After
+    public void tearDown() {
+        if (entityManager.getTransaction().isActive()) {
+            entityManager.getTransaction().rollback();
+        }
     }
 
     @Test
@@ -84,5 +87,14 @@ public class DeviceMessageRepositoryTest {
                 DeviceMessageStatus.NEW);
         Assert.assertNotNull(deviceMessages);
         Assert.assertEquals(3   , deviceMessages.size());
+    }
+
+    @Test
+    public void testCleanup() {
+        try {
+            repository.cleanup(new LocalDate());
+        } catch (Exception e) {
+            Assert.fail(e.getMessage());
+        }
     }
 }

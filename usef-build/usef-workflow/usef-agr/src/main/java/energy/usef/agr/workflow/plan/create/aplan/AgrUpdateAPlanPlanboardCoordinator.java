@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_H
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 
 import energy.usef.core.event.RequestMoveToValidateEvent;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
 
 import javax.ejb.Asynchronous;
@@ -46,6 +48,9 @@ public class AgrUpdateAPlanPlanboardCoordinator {
     @Inject
     private Event<RequestMoveToValidateEvent> moveToValidateEventManager;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
     /**
      * Handles the event {@link FinalizeAPlansEvent}.
      * 
@@ -53,8 +58,10 @@ public class AgrUpdateAPlanPlanboardCoordinator {
      */
     @Asynchronous
     @Lock(LockType.WRITE)
-    public void handleEvent(@Observes FinalizeAPlansEvent event) {
+    public void handleEvent(@Observes FinalizeAPlansEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
+
         corePlanboardBusinessService.finalizeAPlans(event.getPeriod());
 
         // now trigger the moveToValidateEvent to create D-prognoses and start trading with DSOs

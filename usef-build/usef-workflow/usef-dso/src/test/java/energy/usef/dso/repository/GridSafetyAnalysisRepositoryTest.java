@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,6 +125,16 @@ public class GridSafetyAnalysisRepositoryTest {
         Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("1999-12-30")));
         Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("1999-12-29")));
         Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("1999-12-29")));
+    }
+
+    @Test
+    public void testDeletePreviousGridSafetyAnalysis() {
+        String entityAddress = "ea1.1992-01.com.example:gridpoint.4f76ff19-a53b-49f5-84e7";
+        Assert.assertEquals("Expected no deleted objects", 0, repository.deletePreviousGridSafetyAnalysis(entityAddress, new LocalDate()));
+        Assert.assertEquals("Expected deleted objects", 1, repository.deletePreviousGridSafetyAnalysis(entityAddress, new LocalDate("1999-12-30")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.deletePreviousGridSafetyAnalysis(entityAddress, new LocalDate("1999-12-30")));
+        Assert.assertEquals("Expected deleted objects", 1, repository.deletePreviousGridSafetyAnalysis(entityAddress, new LocalDate("1999-12-29")));
+        Assert.assertEquals("Expected no deleted objects", 0, repository.deletePreviousGridSafetyAnalysis(entityAddress, new LocalDate("1999-12-29")));
     }
 
 }

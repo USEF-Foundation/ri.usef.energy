@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import energy.usef.brp.workflow.plan.flexrequest.create.CreateFlexRequestEvent;
 import energy.usef.brp.workflow.BrpWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.AgrConnectionGroup;
 import energy.usef.core.model.ConnectionGroup;
 import energy.usef.core.model.DocumentStatus;
@@ -88,6 +90,8 @@ public class BrpAplanCoordinatorTest {
     private Event<PrepareFlexRequestsEvent> prepareFlexRequestsEventManager;
     @Mock
     private Event<CreateFlexRequestEvent> createFlexRequestEventManager;
+    @Mock
+    private EventValidationService eventValidationService;
 
     @Before
     public void init() {
@@ -97,13 +101,14 @@ public class BrpAplanCoordinatorTest {
         Whitebox.setInternalState(coordinator, workflowStepExecuter);
         Whitebox.setInternalState(coordinator, config);
         Whitebox.setInternalState(coordinator, jmsHelperService);
+        Whitebox.setInternalState(coordinator, eventValidationService);
         Whitebox.setInternalState(coordinator, "prepareFlexRequestsEventManager", prepareFlexRequestsEventManager);
         Whitebox.setInternalState(coordinator, "createFlexRequestEventManager", createFlexRequestEventManager);
         PowerMockito.when(config.getIntegerProperty(ConfigParam.PTU_DURATION)).thenReturn(PTU_DURATION);
     }
 
     @Test
-    public void testReceivedAPlanEvent() {
+    public void testReceivedAPlanEvent() throws BusinessValidationException {
         PowerMockito.when(corePlanboardBusinessService
                 .findLastPrognoses(Matchers.any(LocalDate.class), Matchers.eq(PrognosisType.A_PLAN)))
                 .thenReturn(buildPlanboardAPlans());
@@ -139,7 +144,7 @@ public class BrpAplanCoordinatorTest {
     }
 
     @Test
-    public void testPrepareFlexRequestsEvent() {
+    public void testPrepareFlexRequestsEvent() throws BusinessValidationException {
         PowerMockito.when(corePlanboardBusinessService
                 .findLastPrognoses(Matchers.any(LocalDate.class), Matchers.eq(PrognosisType.A_PLAN),
                         Matchers.eq(DocumentStatus.PROCESSED))).thenReturn(buildPlanboardAPlans());

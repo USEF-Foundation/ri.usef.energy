@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -125,6 +125,7 @@ public class ParticipantListBuilder {
         Participant participant = new Participant();
         participant.setDomainName((String) participantMap.get(DOMAIN_NAME));
         participant.setSpecVersion((String) participantMap.get(SPEC_VERSION));
+        participant.setPublicKeysFromString((String) participantMap.get(PUBLIC_KEYS));
         participant.setRoles(buildParticipantRoles(participantMap));
         return participant;
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import energy.usef.agr.config.ConfigAgr;
 import energy.usef.agr.config.ConfigAgrParam;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
+import energy.usef.core.event.validation.EventValidationService;
 import energy.usef.core.model.BrpConnectionGroup;
 import energy.usef.core.model.CongestionPointConnectionGroup;
 import energy.usef.core.model.ConnectionGroup;
@@ -66,6 +67,9 @@ public class AgrNonUdiSetAdsGoalsCoordinatorTest {
     @Mock
     private Config config;
 
+    @Mock
+    private EventValidationService eventValidationService;
+
     @Before
     public void setUp() throws Exception {
         coordinator = new AgrNonUdiSetAdsGoalsCoordinator();
@@ -73,6 +77,7 @@ public class AgrNonUdiSetAdsGoalsCoordinatorTest {
         Whitebox.setInternalState(coordinator, corePlanboardBusinessService);
         Whitebox.setInternalState(coordinator, configAgr);
         Whitebox.setInternalState(coordinator, config);
+        Whitebox.setInternalState(coordinator, eventValidationService);
 
         Mockito.when(configAgr.getBooleanProperty(Matchers.eq(ConfigAgrParam.AGR_IS_NON_UDI_AGGREGATOR))).thenReturn(true);
         Mockito.when(config.getIntegerProperty(Matchers.eq(ConfigParam.PTU_DURATION))).thenReturn(15);

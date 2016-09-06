@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,14 @@ public class SynchronisationConnection {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public SynchronisationCongestionPoint getCongestionPoint() {
+        return congestionPoint;
+    }
+
+    public void setCongestionPoint(SynchronisationCongestionPoint congestionPoint) {
+        this.congestionPoint = congestionPoint;
     }
 
     public String getEntityAddress() {

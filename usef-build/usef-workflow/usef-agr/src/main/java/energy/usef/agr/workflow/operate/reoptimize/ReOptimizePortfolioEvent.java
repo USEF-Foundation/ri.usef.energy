@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,32 +16,33 @@
 
 package energy.usef.agr.workflow.operate.reoptimize;
 
+import energy.usef.core.event.ExpirableEvent;
 import org.joda.time.LocalDate;
 
 /**
  * Event for Re-optimizing portfolio of aggregator.
  * 
  */
-public class ReOptimizePortfolioEvent {
-    private final LocalDate ptuDate;
+public class ReOptimizePortfolioEvent implements ExpirableEvent {
+    private final LocalDate period;
 
     /**
      * Specific constructor for the {@link ReOptimizePortfolioEvent}.
      *
-     * @param ptuDate {@link LocalDate} period for which the portfolio needs to be optimized.
+     * @param period {@link LocalDate} period for which the portfolio needs to be optimized.
      */
-    public ReOptimizePortfolioEvent(LocalDate ptuDate) {
-        this.ptuDate = ptuDate;
+    public ReOptimizePortfolioEvent(LocalDate period) {
+        this.period = period;
     }
 
-    public LocalDate getPtuDate() {
-        return ptuDate;
+    public LocalDate getPeriod() {
+        return period;
     }
 
     @Override
     public String toString() {
         return "ReOptimizePortfolioEvent" + "[" +
-                "ptuDate=" + ptuDate +
+                "period=" + period +
                 "]";
     }
 }

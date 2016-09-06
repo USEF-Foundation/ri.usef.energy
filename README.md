@@ -1,5 +1,17 @@
 # Release notes USEF Reference Implementation
 
+## Relase v 1.3.5, 6 september 2016 ##
+
+###Delivered items###
+	*   Added version management to Udi's.
+	*   Added PTU Duration to context of several pluggable business components.
+	*   Supported version of libsodium is now 1.0.10.
+	*   Improved robustness through additional validations (e.g. ignore events that are not valid in a certain periods).
+	*   Copyright notice extended to 2016.
+	*   Fixed an issue related to endpoint resosolving when using DNS.
+	*   Included pluggable business component examples from the Hoog Dalem project (courtesy of Stedin and BePowered).
+	*   Minor documentation updates.
+
 ## Release v 1.3.4 , 28 July 2016 ##
 
 ###Delivered items###

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package energy.usef.dso.workflow.validate.gridsafetyanalysis;
 
+import energy.usef.core.event.ExpirableEvent;
 import org.joda.time.LocalDate;
 
 import energy.usef.dso.workflow.dto.GridSafetyAnalysisDto;
@@ -23,10 +24,10 @@ import energy.usef.dso.workflow.dto.GridSafetyAnalysisDto;
 /**
  * Event implementation for starting the Grid Safety Analysis workflow.
  */
-public class StoreGridSafetyAnalysisEvent {
+public class StoreGridSafetyAnalysisEvent implements ExpirableEvent {
 
     private String congestionPointEntityAddress;
-    private LocalDate analysisDay;
+    private LocalDate period;
     private GridSafetyAnalysisDto gridSafetyAnalysisDto;
 
     /**
@@ -34,17 +35,17 @@ public class StoreGridSafetyAnalysisEvent {
      *
      * @param congestionPointEntityAddress The entityAddress of the congestionPoint on which a GridSafetyAnalysis should be
      *                                     performed.
-     * @param analysisDay                  {@link LocalDate} day for which the analysis is done.
+     * @param period                  {@link LocalDate} day for which the analysis is done.
      */
-    public StoreGridSafetyAnalysisEvent(String congestionPointEntityAddress, LocalDate analysisDay,
+    public StoreGridSafetyAnalysisEvent(String congestionPointEntityAddress, LocalDate period,
             GridSafetyAnalysisDto gridSafetyAnalysisDto) {
         this.congestionPointEntityAddress = congestionPointEntityAddress;
-        this.analysisDay = analysisDay;
+        this.period = period;
         this.gridSafetyAnalysisDto = gridSafetyAnalysisDto;
     }
 
-    public LocalDate getAnalysisDay() {
-        return analysisDay;
+    public LocalDate getPeriod() {
+        return period;
     }
 
     public String getCongestionPointEntityAddress() {
@@ -59,7 +60,7 @@ public class StoreGridSafetyAnalysisEvent {
     public String toString() {
         return "GridSafetyAnalysisEvent" + "[" +
                 "congestionPointEntityAddress='" + congestionPointEntityAddress + "'" +
-                ", analysisDay=" + analysisDay +
+                ", analysisDay=" + period +
                 "]";
     }
 }

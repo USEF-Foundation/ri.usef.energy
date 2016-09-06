@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,8 @@
 package energy.usef.dso.workflow.settlement.initiate;
 
 import static energy.usef.core.data.xml.bean.message.MessagePrecedence.TRANSACTIONAL;
-import static energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter.IN.END_DATE;
-import static energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter.IN.FLEX_OFFER_DTO_LIST;
-import static energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter.IN.FLEX_ORDER_DTO_LIST;
-import static energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter.IN.FLEX_REQUEST_DTO_LIST;
-import static energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter.IN.PROGNOSIS_DTO_LIST;
-import static energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter.IN.START_DATE;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static energy.usef.core.workflow.settlement.CoreInitiateSettlementParameter.IN.*;
+import static java.util.stream.Collectors.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +77,7 @@ import energy.usef.dso.model.PtuGridMonitor;
 import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 import energy.usef.dso.workflow.DsoWorkflowStep;
 import energy.usef.dso.workflow.dto.GridMonitoringDto;
-import energy.usef.dso.workflow.settlement.send.SendSettlementMessageEvent;
+import energy.usef.dso.workflow.settlement.send.CheckInitiateSettlementDoneEvent;
 import energy.usef.dso.workflow.transformer.GridMonitoringTransformer;
 
 /**
@@ -112,7 +105,7 @@ public class DsoInitiateSettlementCoordinator extends AbstractSettlementCoordina
     private Event<FinalizeInitiateSettlementEvent> finalizeInitiateSettlementEventManager;
 
     @Inject
-    private Event<SendSettlementMessageEvent> sendSettlementMessageEventManager;
+    private Event<CheckInitiateSettlementDoneEvent> checkInitiateSettlementDoneEvent;
 
     @Inject
     private JMSHelperService jmsHelperService;
@@ -146,7 +139,8 @@ public class DsoInitiateSettlementCoordinator extends AbstractSettlementCoordina
                 .findPlanboardMessages(DocumentType.FLEX_ORDER, startDate, endDate, DocumentStatus.ACCEPTED).stream()
                 .map(PlanboardMessage::getPeriod).distinct().collect(toList());
         if (daysWithOrders.isEmpty()) {
-            sendSettlementMessageEventManager.fire(new SendSettlementMessageEvent(startDate.getYear(), startDate.getMonthOfYear()));
+            checkInitiateSettlementDoneEvent
+                    .fire(new CheckInitiateSettlementDoneEvent(startDate.getYear(), startDate.getMonthOfYear()));
             LOGGER.debug(USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
             return;
         }
@@ -256,9 +250,8 @@ public class DsoInitiateSettlementCoordinator extends AbstractSettlementCoordina
 
         // save the settlement dtos.
         saveSettlement(settlementDto);
-        if (coreSettlementBusinessService.isEachFlexOrderReadyForSettlement(startDate.getYear(), startDate.getMonthOfYear())) {
-            sendSettlementMessageEventManager.fire(new SendSettlementMessageEvent(startDate.getYear(), startDate.getMonthOfYear()));
-        }
+        checkInitiateSettlementDoneEvent.fire(new CheckInitiateSettlementDoneEvent(startDate.getYear(), startDate.getMonthOfYear()));
+
         LOGGER.debug(USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT, finalizeInitiateSettlementEvent);
     }
 
@@ -276,7 +269,7 @@ public class DsoInitiateSettlementCoordinator extends AbstractSettlementCoordina
      * Initializes the workflow context with all the relevant information which will be given to the PBC.
      *
      * @param startDate {@link LocalDate} start date of the settlement period (inclusive).
-     * @param endDate {@link LocalDate} end date of the settlement period (inclusive).
+     * @param endDate   {@link LocalDate} end date of the settlement period (inclusive).
      * @return a {@link WorkflowContext} object.
      */
     @Override
@@ -303,12 +296,14 @@ public class DsoInitiateSettlementCoordinator extends AbstractSettlementCoordina
         // Invoking PBC
         WorkflowContext inputContext = new DefaultWorkflowContext();
         inputContext.setValue(RequestPenaltyDataParameter.IN.SETTLEMENT_DTO.name(), settlementDto);
-        inputContext.setValue(RequestPenaltyDataParameter.IN.PTU_DURATION.name(), config.getIntegerProperty(ConfigParam.PTU_DURATION));
+        inputContext
+                .setValue(RequestPenaltyDataParameter.IN.PTU_DURATION.name(), config.getIntegerProperty(ConfigParam.PTU_DURATION));
 
         WorkflowContext outputContext = workflowStepExecuter.invoke(DsoWorkflowStep.DSO_REQUEST_PENALTY_DATA.name(), inputContext);
 
         // Validating context
-        WorkflowUtil.validateContext(DsoWorkflowStep.DSO_REQUEST_PENALTY_DATA.name(), outputContext, RequestPenaltyDataParameter.OUT.values());
+        WorkflowUtil.validateContext(DsoWorkflowStep.DSO_REQUEST_PENALTY_DATA.name(), outputContext,
+                RequestPenaltyDataParameter.OUT.values());
         return outputContext.get(RequestPenaltyDataParameter.OUT.UPDATED_SETTLEMENT_DTO.name(), SettlementDto.class);
     }
 

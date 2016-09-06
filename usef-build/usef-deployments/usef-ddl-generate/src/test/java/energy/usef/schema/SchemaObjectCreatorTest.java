@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ public class SchemaObjectCreatorTest extends TestCase {
     private static final String APPLICATION_PERSISTENCE_UNIT = "ApplicationPersistenceUnit";
 
     public void testExecuteH2() throws Exception {
-        SchemaObjectCreator.execute(APPLICATION_PERSISTENCE_UNIT, "org.hibernate.dialect.H2Dialect", "H2");
+        SchemaObjectCreator.execute(APPLICATION_PERSISTENCE_UNIT, "org.hibernate.dialect.H2Dialect", "H2", "USEF_DS");
     }
 
     public void testExecuteMySQL() throws Exception {
-        SchemaObjectCreator.execute(APPLICATION_PERSISTENCE_UNIT, "org.hibernate.dialect.MySQLDialect", "MySQL");
+        SchemaObjectCreator.execute(APPLICATION_PERSISTENCE_UNIT, "org.hibernate.dialect.MySQLDialect", "MySQL", "USEF_DS");
     }
 
     public void testExecutePostgres() throws Exception {
-        SchemaObjectCreator.execute(APPLICATION_PERSISTENCE_UNIT, "org.hibernate.dialect.PostgreSQLDialect", "Postgres");
+        SchemaObjectCreator.execute(APPLICATION_PERSISTENCE_UNIT, "org.hibernate.dialect.PostgreSQLDialect", "Postgres", "USEF_DS");
     }
 }

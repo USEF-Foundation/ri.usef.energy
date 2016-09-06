@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -257,7 +257,7 @@ public class SenderServiceTest {
     private Participant buildParticipant() {
         Participant participant = new Participant();
         participant.setDomainName(SENDER_DOMAIN);
-        participant.setSpecVersion("2014:I");
+        participant.setSpecVersion("2015");
 
         ParticipantRole role = new ParticipantRole(USEFRole.DSO);
         role.setUrl("http://localhost:666");

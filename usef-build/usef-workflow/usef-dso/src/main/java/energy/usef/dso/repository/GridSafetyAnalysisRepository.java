@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -142,4 +142,21 @@ public class GridSafetyAnalysisRepository extends BaseRepository<GridSafetyAnaly
         return entityManager.createQuery(sql.toString()).setParameter("ptuDate", period.toDateMidnight().toDate()).executeUpdate();
     }
 
+    /**
+     * Delete all {@link GridSafetyAnalysis} objects for a certain date and congestion point.
+     *
+     * @param entityAddress
+     * @param period
+     */
+    public int deletePreviousGridSafetyAnalysis(String entityAddress, LocalDate period) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM GridSafetyAnalysis gsa ");
+        sql.append("WHERE gsa.connectionGroup.usefIdentifier = :entityAddress ");
+        sql.append("AND gsa.ptuContainer IN (SELECT pc FROM PtuContainer pc WHERE pc.ptuDate = :ptuDate)");
+
+        return getEntityManager().createQuery(sql.toString())
+                .setParameter("entityAddress", entityAddress)
+                .setParameter("ptuDate", period.toDateMidnight().toDate())
+                .executeUpdate();
+    }
 }

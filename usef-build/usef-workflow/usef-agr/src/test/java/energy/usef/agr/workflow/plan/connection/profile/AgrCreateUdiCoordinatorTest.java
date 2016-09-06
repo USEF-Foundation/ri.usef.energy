@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ import energy.usef.agr.service.business.AgrElementBusinessService;
 import energy.usef.agr.service.business.AgrPortfolioBusinessService;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
+import energy.usef.core.event.validation.EventValidationService;
 import energy.usef.core.workflow.DefaultWorkflowContext;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.step.WorkflowStepExecuter;
@@ -69,6 +70,9 @@ public class AgrCreateUdiCoordinatorTest {
     @Mock
     private AgrDeviceCapabilityBusinessService agrDeviceCapabilityBusinessService;
 
+    @Mock
+    private EventValidationService eventValidationService;
+
     @Before
     public void init() {
         agrCreateUdiCoordinator = new AgrCreateUdiCoordinator();
@@ -78,6 +82,7 @@ public class AgrCreateUdiCoordinatorTest {
         Whitebox.setInternalState(agrCreateUdiCoordinator, agrElementBusinessService);
         Whitebox.setInternalState(agrCreateUdiCoordinator, agrPortfolioBusinessService);
         Whitebox.setInternalState(agrCreateUdiCoordinator, agrDeviceCapabilityBusinessService);
+        Whitebox.setInternalState(agrCreateUdiCoordinator, eventValidationService);
 
         when(config.getIntegerProperty(ConfigParam.PTU_DURATION)).thenReturn(15);
         when(configAgr.getIntegerProperty(ConfigAgrParam.AGR_INITIALIZE_PLANBOARD_DAYS_INTERVAL)).thenReturn(1);

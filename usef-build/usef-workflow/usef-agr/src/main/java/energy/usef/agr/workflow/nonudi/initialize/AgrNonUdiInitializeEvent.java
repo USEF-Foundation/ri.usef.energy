@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 package energy.usef.agr.workflow.nonudi.initialize;
 
+import energy.usef.core.event.ExpirableEvent;
 import org.joda.time.LocalDate;
 
 /**
  * This event will trigger the {@link AgrNonUdiInitializeCoordinator}.
  */
-public class AgrNonUdiInitializeEvent {
+public class AgrNonUdiInitializeEvent implements ExpirableEvent {
     private LocalDate period;
 
     public AgrNonUdiInitializeEvent(LocalDate period) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package energy.usef.dso.workflow.validate.gridsafetyanalysis;
 import energy.usef.core.config.Config;
 import energy.usef.core.data.xml.bean.message.Prognosis;
 import energy.usef.core.event.DayAheadClosureEvent;
+import energy.usef.core.event.validation.EventValidationService;
 import energy.usef.core.model.CongestionPointConnectionGroup;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
@@ -70,6 +71,9 @@ public class DsoCreateMissingDPrognosisCoordinatorTest {
     private Config config;
 
     @Mock
+    private EventValidationService eventValidationService;
+
+    @Mock
     private Event<GridSafetyAnalysisEvent> gridSafetyEventManager;
 
     private DsoCreateMissingDPrognosisCoordinator dsoCreateMissingDPrognosisCoordinator;
@@ -84,6 +88,7 @@ public class DsoCreateMissingDPrognosisCoordinatorTest {
         Whitebox.setInternalState(dsoCreateMissingDPrognosisCoordinator, config);
         Whitebox.setInternalState(dsoCreateMissingDPrognosisCoordinator, gridSafetyEventManager);
         Whitebox.setInternalState(dsoCreateMissingDPrognosisCoordinator, sequenceGeneratorService);
+        Whitebox.setInternalState(dsoCreateMissingDPrognosisCoordinator, eventValidationService);
     }
 
     @Test

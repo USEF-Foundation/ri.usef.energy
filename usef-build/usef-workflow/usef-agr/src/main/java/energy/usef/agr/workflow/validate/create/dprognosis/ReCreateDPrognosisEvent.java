@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package energy.usef.agr.workflow.validate.create.dprognosis;
 
+import energy.usef.core.event.ExpirableEvent;
 import energy.usef.core.util.DateTimeUtil;
 
 import org.joda.time.LocalDate;
@@ -23,7 +24,7 @@ import org.joda.time.LocalDate;
 /**
  * Event class in charge of triggering the workflow 'Re-Create D-Prognosis' for the aggregator only.
  */
-public class ReCreateDPrognosisEvent {
+public class ReCreateDPrognosisEvent implements ExpirableEvent {
 
     private final LocalDate period;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,6 @@
 
 package energy.usef.dso.workflow.validate.gridsafetyanalysis;
 
-import static org.mockito.Matchers.contains;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,6 +27,8 @@ import java.util.stream.IntStream;
 
 import javax.enterprise.event.Event;
 
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Before;
@@ -79,8 +77,6 @@ import energy.usef.dso.workflow.validate.create.flexrequest.CreateFlexRequestEve
  */
 @RunWith(PowerMockRunner.class)
 public class DsoGridSafetyAnalysisCoordinatorTest {
-    private static final String WRONG_PTU_DATE_LOG = "Grid safety analysis is not allowed for the date {}, the workflow is "
-            + "stopped.";
     private static final String TEST_DOMAIN = "abc.com";
     private static final String ENTITY_ADDRESS = "ean.12340001";
     private static final int PTUS_PER_DAY = 96;
@@ -101,6 +97,7 @@ public class DsoGridSafetyAnalysisCoordinatorTest {
 
     @Mock
     private Event<StoreGridSafetyAnalysisEvent> storeGridSafetyEventManager;
+
     @Mock
     private Event<CreateFlexRequestEvent> flexRequestEventManager;
 
@@ -112,8 +109,12 @@ public class DsoGridSafetyAnalysisCoordinatorTest {
 
     @Mock
     private Config config;
+
     @Mock
     private ConfigDso configDso;
+
+    @Mock
+    private EventValidationService eventValidationService;
 
     @Before
     public void init() throws Exception {
@@ -126,6 +127,7 @@ public class DsoGridSafetyAnalysisCoordinatorTest {
         Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, config);
         Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, configDso);
         Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, sequenceGeneratorService);
+        Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, eventValidationService);
         Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, "storeGridSafetyEventManager", storeGridSafetyEventManager);
         Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, "flexRequestEventManager", flexRequestEventManager);
         Whitebox.setInternalState(dsoGridSafetyAnalysisCoordinator, "coloringEventManager", coloringEventManager);
@@ -153,20 +155,17 @@ public class DsoGridSafetyAnalysisCoordinatorTest {
      * Tests DsoGridSafetyAnalysisCoordinator.invoke method.
      */
     @Test
-    public void invokeWorkflowWithWrongPtuDate() {
+    public void invokeWorkflowWithWrongPtuDate() throws BusinessValidationException {
         LocalDate ptuDate = new LocalDate().minusDays(2);
-
         dsoGridSafetyAnalysisCoordinator.startGridSafetyAnalysis(new GridSafetyAnalysisEvent(ENTITY_ADDRESS, ptuDate));
-
-        verify(LOGGER, times(1)).warn(contains(WRONG_PTU_DATE_LOG), Matchers.eq(ptuDate));
-
+        Mockito.verify(eventValidationService, Mockito.times(1));
     }
 
     /**
      * Tests DsoGridSafetyAnalysisCoordinator.invoke method.
      */
     @Test
-    public void invokeWorkflowWith() {
+    public void invokeWorkflowWith() throws BusinessValidationException {
         LocalDate ptuDate = new LocalDate().plusDays(2);
 
         ArgumentCaptor<WorkflowContext> contextCapturer = ArgumentCaptor.forClass(WorkflowContext.class);
@@ -212,7 +211,7 @@ public class DsoGridSafetyAnalysisCoordinatorTest {
      * Test case to test the workflow without aggregators so the coloring process is invoked
      */
     @Test
-    public void testWithNoAggregators() {
+    public void testWithNoAggregators() throws BusinessValidationException {
         LocalDate ptuDate = new LocalDate().plusDays(2);
         ArgumentCaptor<WorkflowContext> inputContextCaptor = ArgumentCaptor.forClass(WorkflowContext.class);
 
@@ -232,7 +231,7 @@ public class DsoGridSafetyAnalysisCoordinatorTest {
     }
 
     @Test
-    public void testWithNoPreviousGridSafetyAnalysis() {
+    public void testWithNoPreviousGridSafetyAnalysis() throws BusinessValidationException {
         LocalDate ptuDate = new LocalDate().plusDays(2);
         Mockito.when(dsoPlanboardBusinessService.findGridSafetyAnalysis(Matchers.any(String.class), Matchers.any(LocalDate.class)))
                 .thenReturn(new ArrayList<>());

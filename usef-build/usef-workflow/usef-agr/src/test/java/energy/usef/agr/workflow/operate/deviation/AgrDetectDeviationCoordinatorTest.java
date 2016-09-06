@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.agr.workflow.operate.reoptimize.ReOptimizePortfolioEvent;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.CongestionPointConnectionGroup;
 import energy.usef.core.model.ConnectionGroup;
 import energy.usef.core.model.DocumentType;
@@ -93,6 +95,9 @@ public class AgrDetectDeviationCoordinatorTest {
     @Mock
     private ConfigAgr configAgr;
 
+    @Mock
+    private EventValidationService eventValidationService;
+
     @Before
     public void init() throws Exception {
         coordinator = new AgrDetectDeviationCoordinator();
@@ -103,6 +108,7 @@ public class AgrDetectDeviationCoordinatorTest {
         Whitebox.setInternalState(coordinator, config);
         Whitebox.setInternalState(coordinator, configAgr);
         Whitebox.setInternalState(coordinator, eventManager);
+        Whitebox.setInternalState(coordinator, eventValidationService);
         Mockito.when(config.getIntegerProperty(ConfigParam.PTU_DURATION)).thenReturn(15);
 
         Mockito.when(corePlanboardBusinessService
@@ -112,7 +118,7 @@ public class AgrDetectDeviationCoordinatorTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testInvokeWorkflow() {
+    public void testInvokeWorkflow() throws BusinessValidationException {
         Mockito.when(configAgr.getBooleanProperty(ConfigAgrParam.AGR_IS_NON_UDI_AGGREGATOR)).thenReturn(false);
         WorkflowContext workflowContextIn = new DefaultWorkflowContext();
         workflowContextIn.setValue(DetectDeviationFromPrognosisStepParameter.OUT.DEVIATION_INDEX_LIST.name(),
@@ -145,7 +151,7 @@ public class AgrDetectDeviationCoordinatorTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testInvokeWorkflowForNonUdiAggregator() {
+    public void testInvokeWorkflowForNonUdiAggregator() throws BusinessValidationException {
         Mockito.when(configAgr.getBooleanProperty(ConfigAgrParam.AGR_IS_NON_UDI_AGGREGATOR)).thenReturn(true);
         WorkflowContext workflowContextIn = new DefaultWorkflowContext();
         workflowContextIn.setValue(NonUdiDetectDeviationFromPrognosisStepParameter.OUT.DEVIATION_INDEX_LIST.name(),

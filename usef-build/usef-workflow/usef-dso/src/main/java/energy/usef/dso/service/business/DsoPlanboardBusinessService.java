@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -861,6 +861,17 @@ public class DsoPlanboardBusinessService {
     @SuppressWarnings("unchecked")
     public List<GridSafetyAnalysis> findGridSafetyAnalysis(String congestionPointEntityAddress, LocalDate ptuDate) {
         return gridSafetyAnalysisRepository.findGridSafetyAnalysis(congestionPointEntityAddress, ptuDate);
+    }
+
+    /**
+     * Deletes the {@link GridSafetyAnalysis} entities for a given day and congestion point.
+     *
+     * @param entityAddress {@link String} related Congestion Point entity address.
+     * @param period {@link LocalDate} Period of the PTU.
+     */
+    @SuppressWarnings("unchecked")
+    public int deletePreviousGridSafetyAnalysis(String entityAddress, LocalDate period) {
+        return gridSafetyAnalysisRepository.deletePreviousGridSafetyAnalysis(entityAddress, period);
     }
 }
 

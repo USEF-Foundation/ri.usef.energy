@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ import energy.usef.agr.transformer.ElementTransformer;
 import energy.usef.agr.workflow.AgrWorkflowStep;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.workflow.DefaultWorkflowContext;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.step.WorkflowStepExecuter;
@@ -71,6 +73,10 @@ public class AgrUpdateElementDataStoreCoordinator {
     @Inject
     private Event<CreateConnectionProfileEvent> createConnectionProfileEventManager;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
+
     /**
      * Update the element data store in order to supply up-to-date data to the subsequent Portfolio initialization process.
      *
@@ -78,8 +84,9 @@ public class AgrUpdateElementDataStoreCoordinator {
      */
     @Lock(LockType.WRITE)
     @Transactional(Transactional.TxType.REQUIRES_NEW)
-    public void updateElementDataStore(@Observes(during = TransactionPhase.AFTER_COMPLETION) AgrUpdateElementDataStoreEvent event) {
+    public void updateElementDataStore(@Observes(during = TransactionPhase.AFTER_COMPLETION) AgrUpdateElementDataStoreEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodInFuture(event);
 
         // retrieve the input for the PBC from the database
         List<ConnectionPortfolioDto> connectionPortfolioDtoList = agrPortfolioBusinessService

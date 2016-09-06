@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,9 @@ public class GetNotDesirableFlexOffersParameter {
      * Input parameters for the workflow.
      */
     public enum IN {
+        PTU_DURATION,
         CONNECTION_GROUP_IDENTIFIER,
-        FLEX_OFFER_DTO_LIST,
+        FLEX_OFFER_DTO_LIST;
     }
 
     /**

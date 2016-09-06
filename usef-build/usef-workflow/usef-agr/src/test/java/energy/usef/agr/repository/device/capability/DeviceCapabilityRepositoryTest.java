@@ -1,6 +1,5 @@
-package energy.usef.agr.repository.device.capability;
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +13,8 @@ package energy.usef.agr.repository.device.capability;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package energy.usef.agr.repository.device.capability;
 
 import static org.powermock.reflect.Whitebox.setInternalState;
 

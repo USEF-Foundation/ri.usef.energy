@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,42 +95,41 @@ public class DsoCreateFlexRequestCoordinator {
     @Inject
     private SequenceGeneratorService sequenceGeneratorService;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
     /**
      * {@inheritDoc}
      */
     @Asynchronous
     @Lock(LockType.WRITE)
-    public void createFlexRequests(@Observes(during = TransactionPhase.AFTER_COMPLETION) CreateFlexRequestEvent event) {
-        if (!event.isExpired()) {
+    public void createFlexRequests(@Observes(during = TransactionPhase.AFTER_COMPLETION) CreateFlexRequestEvent event) throws BusinessValidationException {
+        LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
 
-            LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
-
-            // 1. Invoke step 2004: transforms the grid safety analysis of one day into flex requests
-            List<GridSafetyAnalysis> gridSafetyAnalysis = dsoPlanboardBusinessService
-                    .findLatestGridSafetyAnalysisWithDispositionRequested(
-                            event.getCongestionPointEntityAddress(), event.getPtuDate());
-            if (gridSafetyAnalysis.isEmpty()) {
-                LOGGER.info(
-                        "No grid analysis with requested disposition has been found for congestion point {} on {}. Workflow will end.",
-                        event.getCongestionPointEntityAddress(), event.getPtuDate());
-                return;
-            }
-            List<FlexRequestDto> flexRequestDtos = invokeCreateFlexRequestPbc(event, gridSafetyAnalysis);
-
-            if (flexRequestDtos == null || flexRequestDtos.isEmpty()) {
-                LOGGER.info("No flex requests to send. Workflow will end.");
-                return;
-            }
-
-            // 2.3 For each aggregator active on the congestion point
-            List<Aggregator> aggregators = dsoPlanboardBusinessService.getAggregatorsByCongestionPointAddress(
-                    event.getCongestionPointEntityAddress(), event.getPtuDate());
-            // 2.1 Initialize a new flex request
-            createAndSendFlexRequests(event, gridSafetyAnalysis, flexRequestDtos, aggregators);
-            LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
-        } else {
-            LOGGER.info("Ignored {}, period is in the past.", event);
+        // 1. Invoke step 2004: transforms the grid safety analysis of one day into flex requests
+        List<GridSafetyAnalysis> gridSafetyAnalysis = dsoPlanboardBusinessService
+                .findLatestGridSafetyAnalysisWithDispositionRequested(
+                        event.getCongestionPointEntityAddress(), event.getPeriod());
+        if (gridSafetyAnalysis.isEmpty()) {
+            LOGGER.info(
+                    "No grid analysis with requested disposition has been found for congestion point {} on {}. Workflow will end.",
+                    event.getCongestionPointEntityAddress(), event.getPeriod());
+            return;
         }
+        List<FlexRequestDto> flexRequestDtos = invokeCreateFlexRequestPbc(event, gridSafetyAnalysis);
+
+        if (flexRequestDtos == null || flexRequestDtos.isEmpty()) {
+            LOGGER.info("No flex requests to send. Workflow will end.");
+            return;
+        }
+
+        // 2.3 For each aggregator active on the congestion point
+        List<Aggregator> aggregators = dsoPlanboardBusinessService.getAggregatorsByCongestionPointAddress(
+                event.getCongestionPointEntityAddress(), event.getPeriod());
+        // 2.1 Initialize a new flex request
+        createAndSendFlexRequests(event, gridSafetyAnalysis, flexRequestDtos, aggregators);
+        LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }
 
     private void createAndSendFlexRequests(CreateFlexRequestEvent event, List<GridSafetyAnalysis> gridSafetyAnalysis,
@@ -165,9 +166,12 @@ public class DsoCreateFlexRequestCoordinator {
             List<GridSafetyAnalysis> gridSafetyAnalysis) {
 
         WorkflowContext contextIn = new DefaultWorkflowContext();
+        int ptuDuration = config.getIntegerProperty(ConfigParam.PTU_DURATION);
+
+        contextIn.setValue(CreateFlexRequestStepParameter.IN.PTU_DURATION.name(), ptuDuration);
         contextIn.setValue(CreateFlexRequestStepParameter.IN.CONGESTION_POINT_ENTITY_ADDRESS.name(),
                 event.getCongestionPointEntityAddress());
-        contextIn.setValue(CreateFlexRequestStepParameter.IN.PERIOD.name(), event.getPtuDate());
+        contextIn.setValue(CreateFlexRequestStepParameter.IN.PERIOD.name(), event.getPeriod());
 
         GridSafetyAnalysisDto gridSafetyAnalysisDto = GridSafetyAnalysisDtoTransformer.transform(gridSafetyAnalysis);
         contextIn.setValue(CreateFlexRequestStepParameter.IN.GRID_SAFETY_ANALYSIS_DTO.name(), gridSafetyAnalysisDto);
@@ -207,7 +211,7 @@ public class DsoCreateFlexRequestCoordinator {
         flexRequestMessage.setCongestionPoint(event.getCongestionPointEntityAddress());
         flexRequestMessage.setExpirationDateTime(flexRequestDto.getExpirationDateTime());
         flexRequestMessage.setPTUDuration(Period.minutes(config.getIntegerProperty(ConfigParam.PTU_DURATION)));
-        flexRequestMessage.setPeriod(event.getPtuDate());
+        flexRequestMessage.setPeriod(event.getPeriod());
         flexRequestMessage.setTimeZone(config.getProperty(ConfigParam.TIME_ZONE));
         flexRequestMessage.setSequence(sequenceGeneratorService.next());
         return flexRequestMessage;

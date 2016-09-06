@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,45 +16,42 @@
 
 package energy.usef.dso.workflow.validate.gridsafetyanalysis;
 
-import energy.usef.core.util.DateTimeUtil;
+import energy.usef.core.event.ExpirableEvent;
 import org.joda.time.LocalDate;
 
 /**
  * Event implementation for starting the Grid Safety Analysis workflow.
  */
-public class GridSafetyAnalysisEvent {
+public class GridSafetyAnalysisEvent implements ExpirableEvent {
 
     private String congestionPointEntityAddress;
-    private LocalDate analysisDay;
+    private LocalDate period;
 
     /**
      * Constructor with analysis day.
      *
      * @param congestionPointEntityAddress The entityAddress of the congestionPoint on which a GridSafetyAnalysis should be
      *            performed.
-     * @param analysisDay {@link LocalDate} day for which the analysis is done.
+     * @param period {@link LocalDate} day for which the analysis is done.
      */
-    public GridSafetyAnalysisEvent(String congestionPointEntityAddress, LocalDate analysisDay) {
+    public GridSafetyAnalysisEvent(String congestionPointEntityAddress, LocalDate period) {
         this.congestionPointEntityAddress = congestionPointEntityAddress;
-        this.analysisDay = analysisDay;
+        this.period = period;
     }
 
-    public LocalDate getAnalysisDay() {
-        return analysisDay;
+    public LocalDate getPeriod() {
+        return period;
     }
 
     public String getCongestionPointEntityAddress() {
         return congestionPointEntityAddress;
     }
 
-    public boolean isExpired() {
-        return (this.analysisDay.isBefore(DateTimeUtil.getCurrentDate()));
-    }
     @Override
     public String toString() {
         return "GridSafetyAnalysisEvent" + "[" +
                 "congestionPointEntityAddress='" + congestionPointEntityAddress + "'" +
-                ", analysisDay=" + analysisDay +
+                ", analysisDay=" + period +
                 "]";
     }
 }

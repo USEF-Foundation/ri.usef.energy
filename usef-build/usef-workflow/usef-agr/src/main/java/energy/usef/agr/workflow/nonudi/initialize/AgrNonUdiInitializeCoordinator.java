@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,8 @@ import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HAND
 import energy.usef.agr.config.ConfigAgr;
 import energy.usef.agr.config.ConfigAgrParam;
 import energy.usef.agr.workflow.nonudi.initialize.AgrInitializeNonUdiClustersParameter.IN;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.BrpConnectionGroup;
 import energy.usef.core.model.CongestionPointConnectionGroup;
 import energy.usef.core.model.Connection;
@@ -61,12 +63,16 @@ public class AgrNonUdiInitializeCoordinator {
     @Inject
     private ConfigAgr configAgr;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
     /**
      * This method will start the initialization of the clusters.
      */
     @Asynchronous
-    public void initializeCluster(@Observes AgrNonUdiInitializeEvent event) {
+    public void initializeCluster(@Observes AgrNonUdiInitializeEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
 
         // Check if aggregator really is a non-udi aggregator
         if (!configAgr.getBooleanProperty(ConfigAgrParam.AGR_IS_NON_UDI_AGGREGATOR)) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,28 +28,20 @@ import energy.usef.core.data.xml.bean.message.MessageMetadata;
 import energy.usef.core.data.xml.bean.message.SignedMessage;
 import energy.usef.core.data.xml.bean.message.USEFRole;
 import energy.usef.core.exception.BusinessException;
+import energy.usef.core.exception.VersionError;
 import energy.usef.core.service.business.error.ParticipantDiscoveryError;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xbill.DNS.*;
 
+import javax.ejb.Singleton;
+import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
-
-import javax.ejb.Singleton;
-import javax.inject.Inject;
-
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xbill.DNS.DClass;
-import org.xbill.DNS.ExtendedResolver;
-import org.xbill.DNS.Name;
-import org.xbill.DNS.Record;
-import org.xbill.DNS.Resolver;
-import org.xbill.DNS.Section;
-import org.xbill.DNS.TXTRecord;
-import org.xbill.DNS.Type;
 
 /**
  * Service class in charge of the discovery of the participants on the network when a message arrives.
@@ -86,13 +78,23 @@ public class ParticipantDiscoveryService {
      * @throws BusinessException
      */
     public Participant discoverParticipant(Message incomingMessage, ParticipantType participantType) throws BusinessException {
+
+        MessageMetadata metadata = incomingMessage.getMessageMetadata();
+        if (metadata == null || metadata.getSenderDomain() == null) {
+            return null;
+        }
+
+        String domain = participantType == ParticipantType.SENDER ? metadata.getSenderDomain() : metadata.getRecipientDomain();
+        USEFRole participantRole = participantType == ParticipantType.SENDER ? metadata.getSenderRole() : metadata
+                .getRecipientRole();
+
         // check if one bypasses the DNS verification
         if (byPassDNSCheck()) {
             LOGGER.warn("DNS verification is bypassed.");
-            return findParticipant(incomingMessage, participantType);
+            return findParticipantInLocalConfiguration(domain, participantRole);
         } else {
             LOGGER.info("DNS verification is active.");
-            return findRealParticipant(incomingMessage, participantType);
+            return findParticipantInDns(domain, participantRole);
         }
     }
 
@@ -105,10 +107,15 @@ public class ParticipantDiscoveryService {
      */
     public String findUnsealingPublicKey(SignedMessage incomingMessage) throws BusinessException {
         String value;
+
+        String senderDomain = incomingMessage.getSenderDomain();
+        USEFRole senderRole = incomingMessage.getSenderRole();
+
         if (byPassDNSCheck()) {
-            value = findLocalParticipantUnsigningPublicKey(incomingMessage);
+            checkSenderDomainAndRoleAvailable(incomingMessage);
+            value = findLocalParticipantUnsigningPublicKey(senderDomain, senderRole);
         } else {
-            value = getUsefText(incomingMessage.getSenderDomain(), incomingMessage.getSenderRole());
+            value = getPublicUnsealingKey(senderDomain, senderRole);
         }
         return StringUtils.removeStart(value, PUBLIC_KEY_PREFIX);
     }
@@ -116,15 +123,12 @@ public class ParticipantDiscoveryService {
     /**
      * Checks whether a participant is found in the list of locally configured USEF participants (YAML file).
      *
-     * @param incomingMessage - {@link Message} which contains the sender's address.
+     * @param domain - {@link String} containing the participants's domain.
+     * @param participantRole - {@link USEFRole} indicating the participant's role.
      * @throws BusinessException if no participant is matching the sender.
      */
-    private Participant findParticipant(Message incomingMessage, ParticipantType participantType)
+    private Participant findParticipantInLocalConfiguration(String domain, USEFRole participantRole)
             throws BusinessException {
-        MessageMetadata metadata = incomingMessage.getMessageMetadata();
-        if (metadata == null || metadata.getSenderDomain() == null) {
-            return null;
-        }
 
         String participantDnsFileName = Config.getConfigurationFolder() +
                 config.getProperty(ConfigParam.PARTICIPANT_DNS_INFO_FILENAME);
@@ -136,9 +140,6 @@ public class ParticipantDiscoveryService {
 
         checkParticipantsListIsAvailable(participants);
 
-        String domain = participantType == ParticipantType.SENDER ? metadata.getSenderDomain() : metadata.getRecipientDomain();
-        USEFRole participantRole = participantType == ParticipantType.SENDER ? metadata.getSenderRole() : metadata
-                .getRecipientRole();
         /*
          * for each participant role, try to find if the sender's address matches the hostname or the EA. At the end of the loops,
          * if nothing has been found, throw a PARTICIPANT_NOT_FOUND error.
@@ -149,6 +150,8 @@ public class ParticipantDiscoveryService {
                     domain);
             throw new BusinessException(ParticipantDiscoveryError.PARTICIPANT_NOT_FOUND);
         }
+        foundParticipant.setUsefRole(participantRole);
+
         return foundParticipant;
     }
 
@@ -176,60 +179,74 @@ public class ParticipantDiscoveryService {
     }
 
     /**
+     * Gets the USEF version implemented in the given participant domain.
+     *
+     * @param participantDomain - {@link String} Domain name of the participant
+     * @return a {@link String} containing the USEF.
+     */
+    protected static String getUsefVersion(String participantDomain)  throws BusinessException {
+        return getTxtRecord("_usef." + participantDomain + ".");
+    }
+
+    /**
+     * Gets the USEF endpoint implemented in the given participant domain.
+     *
+     * @param participantDomain - {@link String} Domain name of the participant
+     * @return a {@link String} containing the url.
+     */
+    protected static String getUsefEndpoint(String participantDomain) throws BusinessException {
+        String version = getUsefVersion(participantDomain);
+
+        switch (version) {
+            case "2015":
+                break;
+            default:
+                throw new BusinessException(VersionError.VERSION_NOT_SUPPORTED, version);
+        }
+        return "https://" + participantDomain + "/USEF/" + getUsefVersion(participantDomain) + "/SignedMessage";
+    }
+
+    /**
+     * Gets the USEF unsealing key implemented of the given participant domain and role.
+     *
+     * @param participantDomain - {@link String} domain name of the participant
+     * @return a {@link String} containing the unsealing key.
+     */
+    protected static String getPublicUnsealingKey(String participantDomain, USEFRole participantRole) throws BusinessException {
+        return getTxtRecord("_" + participantRole.value() + "._usef." + participantDomain + ".");
+    }
+
+
+    /**
      * Checks whether a participant is found in the list of real participants.
      *
-     * @param incomingMessage - {@link Message} which contains the sender's address.
+     * @param domain - {@link String} containing the participants's domain.
+     * @param participantRole - {@link USEFRole} indicating the participant's role.
      * @throws BusinessException if no participant is matching the sender.
      */
-    private Participant findRealParticipant(Message incomingMessage, ParticipantType participantType)
+    protected static Participant findParticipantInDns(String domain, USEFRole participantRole)
             throws BusinessException {
-        MessageMetadata metadata = incomingMessage.getMessageMetadata();
-        if (metadata == null || metadata.getSenderDomain() == null) {
-            return null;
-        }
-
-        String domain = participantType == ParticipantType.SENDER ? metadata.getSenderDomain() : metadata.getRecipientDomain();
-        USEFRole participantRole = participantType == ParticipantType.SENDER ? metadata.getSenderRole() : metadata
-                .getRecipientRole();
-
-        String usefversion = getUsefText(domain, null);
-        getUsefText(domain, participantRole);
 
         Participant participant = new Participant();
         participant.setDomainName(domain);
-        participant.setSpecVersion(usefversion);
-
+        participant.setUsefRole(participantRole);
+        participant.setSpecVersion(getUsefVersion(domain));
+        participant.setUrl(getUsefEndpoint(domain));
         ParticipantRole role = new ParticipantRole(participantRole);
-        String recipientEndpoint = config.getProperty(ConfigParam.RECIPIENT_ENDPOINT);
+        role.setUrl(getUsefEndpoint(domain));
 
-        String url;
-        if (recipientEndpoint == null || "".equals(recipientEndpoint)) {
-            url = "https://" + domain + "/USEF/2015/SignedMessage";
-        } else {
-            url = "https://" + domain + ":8443/" + domain + "_" + participantRole.name() + recipientEndpoint;
-        }
-        role.setUrl(url);
-
-        String[] keys = "".split(" ");
+        String[] keys = getPublicUnsealingKey(domain, participantRole).split(" ");
         for (String singleKey : keys) {
-            role.setPublicKeys(Collections.singletonList(singleKey));
+            role.setPublicKeys(Collections.singletonList(StringUtils.removeStart(singleKey, PUBLIC_KEY_PREFIX)));
+            participant.setPublicKeys(Collections.singletonList(StringUtils.removeStart(singleKey, PUBLIC_KEY_PREFIX)));
         }
 
         participant.setRoles(Collections.singletonList(role));
         return participant;
     }
 
-    /**
-     * Return the USEF text of a domain name, or null if it does not exist. If role == null, the USEF version string is returned.
-     *
-     * @throws BusinessException
-     **/
-    protected String getUsefText(String name, USEFRole role) throws BusinessException {
-        String usefname = "_usef." + name + ".";
-        if (role != null) {
-            usefname = "_" + role.value() + "." + usefname;
-        }
-        Record qr = Record.newRecord(Name.fromConstantString(usefname), Type.TXT, DClass.IN);
+    protected static String getTxtRecord(String name) throws BusinessException {
+        Record qr = Record.newRecord(Name.fromConstantString(name), Type.TXT, DClass.IN);
         org.xbill.DNS.Message response;
         try {
             response = resolver.send(org.xbill.DNS.Message.newQuery(qr));
@@ -247,10 +264,7 @@ public class ParticipantDiscoveryService {
         return result.get(0);
     }
 
-    private String findLocalParticipantUnsigningPublicKey(SignedMessage incomingMessage) throws BusinessException {
-        checkSenderDomainAndRoleAvailable(incomingMessage);
-        String senderDomain = incomingMessage.getSenderDomain();
-        USEFRole senderRole = incomingMessage.getSenderRole();
+    private String findLocalParticipantUnsigningPublicKey(String senderDomain, USEFRole senderRole) throws BusinessException {
         String participantDnsFileName = Config.getConfigurationFolder() +
                 config.getProperty(ConfigParam.PARTICIPANT_DNS_INFO_FILENAME);
         if (!isFileExists(participantDnsFileName)) {
@@ -298,5 +312,4 @@ public class ParticipantDiscoveryService {
     private boolean byPassDNSCheck() {
         return config.getBooleanProperty(ConfigParam.BYPASS_DNS_VERIFICATION);
     }
-
 }

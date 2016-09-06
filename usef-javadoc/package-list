@@ -76,6 +76,7 @@ energy.usef.core.data.xml.bean.message
 energy.usef.core.dto
 energy.usef.core.endpoint
 energy.usef.core.event
+energy.usef.core.event.validation
 energy.usef.core.exception
 energy.usef.core.factory
 energy.usef.core.model

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 USEF Foundation
+ * Copyright 2015-2016 USEF Foundation
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ import energy.usef.core.data.xml.bean.message.DispositionAcceptedRejected;
 import energy.usef.core.data.xml.bean.message.MessageMetadata;
 import energy.usef.core.data.xml.bean.message.PrognosisResponse;
 import energy.usef.core.data.xml.bean.message.USEFRole;
+import energy.usef.core.event.validation.EventValidationService;
+import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
 import energy.usef.core.model.PlanboardMessage;
@@ -87,13 +89,18 @@ public class BrpAplanCoordinator {
     @Inject
     private Event<CreateFlexRequestEvent> createFlexRequestEventManager;
 
+    @Inject
+    private EventValidationService eventValidationService;
+
+
     /**
      * Invokes the PBC in charge of deciding whether A-Plans for the given period are accepted.
      *
      * @param event {@link ReceivedAPlanEvent}
      */
-    public void receivedAPlanEvent(@Observes ReceivedAPlanEvent event) {
+    public void receivedAPlanEvent(@Observes ReceivedAPlanEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
 
         // Making incoming context
         List<PrognosisDto> aplanDtos = fetchAllAPlans(event.getPeriod());
@@ -158,8 +165,9 @@ public class BrpAplanCoordinator {
      * @param event {@link PrepareFlexRequestsEvent}
      */
     @SuppressWarnings("unchecked")
-    public void prepareFlexRequestsEvent(@Observes PrepareFlexRequestsEvent event) {
+    public void prepareFlexRequestsEvent(@Observes PrepareFlexRequestsEvent event) throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+        eventValidationService.validateEventPeriodTodayOrInFuture(event);
 
         // Making incoming context
         List<PrognosisDto> processedAPlanDtos = fetchAllLatestAPlans(event.getPeriod(), DocumentStatus.PROCESSED);

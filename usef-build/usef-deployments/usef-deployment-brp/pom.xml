@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>energy.usef</groupId>
 		<artifactId>usef-deployments</artifactId>
-		<version>1.3.4</version>
+		<version>1.3.5</version>
 	</parent>
 	<artifactId>usef-deployment-brp</artifactId>
 	<packaging>war</packaging>
@@ -16,7 +16,7 @@
 				<dependency>
 					<groupId>energy.usef</groupId>
 					<artifactId>usef-endpoint-brp</artifactId>
-					<version>1.3.4</version>
+					<version>1.3.5</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -26,17 +26,17 @@
 		<dependency>
 			<groupId>energy.usef</groupId>
 			<artifactId>usef-simulation-brp</artifactId>
-			<version>1.3.4</version>
+			<version>1.3.5</version>
 		</dependency>
 		<dependency>
 			<groupId>energy.usef</groupId>
 			<artifactId>usef-core-planboard</artifactId>
-			<version>1.3.4</version>
+			<version>1.3.5</version>
 		</dependency>
 		<dependency>
 			<groupId>energy.usef</groupId>
 			<artifactId>usef-core-workflow</artifactId>
-			<version>1.3.4</version>
+			<version>1.3.5</version>
 		</dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -70,6 +70,7 @@
                                     <arg value="ApplicationPersistenceUnit"/>
                                     <arg value="org.hibernate.dialect.H2Dialect"/>
                                     <arg value="./target/ddl/"/>
+									<arg value="USEF_DS"/>
                                     <!-- reference to the passed-in classpath reference -->
                                     <classpath refid="maven.compile.classpath"/>
                                 </java>
