@@ -20,6 +20,25 @@ import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_H
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 import static energy.usef.core.data.xml.bean.message.MessagePrecedence.TRANSACTIONAL;
 
+import java.math.BigInteger;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import javax.ejb.Asynchronous;
+import javax.ejb.Stateless;
+import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.enterprise.event.TransactionPhase;
+import javax.inject.Inject;
+import javax.transaction.Transactional;
+
+import org.joda.time.LocalDate;
+import org.joda.time.Period;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import energy.usef.agr.config.ConfigAgr;
 import energy.usef.agr.config.ConfigAgrParam;
 import energy.usef.agr.model.PowerContainer;
@@ -44,27 +63,7 @@ import energy.usef.core.service.business.SequenceGeneratorService;
 import energy.usef.core.service.helper.JMSHelperService;
 import energy.usef.core.service.helper.MessageMetadataBuilder;
 import energy.usef.core.service.validation.CorePlanboardValidatorService;
-import energy.usef.core.util.DateTimeUtil;
 import energy.usef.core.util.XMLUtil;
-
-import java.math.BigInteger;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
-import javax.ejb.Asynchronous;
-import javax.ejb.Stateless;
-import javax.enterprise.event.Event;
-import javax.enterprise.event.Observes;
-import javax.enterprise.event.TransactionPhase;
-import javax.inject.Inject;
-import javax.transaction.Transactional;
-
-import org.joda.time.LocalDate;
-import org.joda.time.Period;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Aggregator coordinator class interacting with the planboard in the 'Create and Send A-Plan' workflow.

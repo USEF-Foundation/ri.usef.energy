@@ -96,8 +96,8 @@ public class NotificationHelperServiceImpl implements NotificationHelperService 
         LOGGER.info("Setting a programmatic timeout for {} milliseconds from now.", delay);
         NotificationInfo info = new NotificationInfo(MessageType.fromValue(messageMetadata.getPrecedence()),
                 messageMetadata.getConversationID(), xml);
-        delay = delay / DateTimeUtil.getTimeFactor();
-        timerService.createTimer(delay, info);
+        long factoredDelay = delay / DateTimeUtil.getTimeFactor();
+        timerService.createTimer(factoredDelay, info);
     }
 
     /**

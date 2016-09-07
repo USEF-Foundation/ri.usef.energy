@@ -16,15 +16,14 @@
 
 package energy.usef.agr.repository;
 
-import energy.usef.agr.model.PowerContainer;
-import energy.usef.agr.model.UdiEvent;
-import energy.usef.core.repository.BaseRepository;
-
 import java.util.List;
 
 import javax.persistence.TemporalType;
 
 import org.joda.time.LocalDate;
+
+import energy.usef.agr.model.UdiEvent;
+import energy.usef.core.repository.BaseRepository;
 
 /**
  * Repository class in charge of the operations related to the {@link UdiEvent} entities.
