@@ -15,7 +15,8 @@
 		<module>usef-core</module>
 		<module>usef-workflow</module>
 		<module>usef-simulation</module>
-		<module>usef-endpoints</module>
+        <module>usef-endpoints</module>
+        <module>usef-test</module>
 		<module>usef-deployments</module>
 	</modules>
 

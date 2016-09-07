@@ -18,6 +18,11 @@
 					<artifactId>usef-endpoint-brp</artifactId>
 					<version>1.3.6-SNAPSHOT</version>
 				</dependency>
+				<dependency>
+					<groupId>energy.usef</groupId>
+					<artifactId>usef-test-brp</artifactId>
+					<version>1.3.6-SNAPSHOT</version>
+				</dependency>
 			</dependencies>
 		</profile>
 	</profiles>

@@ -19,6 +19,11 @@
                     <artifactId>usef-endpoint-mdc</artifactId>
                     <version>1.3.6-SNAPSHOT</version>
                 </dependency>
+                <dependency>
+                    <groupId>energy.usef</groupId>
+                    <artifactId>usef-test-mdc</artifactId>
+                    <version>1.3.6-SNAPSHOT</version>
+                </dependency>
             </dependencies>
         </profile>
     </profiles>
