@@ -18,9 +18,6 @@ package energy.usef.core.model;
 
 import static javax.persistence.TemporalType.TIMESTAMP;
 
-import energy.usef.core.data.xml.bean.message.MessageMetadata;
-import energy.usef.core.util.DateTimeUtil;
-
 import java.util.Arrays;
 import java.util.Date;
 
@@ -38,6 +35,9 @@ import javax.persistence.Temporal;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.joda.time.LocalDateTime;
+
+import energy.usef.core.data.xml.bean.message.MessageMetadata;
+import energy.usef.core.util.DateTimeUtil;
 
 /**
  * Entity class {@link Message}: This class is a representation of a Message send or received.
@@ -70,7 +70,7 @@ public class Message {
     @Column(name = "XML", nullable = false)
     private String xml;
 
-    @Column(name = "MESSAGE_ID", nullable = false, unique = true)
+    @Column(name = "MESSAGE_ID", nullable = false, unique = false)
     private String messageId;
 
     @Column(name = "CONVERSATION_ID")
