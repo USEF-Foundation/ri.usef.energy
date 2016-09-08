@@ -20,6 +20,16 @@ import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_H
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 import static energy.usef.core.data.xml.bean.message.MessagePrecedence.ROUTINE;
 
+import java.util.List;
+import java.util.Map;
+
+import javax.ejb.Singleton;
+import javax.enterprise.event.Observes;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.DispositionAcceptedRejected;
@@ -35,18 +45,9 @@ import energy.usef.core.model.PtuFlexOffer;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
 import energy.usef.core.service.helper.JMSHelperService;
 import energy.usef.core.service.helper.MessageMetadataBuilder;
+import energy.usef.core.service.validation.CoreBusinessError;
 import energy.usef.core.service.validation.CorePlanboardValidatorService;
 import energy.usef.core.util.XMLUtil;
-
-import java.util.List;
-import java.util.Map;
-
-import javax.ejb.Singleton;
-import javax.enterprise.event.Observes;
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Coordinator class for the workflow 'Revoke Flex Offer' (DSO side).
@@ -81,17 +82,20 @@ public class DsoFlexOfferRevocationCoordinator {
         List<PlanboardMessage> flexOfferMessages = null;
 
         try {
+            long flexOfferSequence = flexOfferRevocation.getSequence();
+            String senderDomain = flexOfferRevocation.getMessageMetadata().getSenderDomain();
+
             // Retrieving related flex offer details.
-            Map<Integer, PtuFlexOffer> flexOffers = planboardBusinessService.findPtuFlexOffer(flexOfferRevocation.getSequence(),
-                    flexOfferRevocation.getMessageMetadata().getSenderDomain());
+            Map<Integer, PtuFlexOffer> flexOffers = planboardBusinessService.findPtuFlexOffer(flexOfferSequence, senderDomain);
 
             // Checking whether flex offers exist
             planboardValidatorService.checkRelatedFlexOffersExist(flexOfferRevocation, flexOffers);
 
             // Retrieving related plan board messages
             flexOfferMessages = planboardBusinessService
-                    .findPlanboardMessages(flexOfferRevocation.getSequence(), DocumentType.FLEX_OFFER,
-                            flexOfferRevocation.getMessageMetadata().getSenderDomain());
+                    .findPlanboardMessages(flexOfferSequence, DocumentType.FLEX_OFFER, senderDomain);
+
+            validateIfOrdered(flexOfferSequence, senderDomain);
 
             // Checking whether plan board messages exist
             planboardValidatorService.checkRelatedPlanboardMessagesExist(flexOfferRevocation, flexOfferMessages);
@@ -116,6 +120,15 @@ public class DsoFlexOfferRevocationCoordinator {
         response.setMessage(responseResultMessage);
         jmsHelperService.sendMessageToOutQueue(XMLUtil.messageObjectToXml(response));
         LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
+    }
+
+    private void validateIfOrdered(long flexOfferSequence, String senderDomain) throws BusinessValidationException {
+        List<PlanboardMessage> flexOrderMessages = planboardBusinessService
+                .findPlanboardMessagesWithOriginSequence(flexOfferSequence, DocumentType.FLEX_ORDER, senderDomain);
+        if (flexOrderMessages.stream().filter(fo -> DocumentStatus.PROCESSED.equals(fo.getDocumentStatus())).count() > 0) {
+            throw new BusinessValidationException(CoreBusinessError.FLEX_OFFER_ALREADY_ORDERED,
+                    flexOfferSequence);
+        }
     }
 
     private void setPlanboardMessageStatus(List<PlanboardMessage> flexOfferMessages) {

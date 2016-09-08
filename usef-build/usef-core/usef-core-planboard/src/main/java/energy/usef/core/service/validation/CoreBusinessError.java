@@ -38,6 +38,7 @@ public enum CoreBusinessError implements BusinessError {
 
     NO_FLEX_OFFER_RELATED("Impossible to find a flex offer with the sequence {} for participant {}."),
     NO_PLAN_BOARD_MESSAGE_RELATED("Impossible to find a plan board message with the sequence {}."),
+    FLEX_OFFER_ALREADY_ORDERED("Flex Offer has already been ordered, can not be revoked {}."),
     FLEX_OFFER_HAS_PTU_IN_OPERATE_OR_LATER_PHASE(
             "The flex offer {} for participant {} has PTU {} in operate (or later) phase already."),
 
