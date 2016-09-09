@@ -52,7 +52,7 @@ import java.util.Random;
  * <li>FLEX_OFFERS_DTO_LIST : Flex offer DTO list {@link List} of {@link FlexOfferDto}.</li>
  * </ul>
  * <p>
- * This step generates random flexibility on ptu's where flexibility is requested.
+ * This step never generates a flex offer.
  */
 public class AgrFlexOfferDetermineFlexibilityStubNoOffer implements WorkflowStep {
 

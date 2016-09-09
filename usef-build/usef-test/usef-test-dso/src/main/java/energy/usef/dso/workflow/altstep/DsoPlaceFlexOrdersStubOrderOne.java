@@ -35,8 +35,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Workflow step implementation for the Workflow 'DSO Place Flex Orders'. This implementation expects to find the following parameters
- * as input:
+ * Workflow step implementation for the Workflow 'DSO Place Flex Orders'.
+ * This stub orders 1 offer.
+ *
+ * This implementation expects to find the following parameters as input:
  * <ul>
  * <li>FLEX_OFFER_DTO_LIST ({@link List<FlexOfferDto>}): Flex offer DTO list.</li>
  * <li>CONGESTION_POINT_ENTITY_ADDRESS ({@link String}): Entity address of the congestion point.</li>

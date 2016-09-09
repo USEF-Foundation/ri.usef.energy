@@ -32,16 +32,16 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.List;
-
 /**
- * Implementation of a workflow step generating the Grid Safety Analysis. The step works as follows: - The step retrieves the
- * Non-Aggregator forecast and D-prognosis forecast - The step goes through the Non-Aggregator forecast, because this forecast
- * contains all possible values for congestion point, PTU date and PTU index - The step combines the forecasted power of the
- * Non-Aggregator forecast with the forecast in the D-Prognosis - Based on the prognosis, the disposition is determined: - A Max
- * load for a congestion point can be set. If the total forecasted power is within this value (+ or -), there is no congestion.
- * Available power is calculated based on the max load and used for the grid safety analysis. - When the forecasted power is not
- * within the max load, the requested power is calculated in order to reduce production or consumption. This value is added to the
- * grid safety analysis.
+ * Workflow step implementation for the Workflow 'Create Grid Safety Analysis'.
+ * This stub creates a grid safety analysis resulting in congestion.
+ *
+ * This implementation expects to find the following parameters as input:
+ * <ul>
+ * <li>CONGESTION_POINT_ENTITY_ADDRESS: the entity address of the congestion point ({@link String})</li>
+ * <li>NON_AGGREGATOR_FORECAST: the forecast for non-AGR conections ({@link String})</li>
+ * <li>D_PROGNOSIS_LIST: Relevant D-Prognoses ({@link LocalDate})</li>
+ * </ul>
  */
 public class DsoCreateGridSafetyAnalysisStubCongestion implements WorkflowStep {
     //Adjusted to always have congestion

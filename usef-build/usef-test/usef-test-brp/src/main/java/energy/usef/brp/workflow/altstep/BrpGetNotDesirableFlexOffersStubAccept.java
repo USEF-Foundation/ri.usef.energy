@@ -27,8 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Workflow step implementation for the 'Get Not Desirable Flex Offers' step of the 'Place Flex Orders' Workflow. This
- * implementation expects to find the following parameters as input:
+ * Workflow step implementation for the 'Get Not Desirable Flex Offers' step of the 'Place Flex Orders' Workflow.
+ * This stub states that all flex offers are desirable.
+ *
+ * This implementation expects to find the following parameters as input:
  * <ul>
  * <li>CONNECTION_GROUP_IDENTIFIER ({@link String}): USEF identifier of the connection group.</li>
  * <li>FLEX_OFFER_DTO_LIST ({@link List} of {@link FlexOfferDto}): Flex offer DTO list.</li>

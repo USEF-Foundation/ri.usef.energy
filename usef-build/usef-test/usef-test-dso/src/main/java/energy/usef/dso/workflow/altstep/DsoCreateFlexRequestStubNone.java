@@ -36,8 +36,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Workflow step implementation for the Workflow 'Create Flex Requests'. This implementation expects to find the following
- * parameters as input:
+ * Workflow step implementation for the Workflow 'Create Flex Requests'.
+ * This stub creates no flex requests.
+ *
+ * This implementation expects to find the following parameters as input:
  * <ul>
  * <li>CONGESTION_POINT_ENTITY_ADDRESS: the entity address of the congestion point ({@link String})</li>
  * <li>PERIOD: day for which one wants to send flex requests ({@link LocalDate})</li>
@@ -78,7 +80,7 @@ public class DsoCreateFlexRequestStubNone implements WorkflowStep {
 
     private void addFlexRequests(List<FlexRequestDto> flexRequestDtos, String entityAddress, LocalDate period,
             GridSafetyAnalysisDto gridSafetyAnalysis) {
-        int numberOfRequests = 0;//randomGenerator.nextInt(MAX_FLEX_REQUESTS_GENERATED + 1);
+        int numberOfRequests = 0;
         switch (numberOfRequests) {
         case 0:
             LOGGER.debug("No Flex Requests will be generated!");

@@ -29,8 +29,10 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Workflow step implementation for the Workflow 'Place Operate Flex Orders'. This implementation expects to find the following
- * parameters as input:
+ * Workflow step implementation for the Workflow 'Place Operate Flex Orders'.
+ * This stub orders all flex offers.
+ *
+ * This implementation expects to find the following parameters as input:
  * <ul>
  * <li>FLEX_OFFER_DTO_LIST ({@link List<FlexOfferDto>}): Flex offer DTO list.</li>
  * <li>GRID_SAFETY_ANALYSIS_DTO ({@link List<FlexOfferDto>}): Grid safety analysis DTO.</li>

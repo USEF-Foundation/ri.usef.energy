@@ -27,8 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Workflow step implementation for the A-Plan received step of the 'BRP received A-Plan and genetare flex request' workflow. This
- * implementation expects to find the following parameters as input:
+ * Workflow step implementation for the A-Plan received step of the 'BRP received A-Plan and genetare flex request' workflow.
+ * This stub neither accepts, neither processes all incoming A-Plans.
+ *
+ * This implementation expects to find the following parameters as input:
  * <ul>
  * <li>PTU_DURATION: PTU duration ({@link Integer})</li>
  * <li>A_PLAN_DTO_LIST: Full A-Plan DTO list ({@link List}) of {@link PrognosisDto} for this period</li>

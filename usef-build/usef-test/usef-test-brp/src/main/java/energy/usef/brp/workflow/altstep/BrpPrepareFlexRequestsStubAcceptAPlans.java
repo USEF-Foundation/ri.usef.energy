@@ -38,8 +38,10 @@ import java.util.Map;
 
 /**
  * Implementation of the PBC in charge of handling received A-Plans and asking the generation of flex requests. This step will
- * receive the list of A-Plan data per ptu for a given period (day). This implementation expects to find the following parameters as
- * input:
+ * receive the list of A-Plan data per ptu for a given period (day).
+ * This stub accepts all A-Plans, so no flex requests are created
+ *
+ * This implementation expects to find the following parameters as input:
  * <ul>
  * <li>PTU_DURATION: PTU duration ({@link Integer})</li>
  * <li>PROCESSED_A_PLAN_DTO_LIST: A-Plan DTO list ({@link java.util.List}) of {@link PrognosisDto}</li>

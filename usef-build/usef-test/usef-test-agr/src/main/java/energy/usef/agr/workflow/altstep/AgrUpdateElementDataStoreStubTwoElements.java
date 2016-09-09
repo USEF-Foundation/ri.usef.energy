@@ -31,7 +31,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Implementation of a workflow step to simulate the behavior of the AGR Element Data Store Update.
+ * Implementation of a workflow step to simulate the behavior of the AGR Element Data Store Update. This version of the
+ * stub removes the PV elements after being retrieved from the PBC feeder.
  * <p>
  * The PBC receives the following parameters as input:
  * <ul>

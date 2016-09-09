@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Basic step implementation for the {@link WorkflowStep} doing DSO grid monitoring.
+ * Basic step implementation for the {@link WorkflowStep} doing DSO grid monitoring. This stub result in no congestion.
  */
 public class DsoMonitorGridStubNoCongestion implements WorkflowStep {
     // Adjusted to never have Congestion

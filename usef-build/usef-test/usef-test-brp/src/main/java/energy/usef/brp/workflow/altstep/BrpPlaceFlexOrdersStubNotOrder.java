@@ -28,8 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Workflow step implementation for the Workflow 'BRP Place Flex Orders'. This implementation expects to find the following
- * parameters as input:
+ * Workflow step implementation for the Workflow 'BRP Place Flex Orders'.
+ * This stub does not order any flexoffers.
+ *
+ * This implementation expects to find the following parameters as input:
  * <ul>
  * <li>CONNECTION_GROUP_IDENTIFIER ({@link String}): usef identifier of the connection group.</li>
  * <li>PTU_DURATION ({@link Integer}): duration of one ptu in minutes.</li>

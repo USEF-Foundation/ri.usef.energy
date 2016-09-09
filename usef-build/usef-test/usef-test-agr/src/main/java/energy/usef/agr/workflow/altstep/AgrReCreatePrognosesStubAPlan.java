@@ -39,9 +39,9 @@ import java.util.stream.Collectors;
 
 /**
  * Stub implementation of the PBC which is in charge of deciding to re-create or not A-Plans and or D-Prognoses after the
- * re-optimization of the portfolio.
+ * re-optimization of the portfolio. This version only recreates the A-Plans.
  * <p>
- * The PBC receives the following parameters as input to make the decision:
+ * The PBC receives the following parameters as input:
  * <ul>
  * <li>LATEST_D_PROGNOSES_DTO_LIST : the list of latest {@link Prognosis} of type 'D-Progosis'.
  * </li>

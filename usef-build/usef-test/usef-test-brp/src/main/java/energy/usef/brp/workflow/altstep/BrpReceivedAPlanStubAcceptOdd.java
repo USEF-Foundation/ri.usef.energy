@@ -29,8 +29,10 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Workflow step implementation for the A-Plan received step of the 'BRP received A-Plan and genetare flex request' workflow. This
- * implementation expects to find the following parameters as input:
+ * Workflow step implementation for the A-Plan received step of the 'BRP received A-Plan and genetare flex request' workflow.
+ * This stub accepts all incoming A-Plans if there is an odd number of a-plans for that participant
+ *
+ * This implementation expects to find the following parameters as input:
  * <ul>
  * <li>PTU_DURATION: PTU duration ({@link Integer})</li>
  * <li>A_PLAN_DTO_LIST: Full A-Plan DTO list ({@link List}) of {@link PrognosisDto} for this period</li>
@@ -41,7 +43,6 @@ import java.util.stream.Collectors;
  * <li>ACCEPTED_A_PLAN_DTO_LIST: List of accepted A-Plans ({@link java.util.List}) of {@link PrognosisDto}</li>
  * <li>PROCESSED_A_PLAN_DTO_LIST: List of processed A-Plans ({@link java.util.List}) of {@link PrognosisDto}</li>
  * </ul>
- * The list of received A-Plan DTOs is iterated and for each item a pseudo random decision is taken: accepted, processed..
  */
 public class BrpReceivedAPlanStubAcceptOdd implements WorkflowStep {
     private static final Logger LOGGER = LoggerFactory.getLogger(BrpReceivedAPlanStubAcceptOdd.class);

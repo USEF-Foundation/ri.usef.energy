@@ -50,7 +50,7 @@ import java.util.Random;
  * <li>FLEX_OFFERS_DTO_LIST : Flex offer DTO list {@link List} of {@link FlexOfferDto}.</li>
  * </ul>
  * <p>
- * This step generates random flexibility on ptu's where flexibility is requested.
+ * This step always generates 2 flex offers
  */
 public class AgrFlexOfferDetermineFlexibilityStubTwoOffers implements WorkflowStep {
 
@@ -91,6 +91,7 @@ public class AgrFlexOfferDetermineFlexibilityStubTwoOffers implements WorkflowSt
                         flexRequestDto.getSequenceNumber());
                 populateFlexOfferDto(flexOfferDto, flexRequestDto, true);
                 outputFlexOffers.add(flexOfferDto);
+                //add 2nd flex offer
                 outputFlexOffers.add(flexOfferDto);
             } else if (decision == 1) {
                 // refuse to create an offer for the flex request: put an empty flex offer.

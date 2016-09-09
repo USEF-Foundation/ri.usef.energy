@@ -30,7 +30,17 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Implementation of a workflow step related to the Use Case 2015 (Create forecasts for non-Aggregator connections).
+ * Workflow step implementation for the Workflow 'Create Non Aggregator Forecast'.
+ * This stub creates a non-AGR forecast without using the PBC feeder.
+ *
+ * This implementation expects to find the following parameters as input:
+ * <ul>
+ * <li>PTU_DATE: the date for which the non-AGR forecast should be created ({@link String})</li>
+ * <li>PTU_DURATION: The duration of one PTU ({@link String})</li>
+ * <li>CONGESTION_POINT_ENTITY_ADDRESS: the entity address of the congestion point ({@link String})</li>
+ * <li>AGR_DOMAIN_LIST: List of Aggregators ({@link String})</li>
+ * <li>AGR_CONNECTION_COUNT_LIST: Number of non-AGR connections ({@link LocalDate})</li>
+ * </ul>
  */
 public class DsoCreateNonAggregatorForecastStubWithoutFeeder implements WorkflowStep {
 

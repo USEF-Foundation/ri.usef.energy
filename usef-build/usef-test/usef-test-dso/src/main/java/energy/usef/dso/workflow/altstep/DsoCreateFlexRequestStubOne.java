@@ -36,8 +36,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Workflow step implementation for the Workflow 'Create Flex Requests'. This implementation expects to find the following
- * parameters as input:
+ * Workflow step implementation for the Workflow 'Create Flex Requests'.
+ * This stub creates one flex request.
+ *
+ * This implementation expects to find the following parameters as input:
  * <ul>
  * <li>CONGESTION_POINT_ENTITY_ADDRESS: the entity address of the congestion point ({@link String})</li>
  * <li>PERIOD: day for which one wants to send flex requests ({@link LocalDate})</li>
