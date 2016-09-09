@@ -61,6 +61,7 @@ public class ParticipantDiscoveryService {
     private static final Logger LOGGER_CONFIDENTIAL = LoggerFactory.getLogger(USEFLogCategory.CONFIDENTIAL);
     private static final String PUBLIC_KEY_PREFIX = "cs1.";
     private static final String PARTICIPANTS_YAML = "participants_dns_info.yaml";
+    private static final String SUPPORTED_USEF_VERSION = "2015";
 
     private static Resolver resolver = null;
 
@@ -206,7 +207,7 @@ public class ParticipantDiscoveryService {
     protected static String getUsefEndpoint(String participantDomain) throws BusinessException {
         String version = getUsefVersion(participantDomain);
 
-        if(! version.equals("2015")) {
+        if(! SUPPORTED_USEF_VERSION.equals(version)) {
                 throw new BusinessException(VersionError.VERSION_NOT_SUPPORTED, version);
         }
         return "https://" + participantDomain + "/USEF/" + getUsefVersion(participantDomain) + "/SignedMessage";
