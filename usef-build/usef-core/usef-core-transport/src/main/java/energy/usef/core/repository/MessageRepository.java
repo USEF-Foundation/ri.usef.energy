@@ -37,8 +37,8 @@ import energy.usef.core.model.MessageDirection;
 @Stateless
 public class MessageRepository extends BaseRepository<Message> {
 
-    private final String COMMON_REFERENCE_QUERY = "CommonReferenceQuery ";
-    private final String COMMON_REFERENCE_QUERY_RESPONSE = "CommonReferenceQueryResponse";
+    private static final String COMMON_REFERENCE_QUERY = "CommonReferenceQuery ";
+    private static final String COMMON_REFERENCE_QUERY_RESPONSE = "CommonReferenceQueryResponse";
 
     /**
      * Gets an ingoing message entity corresponding to an response message.
