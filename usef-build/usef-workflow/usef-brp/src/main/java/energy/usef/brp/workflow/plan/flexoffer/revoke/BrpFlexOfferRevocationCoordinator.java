@@ -132,7 +132,7 @@ public class BrpFlexOfferRevocationCoordinator {
     private void validateIfOrdered(long flexOfferSequence, String senderDomain) throws BusinessValidationException {
         List<PlanboardMessage> flexOrderMessages = planboardBusinessService
                 .findPlanboardMessagesWithOriginSequence(flexOfferSequence, DocumentType.FLEX_ORDER, senderDomain);
-        if (flexOrderMessages.stream().filter(fo -> DocumentStatus.PROCESSED.equals(fo.getDocumentStatus())).count() > 0) {
+        if (flexOrderMessages.stream().filter(fo -> DocumentStatus.ACCEPTED.equals(fo.getDocumentStatus())).count() > 0) {
             throw new BusinessValidationException(CoreBusinessError.FLEX_OFFER_ALREADY_ORDERED,
                     flexOfferSequence);
         }
