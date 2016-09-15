@@ -18,10 +18,13 @@ package energy.usef.dso.workflow.settlement.send;
 
 import energy.usef.core.data.xml.bean.message.DispositionAcceptedDisputed;
 import energy.usef.core.data.xml.bean.message.SettlementMessageResponse;
+import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
 import energy.usef.core.model.PlanboardMessage;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
 import energy.usef.core.util.DocumentStatusUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -33,6 +36,8 @@ import javax.inject.Inject;
  */
 @Singleton
 public class DsoSettlementMessageResponseCoordinator {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DsoSettlementMessageResponseCoordinator.class);
 
     @Inject
     private CorePlanboardBusinessService businessService;
@@ -50,6 +55,11 @@ public class DsoSettlementMessageResponseCoordinator {
             List<PlanboardMessage> flexOrderSettlementMessages = businessService.findPlanboardMessagesWithOriginSequence(orderReference,
                     DocumentType.FLEX_ORDER_SETTLEMENT, aggregatorDomain);
             for (PlanboardMessage flexOrderSettlementMessage : flexOrderSettlementMessages) {
+                if (!DocumentStatus.SENT.equals(flexOrderSettlementMessage.getDocumentStatus())) {
+                    LOGGER.error("A response has already been processed for this flex request %s. Invalid response received " +
+                                    "from %s. ", flexOrderSettlementMessage.getSequence(), aggregatorDomain);
+                    continue;
+                }
                 flexOrderSettlementMessage.setDocumentStatus(DocumentStatusUtil.toDocumentStatus(disposition));
                 businessService.updatePlanboardMessage(flexOrderSettlementMessage);
             }

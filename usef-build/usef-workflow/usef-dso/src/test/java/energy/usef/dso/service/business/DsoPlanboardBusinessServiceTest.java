@@ -278,9 +278,11 @@ public class DsoPlanboardBusinessServiceTest {
         AcknowledgementStatus acknowledgementStatus = AcknowledgementStatus.ACCEPTED;
         String aggregatorDomain = "test.com";
 
+        PlanboardMessage planboardMessage = new PlanboardMessage();
+        planboardMessage.setDocumentStatus(DocumentStatus.SENT);
         PowerMockito.when(planboardMessageRepository
                 .findSinglePlanboardMessage(Matchers.eq(sequence), Matchers.eq(DocumentType.FLEX_ORDER),
-                        Matchers.eq(aggregatorDomain))).thenReturn(new PlanboardMessage());
+                        Matchers.eq(aggregatorDomain))).thenReturn(planboardMessage);
 
         planboardService.updateFlexOrdersWithAcknowledgementStatus(sequence, acknowledgementStatus, aggregatorDomain);
 
@@ -615,6 +617,7 @@ public class DsoPlanboardBusinessServiceTest {
         PlanboardMessage planboardMessage = new PlanboardMessage();
         planboardMessage.setDocumentType(documentType);
         planboardMessage.setSequence(sequence);
+        planboardMessage.setDocumentStatus(DocumentStatus.SENT);
         planboardMessage.setConnectionGroup(connectionGroup);
         planboardMessage.setPeriod(new LocalDate());
         if (documentType == DocumentType.FLEX_REQUEST || documentType == DocumentType.FLEX_OFFER

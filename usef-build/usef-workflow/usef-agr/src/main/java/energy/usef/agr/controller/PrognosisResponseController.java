@@ -78,12 +78,19 @@ public class PrognosisResponseController extends BaseIncomingResponseMessageCont
         DocumentType documentType = message.getMessageMetadata().getSenderRole() == USEFRole.DSO ? DocumentType.D_PROGNOSIS
                 : DocumentType.A_PLAN;
 
-        // Update status
-        corePlanboardBusinessService.updatePrognosisStatus(message.getPrognosisSequence(), senderDomain, documentType,
-                documentStatus);
 
         PlanboardMessage originalPrognosis = corePlanboardBusinessService.findSinglePlanboardMessage(
                 message.getPrognosisSequence(), documentType, senderDomain);
+
+        if (!DocumentStatus.SENT.equals(originalPrognosis.getDocumentStatus())) {
+            LOGGER.error("A response has already been processed for this prognosis %s. Invalid response received " +
+                    "from %s. ",  message.getPrognosisSequence(), senderDomain);
+            return;
+        }
+
+        // Update status
+        corePlanboardBusinessService.updatePrognosisStatus(message.getPrognosisSequence(), senderDomain, documentType,
+                documentStatus);
 
         if ((originalPrognosis != null) && (documentType == DocumentType.A_PLAN)) {
            // Fire an event to move to Validate phase if possible

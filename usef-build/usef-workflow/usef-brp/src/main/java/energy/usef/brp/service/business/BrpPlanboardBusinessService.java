@@ -77,6 +77,13 @@ public class BrpPlanboardBusinessService {
             AcknowledgementStatus acknowledgementStatus, String aggregatorDomain) {
         PlanboardMessage flexOrderMessage = planboardMessageRepository.findSinglePlanboardMessage(flexOrderSequence,
                 DocumentType.FLEX_ORDER, aggregatorDomain);
+
+        if (!DocumentStatus.SENT.equals(flexOrderMessage.getDocumentStatus())) {
+            LOGGER.error("A response has already been processed for this flex order %s. Invalid response received " +
+                            "from %s. ", flexOrderSequence, aggregatorDomain);
+            return null;
+        }
+
         flexOrderMessage.setDocumentStatus(DocumentStatusUtil.toDocumentStatus(acknowledgementStatus));
 
         List<PtuFlexOrder> ptuFlexOrders = ptuFlexOrderRepository.findFlexOrdersBySequence(flexOrderSequence);

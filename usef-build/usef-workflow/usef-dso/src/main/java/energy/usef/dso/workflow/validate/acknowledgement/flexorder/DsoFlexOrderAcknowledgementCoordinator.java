@@ -57,16 +57,16 @@ public class DsoFlexOrderAcknowledgementCoordinator {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
         // Updating plan-board
         LOGGER.debug("Updating plan-board");
-        FlexOrderDto dto = dsoPlanboardBusinessService.updateFlexOrdersWithAcknowledgementStatus(event.getSequence(),
+        FlexOrderDto flexOrderDto = dsoPlanboardBusinessService.updateFlexOrdersWithAcknowledgementStatus(event.getSequence(),
                 event.getAcknowledgementStatus(), event.getAggregatorDomain());
 
-        if (dto == null) {
+        if (flexOrderDto == null) {
             LOGGER.warn("No flex order to update was found");
         } else if (AcknowledgementStatus.ACCEPTED != event.getAcknowledgementStatus()) {
             // Flexibility request is rejected or no response received, creating a new request
-            CreateFlexRequestEvent createFlexRequestEvent = new CreateFlexRequestEvent(dto.getConnectionGroupEntityAddress(),
-                    dto.getPeriod(),
-                    dto.getPtus().stream()
+            CreateFlexRequestEvent createFlexRequestEvent = new CreateFlexRequestEvent(flexOrderDto.getConnectionGroupEntityAddress(),
+                    flexOrderDto.getPeriod(),
+                    flexOrderDto.getPtus().stream()
                             .map(PtuFlexOrderDto::getPtuIndex)
                             .mapToInt(BigInteger::intValue)
                             .mapToObj(Integer::valueOf)

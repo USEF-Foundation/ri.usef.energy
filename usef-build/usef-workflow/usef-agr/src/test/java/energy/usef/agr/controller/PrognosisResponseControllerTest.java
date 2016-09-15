@@ -81,6 +81,7 @@ public class PrognosisResponseControllerTest {
     public void testActionOnAccepted() throws Exception {
         PrognosisResponse prognosisResponse = buildPrognosisResponse(DispositionAcceptedRejected.ACCEPTED);
         PlanboardMessage originalAPlan = new PlanboardMessage();
+        originalAPlan.setDocumentStatus(DocumentStatus.SENT);
         originalAPlan.setPeriod(new LocalDate());
         originalAPlan.setConnectionGroup(new BrpConnectionGroup());
         originalAPlan.getConnectionGroup().setUsefIdentifier("brp.usef-example.com");
@@ -100,6 +101,14 @@ public class PrognosisResponseControllerTest {
     @Test
     public void testActionOnRejected() throws Exception {
         PrognosisResponse prognosisResponse = buildPrognosisResponse(DispositionAcceptedRejected.REJECTED);
+        PlanboardMessage originalAPlan = new PlanboardMessage();
+        originalAPlan.setDocumentStatus(DocumentStatus.SENT);
+        originalAPlan.setPeriod(new LocalDate());
+        originalAPlan.setConnectionGroup(new BrpConnectionGroup());
+        originalAPlan.getConnectionGroup().setUsefIdentifier("brp.usef-example.com");
+
+        Mockito.when(corePlanboardBusinessService.findSinglePlanboardMessage(prognosisResponse.getPrognosisSequence(),
+                DocumentType.A_PLAN, prognosisResponse.getMessageMetadata().getSenderDomain())).thenReturn(originalAPlan);
 
         controller.action(prognosisResponse, null);
 
@@ -118,6 +127,15 @@ public class PrognosisResponseControllerTest {
         ArgumentCaptor<Message> message = ArgumentCaptor.forClass(Message.class);
 
         PrognosisResponse response = buildPrognosisResponse(DispositionAcceptedRejected.REJECTED);
+        PlanboardMessage originalAPlan = new PlanboardMessage();
+        originalAPlan.setDocumentStatus(DocumentStatus.SENT);
+        originalAPlan.setPeriod(new LocalDate());
+        originalAPlan.setConnectionGroup(new BrpConnectionGroup());
+        originalAPlan.getConnectionGroup().setUsefIdentifier("brp.usef-example.com");
+
+        Mockito.when(corePlanboardBusinessService.findSinglePlanboardMessage(response.getPrognosisSequence(),
+                DocumentType.A_PLAN, response.getMessageMetadata().getSenderDomain())).thenReturn(originalAPlan);
+
         FlexOrderStatus status = new FlexOrderStatus();
         status.setIsValidated(false);
         status.setSequence(101L);
@@ -138,6 +156,15 @@ public class PrognosisResponseControllerTest {
         ArgumentCaptor<Message> message = ArgumentCaptor.forClass(Message.class);
 
         PrognosisResponse response = buildPrognosisResponse(DispositionAcceptedRejected.REJECTED);
+        PlanboardMessage originalAPlan = new PlanboardMessage();
+        originalAPlan.setDocumentStatus(DocumentStatus.SENT);
+        originalAPlan.setPeriod(new LocalDate());
+        originalAPlan.setConnectionGroup(new BrpConnectionGroup());
+        originalAPlan.getConnectionGroup().setUsefIdentifier("brp.usef-example.com");
+
+        Mockito.when(corePlanboardBusinessService.findSinglePlanboardMessage(response.getPrognosisSequence(),
+                DocumentType.A_PLAN, response.getMessageMetadata().getSenderDomain())).thenReturn(originalAPlan);
+
         FlexOrderStatus status = new FlexOrderStatus();
         status.setSequence(101L);
         response.getFlexOrderStatus().add(status);
@@ -158,6 +185,16 @@ public class PrognosisResponseControllerTest {
         ArgumentCaptor<Message> message = ArgumentCaptor.forClass(Message.class);
 
         PrognosisResponse response = buildPrognosisResponse(DispositionAcceptedRejected.REJECTED);
+
+        PlanboardMessage originalAPlan = new PlanboardMessage();
+        originalAPlan.setDocumentStatus(DocumentStatus.SENT);
+        originalAPlan.setPeriod(new LocalDate());
+        originalAPlan.setConnectionGroup(new BrpConnectionGroup());
+        originalAPlan.getConnectionGroup().setUsefIdentifier("brp.usef-example.com");
+
+        Mockito.when(corePlanboardBusinessService.findSinglePlanboardMessage(response.getPrognosisSequence(),
+                DocumentType.A_PLAN, response.getMessageMetadata().getSenderDomain())).thenReturn(originalAPlan);
+
         FlexOrderStatus status = new FlexOrderStatus();
         status.setIsValidated(true);
         status.setSequence(101L);

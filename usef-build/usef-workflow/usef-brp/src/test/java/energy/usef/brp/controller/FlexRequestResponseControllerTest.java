@@ -62,6 +62,7 @@ public class FlexRequestResponseControllerTest {
     @Test
     public void testActionOnAccepted() throws BusinessException {
         PlanboardMessage controlPlanboardMessage = new PlanboardMessage();
+        controlPlanboardMessage.setDocumentStatus(DocumentStatus.SENT);
         PowerMockito.when(corePlanboardBusinessService.findSinglePlanboardMessage(Matchers.any(Long.class), Matchers.eq(
                 DocumentType.FLEX_REQUEST), Matchers.eq("agr-usef-example.com"))).thenReturn(controlPlanboardMessage);
         controller.action(buildFlexRequestResponse(DispositionAcceptedRejected.ACCEPTED), null);
@@ -71,6 +72,7 @@ public class FlexRequestResponseControllerTest {
     @Test
     public void testActionOnRejected() throws BusinessException {
         PlanboardMessage controlPlanboardMessage = new PlanboardMessage();
+        controlPlanboardMessage.setDocumentStatus(DocumentStatus.SENT);
         PowerMockito.when(corePlanboardBusinessService.findSinglePlanboardMessage(Matchers.any(Long.class), Matchers.eq(
                 DocumentType.FLEX_REQUEST), Matchers.eq("agr-usef-example.com"))).thenReturn(controlPlanboardMessage);
         controller.action(buildFlexRequestResponse(DispositionAcceptedRejected.REJECTED), null);
