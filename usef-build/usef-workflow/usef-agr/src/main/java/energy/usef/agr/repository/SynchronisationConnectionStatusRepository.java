@@ -16,6 +16,7 @@
 
 package energy.usef.agr.repository;
 
+import energy.usef.agr.model.CommonReferenceOperator;
 import energy.usef.agr.model.SynchronisationConnection;
 import energy.usef.agr.model.SynchronisationConnectionStatus;
 import energy.usef.agr.model.SynchronisationConnectionStatusType;
@@ -52,6 +53,23 @@ public class SynchronisationConnectionStatusRepository extends BaseRepository<Sy
      */
     public void deleteAll() {
         entityManager.createQuery("DELETE FROM SynchronisationConnectionStatus").executeUpdate();
+    }
+
+
+    /**
+     * Deletes all the {@link SynchronisationConnectionStatus} entities for a given {@link CommonReferenceOperator}.
+     *
+     * @param commonReferenceOperator an existing {@link CommonReferenceOperator}
+     */
+    public void deleteAll(CommonReferenceOperator commonReferenceOperator) {
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("DELETE FROM SynchronisationConnectionStatus ");
+        queryBuilder.append("WHERE commonReferenceOperator = :commonReferenceOperator ");
+
+        Query query = entityManager.createQuery(queryBuilder.toString());
+        query.setParameter("commonReferenceOperator", commonReferenceOperator);
+
+        query.executeUpdate();
     }
 
 }

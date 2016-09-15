@@ -124,7 +124,7 @@ public abstract class BaseRepository<T> {
      * @param entity
      */
     public void delete(T entity) {
-        entityManager.remove(entity);
+        entityManager.remove(entityManager.merge(entity));
     }
 
     /**

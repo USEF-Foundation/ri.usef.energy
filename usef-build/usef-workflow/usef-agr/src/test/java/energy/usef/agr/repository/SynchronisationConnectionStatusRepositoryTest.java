@@ -23,6 +23,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import energy.usef.agr.model.CommonReferenceOperator;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -49,6 +50,7 @@ public class SynchronisationConnectionStatusRepositoryTest {
     private static EntityManager entityManager;
 
     private SynchronisationConnectionStatusRepository repository;
+    private CommonReferenceOperatorRepository aRepository;
 
     /**
      * Initialize test fixture.
