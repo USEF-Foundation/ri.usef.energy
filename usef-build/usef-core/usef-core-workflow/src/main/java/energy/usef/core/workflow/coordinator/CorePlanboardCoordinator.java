@@ -29,11 +29,13 @@ import energy.usef.core.model.PtuContainer;
 import energy.usef.core.model.PtuContainerState;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
 
+import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +72,8 @@ public class CorePlanboardCoordinator {
      *
      * @param event {@link RequestMoveToValidateEvent}.
      */
+    @Asynchronous
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
     public void processMoveToValidateEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) RequestMoveToValidateEvent event) {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
         boolean success = corePlanboardService.processMoveToValidateEvent(event.getPeriod());
