@@ -81,7 +81,7 @@ public class AgrDataBusinessServiceTest {
 
     @Test
     public void testGetSynchronisationConnections() {
-        Assert.assertEquals("[{\"domain\":\"cro0.usef-example.com\"},{\"domain\":\"cro2.usef-example.com\"},{\"domain\":\"cro3.usef-example.com\"}]", service.getSynchronisationConnections());
+        Assert.assertEquals("[{\"entityAddress\":\"ea1.2015-00.A:0\",\"customer\":true},{\"entityAddress\":\"ea1.2015-00.A:2\",\"customer\":true},{\"entityAddress\":\"ea1.2015-00.A:3\",\"customer\":true}]", service.getSynchronisationConnections());
     }
 
     private String createCommonReferenceOperatorRequest() {
