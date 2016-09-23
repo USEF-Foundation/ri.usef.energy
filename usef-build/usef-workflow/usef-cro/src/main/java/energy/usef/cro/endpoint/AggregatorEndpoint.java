@@ -35,14 +35,14 @@ public class AggregatorEndpoint {
     CommonReferenceOperatorTopologyBusinessService service;
 
     /**
-     * Endpoint to find an {@Link Aggregator} by it's domain name.
+     * Endpoint to get all {@Link Aggregator} objects.
      *
      * @return a {@Link Response} message containing the requested information
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response findAllAggregators() {
-        LOGGER.info("Received request to find all Aggregators");
+    public Response getAllAggregators() {
+        LOGGER.info("Received request to get all Aggregators");
         try {
             return Response.ok(JsonUtil.createJsonText(service.findAllAggregators()), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
@@ -53,22 +53,22 @@ public class AggregatorEndpoint {
     }
 
     /**
-     * Endpoint to find an {@Link Aggregator} by it's domain name.
+     * Endpoint to get an {@Link Aggregator} givenit's domain name.
      *
-     * @param domain {@link String} containing the domain name of the {@Link Aggregator} to find.
+     * @param domain {@link String} containing the domain name of the {@Link Aggregator}
      * @return a {@Link Response} message containing the requested information
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{domain}")
-    public Response findAggegatorByDomain(@PathParam("domain") String domain) {
-        LOGGER.info("Received request to find Aggregator {}", domain);
+    public Response getAggegatorByDomain(@PathParam("domain") String domain) {
+        LOGGER.info("Received request to get Aggregator {}", domain);
         try {
             return Response.ok(JsonUtil.createJsonText(service.findAggregator(domain)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
             return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
         } finally {
-            LOGGER.info("Processed request to find Aggregator {}", domain);
+            LOGGER.info("Processed request to get Aggregator {}", domain);
         }
     }
 

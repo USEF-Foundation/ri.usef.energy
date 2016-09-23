@@ -35,14 +35,14 @@ public class BalanceResponsiblePartyEndpoint {
     CommonReferenceOperatorTopologyBusinessService service;
 
     /**
-     * Endpoint to find an {@Link BalanceResponsibleParty} by it's domain name.
+     * Endpoint to get all {@Link BalanceResponsibleParty} objects.
      *
      * @return a {@Link Response} message containing the requested information
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response findAllBalanceResponsiblePartys() {
-        LOGGER.info("Received request to find all BalanceResponsibleParties");
+    public Response getAllBalanceResponsibleParties() {
+        LOGGER.info("Received request to get all BalanceResponsibleParties");
         try {
             return Response.ok(JsonUtil.createJsonText(service.findAllBalanceResponsibleParties()), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
@@ -53,22 +53,22 @@ public class BalanceResponsiblePartyEndpoint {
     }
 
     /**
-     * Endpoint to find an {@Link BalanceResponsibleParty} by it's domain name.
+     * Endpoint to find a {@Link BalanceResponsibleParty} given it's domain name.
      *
-     * @param domain {@link String} containing the domain name of the {@Link BalanceResponsibleParty} to find.
+     * @param domain {@link String} containing the domain name of the {@Link BalanceResponsibleParty}
      * @return a {@Link Response} message containing the requested information
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{domain}")
-    public Response findAggegatorByDomain(@PathParam("domain") String domain) {
-        LOGGER.info("Received request to find BalanceResponsibleParty {}", domain);
+    public Response getBalanceResponsilePartyByDomain(@PathParam("domain") String domain) {
+        LOGGER.info("Received request to get BalanceResponsibleParty {}", domain);
         try {
             return Response.ok(JsonUtil.createJsonText(service.findBalanceResponsibleParty(domain)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
             return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
         } finally {
-            LOGGER.info("Processed request to find BalanceResponsibleParty {}", domain);
+            LOGGER.info("Processed request to get BalanceResponsibleParty {}", domain);
         }
     }
 

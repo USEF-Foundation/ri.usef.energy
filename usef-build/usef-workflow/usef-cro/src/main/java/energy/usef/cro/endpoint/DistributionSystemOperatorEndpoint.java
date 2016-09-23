@@ -35,14 +35,14 @@ public class DistributionSystemOperatorEndpoint {
     CommonReferenceOperatorTopologyBusinessService service;
 
     /**
-     * Endpoint to find an {@Link DistributionSystemOperator} by it's domain name.
+     * Endpoint to get all {@Link DistributionSystemOperator} objects.
      *
      * @return a {@Link Response} message containing the requested information
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response findAllDistributionSystemOperators() {
-        LOGGER.info("Received request to find all DistributionSystemOperators");
+    public Response getAllDistributionSystemOperators() {
+        LOGGER.info("Received request to get all DistributionSystemOperators");
         try {
             return Response.ok(JsonUtil.createJsonText(service.findAllDistributionSystemOperators()), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
@@ -53,22 +53,22 @@ public class DistributionSystemOperatorEndpoint {
     }
 
     /**
-     * Endpoint to find an {@Link DistributionSystemOperator} by it's domain name.
+     * Endpoint to get a {@Link DistributionSystemOperator} given it's domain name.
      *
-     * @param domain {@link String} containing the domain name of the {@Link DistributionSystemOperator} to find.
+     * @param domain {@link String} containing the domain name of the {@Link DistributionSystemOperator}
      * @return a {@Link Response} message containing the requested information
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{domain}")
-    public Response findAggegatorByDomain(@PathParam("domain") String domain) {
-        LOGGER.info("Received request to find DistributionSystemOperator {}", domain);
+    public Response getAggegatorByDomain(@PathParam("domain") String domain) {
+        LOGGER.info("Received request to get DistributionSystemOperator {}", domain);
         try {
             return Response.ok(JsonUtil.createJsonText(service.findDistributionSystemOperator(domain)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
             return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
         } finally {
-            LOGGER.info("Processed request to find DistributionSystemOperator {}", domain);
+            LOGGER.info("Processed request to get DistributionSystemOperator {}", domain);
         }
     }
 

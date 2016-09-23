@@ -36,14 +36,14 @@ public class MeterDataCompanyEndpoint {
     CommonReferenceOperatorTopologyBusinessService service;
 
     /**
-     * Endpoint to find an {@Link MeterDataCompany} by it's domain name.
+     * Endpoint to get all {@Link MeterDataCompany} objects.
      *
      * @return a {@Link Response} message containing the requested information
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response findAllMeterDataCompanys() {
-        LOGGER.info("Received request to find all MeterDataCompanies");
+    public Response getAllMeterDataCompanys() {
+        LOGGER.info("Received request to get all MeterDataCompanies");
         try {
             return Response.ok(JsonUtil.createJsonText(service.findAllMeterDataCompanies()), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
@@ -54,22 +54,22 @@ public class MeterDataCompanyEndpoint {
     }
 
     /**
-     * Endpoint to find an {@Link MeterDataCompany} by it's domain name.
+     * Endpoint to get a {@Link MeterDataCompany} given it's domain name.
      *
-     * @param domain {@link String} containing the domain name of the {@Link MeterDataCompany} to find.
+     * @param domain {@link String} containing the domain name of the {@Link MeterDataCompany}
      * @return a {@Link Response} message containing the requested information
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{domain}")
-    public Response findAggegatorByDomain(@PathParam("domain") String domain) {
-        LOGGER.info("Received request to find MeterDataCompany {}", domain);
+    public Response getAggegatorByDomain(@PathParam("domain") String domain) {
+        LOGGER.info("Received request to get MeterDataCompany {}", domain);
         try {
             return Response.ok(JsonUtil.createJsonText(service.findMeterDataCompany(domain)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
             return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
         } finally {
-            LOGGER.info("Processed request to find MeterDataCompany {}", domain);
+            LOGGER.info("Processed request to get MeterDataCompany {}", domain);
         }
     }
 
