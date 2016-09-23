@@ -17,6 +17,10 @@
 package energy.usef.core.service.business;
 
 import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
+import energy.usef.core.data.xml.bean.message.Message;
+import energy.usef.core.data.xml.bean.message.SignedMessage;
+import energy.usef.core.data.xml.bean.message.USEFRole;
 import energy.usef.core.exception.BusinessException;
 import energy.usef.core.service.business.error.MessageEncryptionError;
 import energy.usef.core.service.helper.KeystoreHelperService;
@@ -63,6 +67,10 @@ public class MessageEncryptionServiceIntegrationTest {
     private static final String JCEKS = "JCEKS";
     private static final String ALGORITHM = "NaCl";
 
+    private static final String JL_PRIVATE = "4ffda13c11d61d2b9568e54bec06ea59368e84874883087645e64e5e9653422e667827d16bab821940689382a580f6b2c4d27cf60b92cce77d471087ff50d83e";
+    private static final String JL_PUBLIC = "Zngn0WurghlAaJOCpYD2ssTSfPYLksznfUcQh/9Q2D4=";
+
+
 
     byte[] publicKey = new byte[PUBLIC_KEY_SIZE];
     byte[] privateKey = new byte[PRIVATE_KEY_SIZE];
@@ -104,7 +112,6 @@ public class MessageEncryptionServiceIntegrationTest {
     }
 
     @Test
-    @Ignore
     public void sealMessage() throws Exception {
         String message = HELLO_MESSAGE;
         String publicKeyB64 = Base64.encodeBase64String(publicKey);
@@ -120,4 +127,6 @@ public class MessageEncryptionServiceIntegrationTest {
             fail(e.getBusinessError().getError());
         }
     }
+
+
 }

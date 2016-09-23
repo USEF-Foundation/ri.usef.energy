@@ -1,0 +1,27 @@
+{
+  "title": "Participant Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "method": {
+        "enum": [
+          "POST",
+          "GET",
+          "PUT",
+          "PATCH",
+          "DELETE"
+        ]
+      },
+      "domain": {
+        "type": "string",
+        "pattern": "([a-z0-9]+(-[a-z0-9]+)*\\.)+[a-z]{2,}"
+      }
+    },
+    "required": [
+      "method",
+      "domain"
+    ],
+    "additionalProperties": false
+  }
+}

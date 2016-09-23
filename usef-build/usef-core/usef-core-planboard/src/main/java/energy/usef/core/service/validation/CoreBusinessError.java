@@ -28,6 +28,8 @@ public enum CoreBusinessError implements BusinessError {
     INVALID_TIMEZONE("The Time zone is not the agreed value."),
     INVALID_CURRENCY("The Currency is not the agreed value."),
     INVALID_DOMAIN("The domain {} does not equal the expected {}."),
+    INVALID_DOMAIN_NAME("{} is not a valid domain name."),
+    INVALID_ENTITY_ADDRESS("{} is not a valid domain name."),
 
     DOCUMENT_EXIRED("{} with sequence number {} expired at {}"),
     RELATED_MESSAGE_NOT_FOUND("The message with sequence {} does not exist. "),

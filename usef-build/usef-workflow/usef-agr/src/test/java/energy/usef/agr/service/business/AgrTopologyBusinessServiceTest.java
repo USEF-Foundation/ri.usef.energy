@@ -1,3 +1,18 @@
+/*
+ * Copyright 2015-2016 USEF Foundation
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package energy.usef.agr.service.business;
 
 import energy.usef.agr.model.CommonReferenceOperator;
@@ -21,9 +36,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RunWith(PowerMockRunner.class)
-public class AgrDataBusinessServiceTest {
+public class AgrTopologyBusinessServiceTest {
 
-    AgrDataBusinessService service;
+    AgrTopologyBusinessService service;
 
     @Mock
     CommonReferenceOperatorRepository commonReferenceOperatorRepository;
@@ -36,7 +51,7 @@ public class AgrDataBusinessServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        service = new AgrDataBusinessService();
+        service = new AgrTopologyBusinessService();
         Whitebox.setInternalState(service, "commonReferenceOperatorRepository", commonReferenceOperatorRepository);
         Mockito.doNothing().when(commonReferenceOperatorRepository).persist(Matchers.any(CommonReferenceOperator.class));
         Mockito.doNothing().when(commonReferenceOperatorRepository).delete(Matchers.any(CommonReferenceOperator.class));
@@ -76,12 +91,12 @@ public class AgrDataBusinessServiceTest {
 
     @Test
     public void testGetCommonReferenceOperators() {
-        Assert.assertEquals("[{\"domain\":\"cro0.usef-example.com\"},{\"domain\":\"cro2.usef-example.com\"},{\"domain\":\"cro3.usef-example.com\"}]", service.getCommonReferenceOperators());
+        Assert.assertEquals("[{\"domain\":\"cro0.usef-example.com\"},{\"domain\":\"cro2.usef-example.com\"},{\"domain\":\"cro3.usef-example.com\"}]", service.findAllCommonReferenceOperators());
     }
 
     @Test
     public void testGetSynchronisationConnections() {
-        Assert.assertEquals("[{\"entityAddress\":\"ea1.2015-00.A:0\",\"customer\":true},{\"entityAddress\":\"ea1.2015-00.A:2\",\"customer\":true},{\"entityAddress\":\"ea1.2015-00.A:3\",\"customer\":true}]", service.getSynchronisationConnections());
+        Assert.assertEquals("[{\"entityAddress\":\"ea1.2015-00.A:0\",\"customer\":true},{\"entityAddress\":\"ea1.2015-00.A:2\",\"customer\":true},{\"entityAddress\":\"ea1.2015-00.A:3\",\"customer\":true}]", service.findAllSynchronisationConnections());
     }
 
     private String createCommonReferenceOperatorRequest() {

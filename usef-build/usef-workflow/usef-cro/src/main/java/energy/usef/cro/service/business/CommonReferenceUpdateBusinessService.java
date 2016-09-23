@@ -215,7 +215,7 @@ public class CommonReferenceUpdateBusinessService {
      * @return Aggregator entity
      */
     public Aggregator getAggregatorByDomain(String domain) {
-        return aggregatorRepository.getAggregatorByDomain(domain);
+        return aggregatorRepository.findByDomain(domain);
     }
 
     /**
@@ -291,7 +291,7 @@ public class CommonReferenceUpdateBusinessService {
 
     private Aggregator validateByModeAggregator(CommonReferenceUpdate message, List<String> errors) {
         String aggregatorDomain = message.getMessageMetadata().getSenderDomain();
-        Aggregator aggregator = aggregatorRepository.getAggregatorByDomain(aggregatorDomain);
+        Aggregator aggregator = aggregatorRepository.findByDomain(aggregatorDomain);
         if (CommonReferenceMode.CLOSED.value().equals(configCro.getProperty(ConfigCroParam.COMMON_REFERENCE_MODE))) {
             // Closed mode
             if (aggregator == null) {

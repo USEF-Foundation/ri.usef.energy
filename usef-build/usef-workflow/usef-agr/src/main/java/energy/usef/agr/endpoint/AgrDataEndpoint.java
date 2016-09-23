@@ -16,8 +16,7 @@
 
 package energy.usef.agr.endpoint;
 
-import energy.usef.agr.service.business.AgrDataBusinessService;
-import energy.usef.agr.workflow.plan.updateforecast.UpdateConnectionForecastEvent;
+import energy.usef.agr.service.business.AgrTopologyBusinessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +24,6 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Path("/Data")
 public class AgrDataEndpoint {
@@ -35,7 +31,7 @@ public class AgrDataEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(AgrDataEndpoint.class);
 
     @Inject
-    AgrDataBusinessService service;
+    AgrTopologyBusinessService service;
 
     /**
      * Return all {@Link CommonReferenceOperator}s in json format.
@@ -46,7 +42,7 @@ public class AgrDataEndpoint {
     public Response getCommonReferenceOperatorEndpoint() {
         try {
             LOGGER.info("Received request to get all CommonReferenceOperators");
-            return Response.status(Response.Status.OK).entity(service.getCommonReferenceOperators()).build();
+            return Response.status(Response.Status.OK).entity(service.findAllCommonReferenceOperators()).build();
         } finally {
             LOGGER.info("Processed request to get all CommonReferenceOperators");
         }
@@ -61,7 +57,7 @@ public class AgrDataEndpoint {
     public Response getSynchronisationConnectionsEndpoint() {
         try {
             LOGGER.info("Received request to get all SynchronisationConnections");
-            return Response.status(Response.Status.OK).entity(service.getSynchronisationConnections()).build();
+            return Response.status(Response.Status.OK).entity(service.findAllSynchronisationConnections()).build();
         } finally {
             LOGGER.info("Processed request to get all SynchronisationConnections");
         }

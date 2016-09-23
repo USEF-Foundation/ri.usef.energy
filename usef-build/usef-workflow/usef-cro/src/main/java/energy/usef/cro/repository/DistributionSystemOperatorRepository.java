@@ -17,6 +17,7 @@
 package energy.usef.cro.repository;
 
 import energy.usef.core.repository.BaseRepository;
+import energy.usef.cro.model.BalanceResponsibleParty;
 import energy.usef.cro.model.DistributionSystemOperator;
 
 import java.util.List;
@@ -73,4 +74,28 @@ public class DistributionSystemOperatorRepository extends
         }
     }
 
+    /**
+     * Deletes {@Link DistributionSystemOperator} entity by its domain.
+     *
+     * @param domain DistributionSystemOperator domain
+     */
+    @SuppressWarnings("unchecked")
+    public void deleteByDomain(String domain) {
+        DistributionSystemOperator distributionSystemOperator = findByDomain(domain);
+        if (distributionSystemOperator != null) {
+            entityManager.remove(distributionSystemOperator);
+        }
+    }
+
+
+
+    /**
+     * Gets the entire list of {@link DistributionSystemOperator} known objects by this Common Refernce Oparetor.
+     *
+     * @return {@link List} of {@link DistributionSystemOperator}
+     */
+    @SuppressWarnings("unchecked")
+    public List<DistributionSystemOperator> findAll() {
+        return getEntityManager().createQuery("SELECT participant FROM DistributionSystemOperator participant").getResultList();
+    }
 }

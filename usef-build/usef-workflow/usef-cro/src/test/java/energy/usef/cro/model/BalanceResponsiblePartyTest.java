@@ -16,19 +16,19 @@
 
 package energy.usef.cro.model;
 
-        import org.junit.Assert;
-        import org.junit.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
-public class AggregatorTest {
+public class BalanceResponsiblePartyTest {
 
     /***
-     * This tests the equals and hashcode methods of the entity Aggregator.
+     * This tests the equals and hashcode methods of the entity BalanceResponsibleParty.
      */
     @Test
     public void testEquals() {
-        Aggregator participant1 = new Aggregator("domain1");
-        Aggregator participant2 = new Aggregator("domain2");
-        Aggregator participant3 = new Aggregator("domain1");
+        BalanceResponsibleParty participant1 = new BalanceResponsibleParty("domain1");
+        BalanceResponsibleParty participant2 = new BalanceResponsibleParty("domain2");
+        BalanceResponsibleParty participant3 = new BalanceResponsibleParty("domain1");
 
         Assert.assertTrue(participant1.equals(participant1));
         Assert.assertTrue(!participant1.equals(null));

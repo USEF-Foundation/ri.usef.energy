@@ -17,6 +17,7 @@
 package energy.usef.cro.repository;
 
 import energy.usef.core.repository.BaseRepository;
+import energy.usef.cro.model.DistributionSystemOperator;
 import energy.usef.cro.model.MeterDataCompany;
 
 import java.util.List;
@@ -44,6 +45,29 @@ public class MeterDataCompanyRepository extends BaseRepository<MeterDataCompany>
             return null;
         }
         return result.get(0);
+    }
+
+    /**
+     * Deletes {@Link MeterDataCompany} entity by its domain.
+     *
+     * @param domain MeterDataCompany domain
+     */
+    @SuppressWarnings("unchecked")
+    public void deleteByDomain(String domain) {
+        MeterDataCompany meterDataCompany = findByDomain(domain);
+        if (meterDataCompany != null) {
+            entityManager.remove(meterDataCompany);
+        }
+    }
+
+    /**
+     * Gets the entire list of {@link DistributionSystemOperator} known objects by this Common Refernce Oparetor.
+     *
+     * @return {@link List} of {@link DistributionSystemOperator}
+     */
+    @SuppressWarnings("unchecked")
+    public List<MeterDataCompany> findAll() {
+        return getEntityManager().createQuery("SELECT participant FROM MeterDataCompany participant").getResultList();
     }
 
 }
