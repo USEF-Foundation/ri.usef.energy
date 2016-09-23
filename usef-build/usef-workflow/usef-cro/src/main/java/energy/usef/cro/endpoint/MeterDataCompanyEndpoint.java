@@ -42,7 +42,7 @@ public class MeterDataCompanyEndpoint {
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllMeterDataCompanys() {
+    public Response getAllMeterDataCompanies() {
         LOGGER.info("Received request to get all MeterDataCompanies");
         try {
             return Response.ok(JsonUtil.createJsonText(service.findAllMeterDataCompanies()), MediaType.APPLICATION_JSON_TYPE).build();
@@ -62,7 +62,7 @@ public class MeterDataCompanyEndpoint {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{domain}")
-    public Response getAggegatorByDomain(@PathParam("domain") String domain) {
+    public Response getMeterDataCompanyByDomain(@PathParam("domain") String domain) {
         LOGGER.info("Received request to get MeterDataCompany {}", domain);
         try {
             return Response.ok(JsonUtil.createJsonText(service.findMeterDataCompany(domain)), MediaType.APPLICATION_JSON_TYPE).build();
