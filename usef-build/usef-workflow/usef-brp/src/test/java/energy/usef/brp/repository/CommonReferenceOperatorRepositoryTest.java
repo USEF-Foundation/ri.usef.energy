@@ -35,6 +35,7 @@ import org.junit.Test;
  * Test class in charge of the unit testing of the {@link CommonReferenceOperatorRepository}.
  */
 public class CommonReferenceOperatorRepositoryTest {
+
     /** The factory that produces entity manager. */
     private static EntityManagerFactory entityManagerFactory;
     /** The entity manager that persists and queries the DB. */

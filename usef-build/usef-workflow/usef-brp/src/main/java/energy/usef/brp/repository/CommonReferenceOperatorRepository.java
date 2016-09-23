@@ -28,6 +28,38 @@ import javax.ejb.Stateless;
  */
 @Stateless
 public class CommonReferenceOperatorRepository extends BaseRepository<CommonReferenceOperator> {
+    /**
+     * Gets Common Reference Operator entity by its domain.
+     *
+     * @param domain commonReferenceOperator domain
+     *
+     * @return CommonReferenceOperator entity
+     */
+    @SuppressWarnings("unchecked")
+    public CommonReferenceOperator findByDomain(String domain) {
+
+        List<CommonReferenceOperator> result = entityManager
+                .createQuery(
+                        "SELECT cro FROM CommonReferenceOperator cro WHERE cro.domain = :domain")
+                .setParameter("domain", domain).getResultList();
+        if (result == null || result.isEmpty()) {
+            return null;
+        }
+        return result.get(0);
+    }
+
+    /**
+     * Deletes {@Link CommonReferenceOperator} entity by its domain.
+     *
+     * @param domain commonReferenceOperator domain
+     */
+    @SuppressWarnings("unchecked")
+    public void deleteByDomain(String domain) {
+        CommonReferenceOperator commonReferenceOperator = findByDomain(domain);
+        if (commonReferenceOperator != null) {
+            entityManager.remove(commonReferenceOperator);
+        }
+    }
 
     /**
      * Gets the entire list of {@link CommonReferenceOperator} known by this Balance Responsible Party.
