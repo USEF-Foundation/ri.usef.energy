@@ -20,12 +20,23 @@ import energy.usef.core.repository.BaseRepository;
 import energy.usef.mdc.model.Aggregator;
 
 import javax.ejb.Stateless;
+import java.util.List;
 
 /**
  * Repository class for the {@link Aggregator} entity.
  */
 @Stateless
 public class AggregatorRepository extends BaseRepository<Aggregator> {
+
+    /**
+     * Gets the entire list of {@link Aggregator} known objects by this Meter Data Company
+     *
+     * @return {@link List} of {@link Aggregator}
+     */
+    @SuppressWarnings("unchecked")
+    public List<Aggregator> findAll() {
+        return getEntityManager().createQuery("SELECT participant FROM Aggregator participant").getResultList();
+    }
 
     /**
      * Finds or creates an aggregator given the his domain name.

@@ -28,9 +28,9 @@ import energy.usef.mdc.repository.CommonReferenceQueryStateRepository;
 /**
  * Service class in charge of housekeeping operations for the Meter Data Company.
  */
-public class MdcHousekeepingBusinessService {
+public class MeterDataCompanyHousekeepingBusinessService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MdcHousekeepingBusinessService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeterDataCompanyHousekeepingBusinessService.class);
 
     @Inject
     private AggregatorConnectionRepository aggregatorConnectionRepository;

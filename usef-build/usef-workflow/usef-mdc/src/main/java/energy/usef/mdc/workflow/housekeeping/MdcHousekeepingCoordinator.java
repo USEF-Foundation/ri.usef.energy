@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 
 import energy.usef.core.event.HousekeepingEvent;
 import energy.usef.core.service.business.TransportHousekeepingBusinessService;
-import energy.usef.mdc.service.business.MdcHousekeepingBusinessService;
+import energy.usef.mdc.service.business.MeterDataCompanyHousekeepingBusinessService;
 
 /**
  * Coordinator for housekeeping in a meter data company implementation.
@@ -37,7 +37,7 @@ public class MdcHousekeepingCoordinator {
     private static final Logger LOGGER = LoggerFactory.getLogger(MdcHousekeepingCoordinator.class);
 
     @Inject
-    private MdcHousekeepingBusinessService mdcHousekeepingBusinessService;
+    private MeterDataCompanyHousekeepingBusinessService mdcHousekeepingBusinessService;
     @Inject
     private TransportHousekeepingBusinessService transportHousekeepingBusinessService;
 

@@ -19,9 +19,8 @@ package energy.usef.mdc.repository;
 import energy.usef.core.repository.BaseRepository;
 import energy.usef.mdc.model.Connection;
 
-import java.util.List;
-
 import javax.ejb.Stateless;
+import java.util.List;
 
 /**
  * Repository class for the {@link Connection} entity.
@@ -38,4 +37,18 @@ public class MdcConnectionRepository extends BaseRepository<Connection> {
         String sql = "SELECT c FROM Connection c ";
         return getEntityManager().createQuery(sql, Connection.class).getResultList();
     }
+
+    /**
+     * Deletes {@Link Connection} entity by its entityAddress.
+     *
+     * @param entityAddress connection entityAddress
+     */
+    @SuppressWarnings("unchecked")
+    public void deleteByEntityAddress(String entityAddress) {
+        Connection connection = find(entityAddress);
+        if (connection != null) {
+            entityManager.remove(connection);
+        }
+    }
+
 }

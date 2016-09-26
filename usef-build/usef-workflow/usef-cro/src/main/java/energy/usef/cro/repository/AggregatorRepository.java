@@ -62,7 +62,7 @@ public class AggregatorRepository extends BaseRepository<Aggregator> {
     }
 
     /**
-     * Gets the entire list of {@link Aggregator} known objects by this Common Refernce Oparetor.
+     * Gets the entire list of {@link Aggregator} known objects by this Common Reference Oparetor.
      *
      * @return {@link List} of {@link Aggregator}
      */

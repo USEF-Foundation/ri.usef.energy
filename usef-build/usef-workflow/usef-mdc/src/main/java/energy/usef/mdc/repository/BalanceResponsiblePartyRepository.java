@@ -20,11 +20,34 @@ import energy.usef.core.repository.BaseRepository;
 import energy.usef.mdc.model.BalanceResponsibleParty;
 
 import javax.ejb.Stateless;
+import java.util.List;
 
 /**
  * BalanceResponsibleParty Repository for BRP.
  */
 @Stateless
 public class BalanceResponsiblePartyRepository extends BaseRepository<BalanceResponsibleParty> {
+    /**
+     * Deletes {@Link BalanceResponsibleParty} entity by its domain.
+     *
+     * @param domain BalanceResponsibleParty domain
+     */
+    @SuppressWarnings("unchecked")
+    public void deleteByDomain(String domain) {
+        BalanceResponsibleParty balanceResponsibleParty = find(domain);
+        if (balanceResponsibleParty != null) {
+            entityManager.remove(balanceResponsibleParty);
+        }
+    }
+
+    /**
+     * Gets the entire list of {@link BalanceResponsibleParty} known objects by this Common Refernce Oparetor.
+     *
+     * @return {@link List} of {@link BalanceResponsibleParty}
+     */
+    @SuppressWarnings("unchecked")
+    public List<BalanceResponsibleParty> findAll() {
+        return getEntityManager().createQuery("SELECT participant FROM BalanceResponsibleParty participant").getResultList();
+    }
 
 }

@@ -40,6 +40,20 @@ public class CommonReferenceOperatorRepository extends BaseRepository<CommonRefe
     }
 
     /**
+     * Deletes {@Link CommonReferenceOperator} entity by its domain.
+     *
+     * @param domain commonReferenceOperator domain
+     */
+    @SuppressWarnings("unchecked")
+    public void deleteByDomain(String domain) {
+        CommonReferenceOperator participant = find(domain);
+        if (participant != null) {
+            entityManager.remove(participant);
+        }
+    }
+
+
+    /**
      * Finds or creates a Common Reference Operator given its domain name.
      *
      * @param croDomain {@link String} domain name.

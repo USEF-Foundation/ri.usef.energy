@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package energy.usef.cro.service.business;
+package energy.usef.mdc.service.business;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -24,19 +24,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import energy.usef.core.config.Role;
 import energy.usef.core.exception.BusinessValidationException;
-import energy.usef.core.rest.Participant;
+import energy.usef.mdc.dto.ConnectionAction;
+import energy.usef.mdc.model.Connection;
 import energy.usef.core.rest.RestResult;
 import energy.usef.core.rest.RestResultFactory;
 import energy.usef.core.util.JsonUtil;
-import energy.usef.cro.dto.ParticipantAction;
-import energy.usef.cro.model.Aggregator;
-import energy.usef.cro.model.BalanceResponsibleParty;
-import energy.usef.cro.model.DistributionSystemOperator;
-import energy.usef.cro.model.MeterDataCompany;
-import energy.usef.cro.repository.AggregatorRepository;
-import energy.usef.cro.repository.BalanceResponsiblePartyRepository;
-import energy.usef.cro.repository.DistributionSystemOperatorRepository;
-import energy.usef.cro.repository.MeterDataCompanyRepository;
+import energy.usef.mdc.dto.ParticipantAction;
+import energy.usef.mdc.model.Aggregator;
+import energy.usef.mdc.model.BalanceResponsibleParty;
+import energy.usef.mdc.model.DistributionSystemOperator;
+import energy.usef.mdc.model.CommonReferenceOperator;
+import energy.usef.mdc.repository.BalanceResponsiblePartyRepository;
+import energy.usef.mdc.repository.DistributionSystemOperatorRepository;
+import energy.usef.mdc.repository.CommonReferenceOperatorRepository;
+import energy.usef.mdc.repository.MdcConnectionRepository;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +49,6 @@ import javax.inject.Inject;
 import javax.ws.rs.HttpMethod;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,11 +62,9 @@ import static energy.usef.core.util.JsonUtil.createJsonText;
  * This service class implements the business logic related to the CRO part of the common reference query.
  */
 @Stateless
-public class CommonReferenceOperatorTopologyBusinessService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonReferenceOperatorTopologyBusinessService.class);
+public class MeterDataCompanyTopologyBusinessService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeterDataCompanyTopologyBusinessService.class);
 
-    @Inject
-    AggregatorRepository aggregatorRepository;
 
     @Inject
     BalanceResponsiblePartyRepository balanceResponsiblePartyRepository;
@@ -75,39 +73,36 @@ public class CommonReferenceOperatorTopologyBusinessService {
     DistributionSystemOperatorRepository distributionSystemOperatorRepository;
 
     @Inject
-    MeterDataCompanyRepository meterDataCompanyRepository;
+    CommonReferenceOperatorRepository commonReferenceOperatorRepository;
 
     @Inject
-    CommonReferenceOperatorValidationBusinessService validationService;
+    MdcConnectionRepository mdcConnectionRepository;
 
-    public CommonReferenceOperatorTopologyBusinessService() {
+    @Inject
+    MeterDataCompanyValidationBusinessService validationService;
+
+    public MeterDataCompanyTopologyBusinessService() {
     }
 
-
-    /*
-     * Methods to find individual Participants
-     */
-
     /**
-     * Try and retrieve an {@link Aggregator} with the given domain name, returning it in a {@Link RestResult}.
+     * Try and retrieve an {@link Connection} with the given entityAddress, returning it as a {@Link RestResult}.
      *
-     * @param domain a {@link String} containing a domain name of the {@link Aggregator} to be retrieved.
+     * @param entityAddress a {@link String} containing a entityAddress of the {@link Connection} to be retrieved.
      * @return a {@Link RestResult}
      */
-    public RestResult findAggregator(String domain) throws IOException {
+    public RestResult findConnection(String entityAddress) throws IOException {
         RestResult result = RestResultFactory.getJsonRestResult();
-        Aggregator participant = aggregatorRepository.findByDomain(domain);
+        Connection connection = mdcConnectionRepository.find(entityAddress);
 
-        if (participant != null) {
+        if (connection != null) {
             result.setCode(HttpResponseCodes.SC_OK);
-            result.setBody(createJsonText(new Participant(participant.getId(), participant.getDomain())));
+            result.setBody(createJsonText(connection));
         } else {
             result.setCode(HttpResponseCodes.SC_NOT_FOUND);
-            result.getErrors().add("Aggregator " + domain + " not found.");
+            result.getErrors().add("Connection " + entityAddress + " not found.");
         }
         return result;
     }
-
     /**
      * Try and retrieve an {@link BalanceResponsibleParty} with the given domain name, returning it as a {@Link RestResult}.
      *
@@ -116,11 +111,11 @@ public class CommonReferenceOperatorTopologyBusinessService {
      */
     public RestResult findBalanceResponsibleParty(String domain) throws IOException {
         RestResult result = RestResultFactory.getJsonRestResult();
-        BalanceResponsibleParty participant = balanceResponsiblePartyRepository.findByDomain(domain);
+        BalanceResponsibleParty participant = balanceResponsiblePartyRepository.find(domain);
 
         if (participant != null) {
             result.setCode(HttpResponseCodes.SC_OK);
-            result.setBody(createJsonText(new Participant(participant.getId(), participant.getDomain())));
+            result.setBody(createJsonText(participant));
         } else {
             result.setCode(HttpResponseCodes.SC_NOT_FOUND);
             result.getErrors().add("BalanceResponsibleParty " + domain + " not found.");
@@ -136,11 +131,11 @@ public class CommonReferenceOperatorTopologyBusinessService {
      */
     public RestResult findDistributionSystemOperator(String domain) throws IOException {
         RestResult result = RestResultFactory.getJsonRestResult();
-        DistributionSystemOperator participant = distributionSystemOperatorRepository.findByDomain(domain);
+        DistributionSystemOperator participant = distributionSystemOperatorRepository.find(domain);
 
         if (participant != null) {
             result.setCode(HttpResponseCodes.SC_OK);
-            result.setBody(createJsonText(new Participant(participant.getId(), participant.getDomain())));
+            result.setBody(createJsonText(participant.getDomain()));
         } else {
             result.setCode(HttpResponseCodes.SC_NOT_FOUND);
             result.getErrors().add("DistributionSystemOperator " + domain + " not found.");
@@ -149,45 +144,35 @@ public class CommonReferenceOperatorTopologyBusinessService {
     }
 
     /**
-     * Try and retrieve an {@link MeterDataCompany} with the given domain name, returning it as a {@Link RestResult}.
+     * Try and retrieve an {@link CommonReferenceOperator} with the given domain name, returning it as a {@Link RestResult}.
      *
-     * @param domain a {@link String} containing a domain name of the {@link MeterDataCompany} to be retrieved.
+     * @param domain a {@link String} containing a domain name of the {@link CommonReferenceOperator} to be retrieved.
      * @return a {@Link RestResult}
      */
-    public RestResult findMeterDataCompany(String domain) throws IOException {
+    public RestResult findCommonReferenceOperator(String domain) throws IOException {
         RestResult result = RestResultFactory.getJsonRestResult();
-        MeterDataCompany participant = meterDataCompanyRepository.findByDomain(domain);
+        CommonReferenceOperator participant = commonReferenceOperatorRepository.find(domain);
 
         if (participant != null) {
 
             result.setCode(HttpResponseCodes.SC_OK);
-            result.setBody(createJsonText(new Participant(participant.getId(), participant.getDomain())));
+            result.setBody(createJsonText(participant.getDomain()));
         } else {
             result.setCode(HttpResponseCodes.SC_NOT_FOUND);
-            result.getErrors().add("MeterDataCompany " + domain + " not found.");
+            result.getErrors().add("CommonReferenceOperator " + domain + " not found.");
         }
         return result;
     }
 
-    /*
-     * Methods to find individual Participants
-     */
-
     /**
-     * Try and retrieve all {@link Aggregator} instances.
+     * Try and retrieve all {@link Connection} instances.
      */
-    public RestResult findAllAggregators() throws IOException {
+    public RestResult findAllConnections() throws IOException {
         RestResult result = RestResultFactory.getJsonRestResult();
 
-        List<Participant> participantList = new ArrayList<>();
-        aggregatorRepository.findAll().stream().forEach(a -> {
-            Participant participant = new Participant();
-            participant.setId(a.getId());
-            participant.setDomain(a.getDomain());
-            participantList.add(participant);
-        });
+        List<Connection> connectionList = mdcConnectionRepository.findAllConnections();
         result.setCode(HttpResponseCodes.SC_OK);
-        result.setBody(createJsonText(participantList));
+        result.setBody(createJsonText(connectionList));
 
         return result;
     }
@@ -198,13 +183,7 @@ public class CommonReferenceOperatorTopologyBusinessService {
     public RestResult findAllBalanceResponsibleParties() throws IOException {
         RestResult result = RestResultFactory.getJsonRestResult();
 
-        List<Participant> participantList = new ArrayList<>();
-        balanceResponsiblePartyRepository.findAll().stream().forEach(a -> {
-            Participant participant = new Participant();
-            participant.setId(a.getId());
-            participant.setDomain(a.getDomain());
-            participantList.add(participant);
-        });
+        List<BalanceResponsibleParty> participantList = balanceResponsiblePartyRepository.findAll();
         result.setCode(HttpResponseCodes.SC_OK);
         result.setBody(createJsonText(participantList));
 
@@ -217,13 +196,7 @@ public class CommonReferenceOperatorTopologyBusinessService {
     public RestResult findAllDistributionSystemOperators() throws IOException {
         RestResult result = RestResultFactory.getJsonRestResult();
 
-        List<Participant> participantList = new ArrayList<>();
-        distributionSystemOperatorRepository.findAll().stream().forEach(a -> {
-            Participant participant = new Participant();
-            participant.setId(a.getId());
-            participant.setDomain(a.getDomain());
-            participantList.add(participant);
-        });
+        List<DistributionSystemOperator> participantList = distributionSystemOperatorRepository.findAll();
         result.setCode(HttpResponseCodes.SC_OK);
         result.setBody(createJsonText(participantList));
 
@@ -231,18 +204,12 @@ public class CommonReferenceOperatorTopologyBusinessService {
     }
 
     /**
-     * Try and retrieve all{@link MeterDataCompany} instances.
+     * Try and retrieve all{@link CommonReferenceOperator} instances.
      */
-    public RestResult findAllMeterDataCompanies() throws IOException {
+    public RestResult findAllCommonReferenceOperators() throws IOException {
         RestResult result = RestResultFactory.getJsonRestResult();
 
-        List<Participant> participantList = new ArrayList<>();
-        meterDataCompanyRepository.findAll().stream().forEach(a -> {
-            Participant participant = new Participant();
-            participant.setId(a.getId());
-            participant.setDomain(a.getDomain());
-            participantList.add(participant);
-        });
+        List<CommonReferenceOperator> participantList = commonReferenceOperatorRepository.findAll();
         result.setCode(HttpResponseCodes.SC_OK);
         result.setBody(createJsonText(participantList));
 
@@ -250,16 +217,45 @@ public class CommonReferenceOperatorTopologyBusinessService {
     }
 
     /**
-     * Process a batch of {@Link Aggregator} updates.
+     * Process a batch of {@Link Connection} updates.
      *
-     * @param jsonText a json {@link String} containing a batch of {@Link Aggregator} updates.
+     * @param jsonText a json {@link String} containing a batch of {@Link Connection} updates.
      * @return a {@Link Response} message containing batch update results
      */
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public List<RestResult> processAggregatorBatch(String jsonText) throws IOException, ProcessingException {
-        LOGGER.info("Start processing Aggregator batch.");
-        return processParticipantBatch(AGR, jsonText);
+    public List<RestResult> processConnectionBatch(String jsonText) throws IOException, ProcessingException {
+        LOGGER.info("Start processing Connection batch.");
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode root = objectMapper.readTree(jsonText);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        Map<Integer, RestResult> resultMap = new HashMap<>();
+
+        JsonFactory factory = new JsonFactory();
+        StringWriter stringWriter = new StringWriter();
+
+        JsonGenerator generator = factory.createGenerator(stringWriter);
+        generator.writeStartArray();
+
+        JsonUtil.validateNodeSyntax("/connection-schema.json", root, resultMap);
+
+        if (!resultMap.containsKey(ROOT_KEY)) {
+            List<ConnectionAction> actions = objectMapper.readValue(jsonText, new TypeReference<List<ConnectionAction>>() {
+            });
+
+            // Bow process all the actions that have the correct syntax.
+            for (int entry = 0; entry < actions.size(); entry++) {
+                if (!resultMap.containsKey(entry)) {
+
+                    resultMap.put(entry, processConnectionNode(actions.get(entry)));
+                }
+            }
+        }
+
+        List<RestResult> result = resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue())
+                .collect(Collectors.toList());
+        return result;
     }
 
     /**
@@ -287,15 +283,15 @@ public class CommonReferenceOperatorTopologyBusinessService {
     }
 
     /**
-     * Process a batch of {@Link MeterDataCompany} updates.
+     * Process a batch of {@Link CommonReferenceOperator} updates.
      *
-     * @param jsonText a json {@link String} containing a batch of {@Link MeterDataCompany} updates.
+     * @param jsonText a json {@link String} containing a batch of {@Link CommonReferenceOperator} updates.
      * @return a {@Link Response} message containing batch update results
      */
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public List<RestResult> processMeterDataCompanyBatch(String jsonText) throws IOException, ProcessingException {
-        LOGGER.info("Start processing a MeterDataCompany batch");
-        return processParticipantBatch(MDC, jsonText);
+    public List<RestResult> processCommonReferenceOperatorBatch(String jsonText) throws IOException, ProcessingException {
+        LOGGER.info("Start processing a CommonReferenceOperator batch");
+        return processParticipantBatch(CRO, jsonText);
     }
 
     private List<RestResult> processParticipantBatch(Role role, String jsonText) throws IOException, ProcessingException {
@@ -331,6 +327,26 @@ public class CommonReferenceOperatorTopologyBusinessService {
         return result;
     }
 
+    private RestResult processConnectionNode(ConnectionAction action) throws IOException {
+        String method = action.getMethod();
+        String entityAddress = action.getEntityAddress();
+        RestResult result = new RestResult();
+        result.setCode(HttpResponseCodes.SC_INTERNAL_SERVER_ERROR);
+
+        switch (method) {
+        case HttpMethod.GET:
+            result = findConnection(entityAddress);
+            break;
+        case HttpMethod.POST:
+            result = createConnection(entityAddress);
+            break;
+        case HttpMethod.DELETE:
+            result = deleteConnection(entityAddress);
+            break;
+        }
+        return result;
+    }
+
     private RestResult processParticipantNode(Role role, ParticipantAction action) throws IOException {
         String method = action.getMethod();
         String domain = action.getDomain();
@@ -356,17 +372,14 @@ public class CommonReferenceOperatorTopologyBusinessService {
         result.setCode(HttpResponseCodes.SC_INTERNAL_SERVER_ERROR);
 
         switch (role) {
-        case AGR:
-            result = findAggregator(domain);
-            break;
         case BRP:
             result = findBalanceResponsibleParty(domain);
             break;
+        case CRO:
+            result = findCommonReferenceOperator(domain);
+            break;
         case DSO:
             result = findDistributionSystemOperator(domain);
-            break;
-        case MDC:
-            result = findMeterDataCompany(domain);
             break;
         }
         return result;
@@ -377,17 +390,14 @@ public class CommonReferenceOperatorTopologyBusinessService {
         result.setCode(HttpResponseCodes.SC_INTERNAL_SERVER_ERROR);
 
         switch (role) {
-        case AGR:
-            result = createAggregator(domain);
-            break;
         case BRP:
             result = createBalanceResponsibleParty(domain);
             break;
+        case CRO:
+            result = createCommonReferenceOperator(domain);
+            break;
         case DSO:
             result = createDistributionSystemOperator(domain);
-            break;
-        case MDC:
-            result = createMeterDataCompany(domain);
             break;
         }
         return result;
@@ -398,17 +408,14 @@ public class CommonReferenceOperatorTopologyBusinessService {
         result.setCode(HttpResponseCodes.SC_INTERNAL_SERVER_ERROR);
 
         switch (role) {
-        case AGR:
-            result = deleteAggregator(domain);
-            break;
         case BRP:
             result = deleteBalanceResponsibleParty(domain);
             break;
+        case CRO:
+            result = deleteCommonReferenceOperator(domain);
+            break;
         case DSO:
             result = deleteDistributionSystemOperator(domain);
-            break;
-        case MDC:
-            result = deleteMeterDataCompany(domain);
             break;
         }
         return result;
@@ -419,26 +426,26 @@ public class CommonReferenceOperatorTopologyBusinessService {
      */
 
     /**
-     * Try and create an {@link Aggregator} with the given domain name.
+     * Try and create an {@link Connection} with the given domain name.
      *
-     * @param domain a {@link String} containing a domain name of the {@link Aggregator} to be created.
+     * @param entityAddress a {@link String} containing a domain name of the {@link Aggregator} to be created.
      * @return a {@Link RestResult}
      */
-    private RestResult createAggregator(String domain) {
+    private RestResult createConnection(String entityAddress) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
-            validationService.checkDuplicateAggregatorDomain(domain);
+            validationService.checkDuplicateConnection(entityAddress);
 
-            Aggregator participant = new Aggregator();
-            participant.setDomain(domain);
-            aggregatorRepository.persist(participant);
+            Connection participant = new Connection();
+            participant.setEntityAddress(entityAddress);
+            mdcConnectionRepository.persist(participant);
 
             result.setCode(HttpResponseCodes.SC_CREATED);
-            LOGGER.info("Aggregator {} created", domain);
+            LOGGER.info("Connection {} created", entityAddress);
         } catch (BusinessValidationException e) {
             result.setCode(HttpResponseCodes.SC_CONFLICT);
             result.getErrors().add(e.getMessage());
-            LOGGER.info("Duplicate Aggregator {} not created", domain);
+            LOGGER.info("Duplicate Connection {} not created", entityAddress);
         }
         return result;
     }
@@ -494,26 +501,26 @@ public class CommonReferenceOperatorTopologyBusinessService {
     }
 
     /**
-     * Try and create a {@link MeterDataCompany} with the given domain name.
+     * Try and create a {@link CommonReferenceOperator} with the given domain name.
      *
-     * @param domain a {@link String} containing a domain name of the {@link MeterDataCompany} to be created.
+     * @param domain a {@link String} containing a domain name of the {@link CommonReferenceOperator} to be created.
      * @return a {@Link RestResult}
      */
-    private RestResult createMeterDataCompany(String domain) {
+    private RestResult createCommonReferenceOperator(String domain) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
-            validationService.checkDuplicateMeterDataCompanyDomain(domain);
+            validationService.checkDuplicateCommonReferenceOperatorDomain(domain);
 
-            MeterDataCompany participant = new MeterDataCompany();
+            CommonReferenceOperator participant = new CommonReferenceOperator();
             participant.setDomain(domain);
-            meterDataCompanyRepository.persist(participant);
+            commonReferenceOperatorRepository.persist(participant);
 
             result.setCode(HttpResponseCodes.SC_CREATED);
-            LOGGER.info("MeterDataCompany {} created", domain);
+            LOGGER.info("CommonReferenceOperator {} created", domain);
         } catch (BusinessValidationException e) {
             result.setCode(HttpResponseCodes.SC_CONFLICT);
             result.getErrors().add(e.getMessage());
-            LOGGER.info("Duplicate MeterDataCompany {} not created", domain);
+            LOGGER.info("Duplicate CommonReferenceOperator {} not created", domain);
         }
         return result;
     }
@@ -523,22 +530,22 @@ public class CommonReferenceOperatorTopologyBusinessService {
      */
 
     /**
-     * Try and delete an {@link Aggregator} with the given domain name.
+     * Try and delete an {@link Connection} with the given domain name.
      *
-     * @param domain a {@link String} containing a domain name of the {@link Aggregator} to be deleted.
+     * @param domain a {@link String} containing a domain name of the {@link Connection} to be deleted.
      * @return a {@Link RestResult}
      */
-    private RestResult deleteAggregator(String domain) {
+    private RestResult deleteConnection(String domain) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
-            validationService.checkExistingAggregatorDomain(domain);
-            aggregatorRepository.deleteByDomain(domain);
+            validationService.checkExistingConnection(domain);
+            mdcConnectionRepository.deleteByEntityAddress(domain);
             result.setCode(HttpResponseCodes.SC_OK);
-            LOGGER.info("Aggregator {} deleted", domain);
+            LOGGER.info("Connection {} deleted", domain);
         } catch (BusinessValidationException e) {
             result.setCode(HttpResponseCodes.SC_NOT_FOUND);
             result.getErrors().add(e.getMessage());
-            LOGGER.info("Aggregator {} not found", domain);
+            LOGGER.info("Connection {} not found", domain);
         }
         return result;
     }
@@ -586,22 +593,22 @@ public class CommonReferenceOperatorTopologyBusinessService {
     }
 
     /**
-     * Try and delete a {@Link MeterDataCompany} with the given domain name.
+     * Try and delete a {@Link CommonReferenceOperator} with the given domain name.
      *
-     * @param domain a {@link String} containing a domain name of the {@Link MeterDataCompany} to be deleted.
+     * @param domain a {@link String} containing a domain name of the {@Link CommonReferenceOperator} to be deleted.
      * @return a {@Link RestResult}
      */
-    private RestResult deleteMeterDataCompany(String domain) {
+    private RestResult deleteCommonReferenceOperator(String domain) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
-            validationService.checkExistingMeterDataCompanyDomain(domain);
-            meterDataCompanyRepository.deleteByDomain(domain);
+            validationService.checkExistingCommonReferenceOperatorDomain(domain);
+            commonReferenceOperatorRepository.deleteByDomain(domain);
             result.setCode(HttpResponseCodes.SC_OK);
-            LOGGER.info("MeterDataCompany {} deleted", domain);
+            LOGGER.info("CommonReferenceOperator {} deleted", domain);
         } catch (BusinessValidationException e) {
             result.setCode(HttpResponseCodes.SC_NOT_FOUND);
             result.getErrors().add(e.getMessage());
-            LOGGER.info("MeterDataCompany {} not found", domain);
+            LOGGER.info("CommonReferenceOperator {} not found", domain);
         }
         return result;
     }

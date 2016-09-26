@@ -72,67 +72,36 @@ public class CommonReferenceOperatorTopologyBusinessServiceTest {
     }
 
     @Test
-    public void testProcessAggregatorBatch() throws Exception
-
-    {
-        Aggregator agr0 = mockAggregator(null, "agr0.usef.energy", false);
-        Aggregator agr1 = mockAggregator(1L, "agr1.usef.energy", false);
-        Aggregator agr2 = mockAggregator(null, "agr2.usef.energy", true);
-        Aggregator agr3 = mockAggregator(null, "agr3.usef.energy", false);
-        Aggregator agr4 = mockAggregator(4L, "agr4.usef.energy", true);
-        Aggregator agr5 = mockAggregator(null, "agr5.usef.energy", true);
-        Aggregator agr6 = mockAggregator(null, "agr6usefenergy", false);
-        Aggregator agr7 = mockAggregator(7L, "agr7.usef.energy", true);
-
-        Assert.assertNull(agr0);
-        Assert.assertNull(agr1);
-        assertNotNull(agr2);
-        Assert.assertNull(agr3);
-        assertNotNull(agr4);
-        assertNotNull(agr5);
-        Assert.assertNull(agr6);
-        assertNotNull(agr7);
-
+    public void testAggregatorBatch() throws Exception  {
+        mockAggregeator(0L, "agr0.usef.energy", true);
+        mockAggregeator(null, "agr1.usef.energy", false);
+        mockAggregeator(null, "agr2.usef.energy", false);
+        mockAggregeator(-3L, "agr3.usef.energy", true);
 
         try {
             String jsonText = "["
                     + "{\"method\" : \"DELETE\", \"domain\": \"agr0.usef.energy\"},"
-                    + "{\"method\" : \"MAIL\", \"domain\": \"agr1.usef.energy\"},"
-                    + "{\"method\" : \"POST\", \"domain\": \"agr2.usef.energy\"},"
-                    + "{\"method\" : \"POST\", \"gebied\": \"agr3.usef.energy\", \"subdomain\": \"www.usef-example.com\"},"
-                    + "{\"method\" : \"DELETE\", \"domain\": \"agr4.usef.energy\"},"
+                    + "{\"method\" : \"POST\", \"domain\": \"agr1.usef.energy\"},"
+                    + "{\"method\" : \"DELETE\", \"domain\": \"agr2.usef.energy\"},"
+                    + "{\"method\" : \"POST\", \"domain\": \"agr3.usef.energy\"},"
+                    + "{\"method\" : \"DELETE\", \"domain\": \"agr4.usef.energy\", \"subdomain\": \"www.usef-example.com\"},"
                     + "{\"methode\" : \"POST\", \"domain\": \"agr5.usef.energy\"},"
                     + "{\"method\" : \"POST\", \"domain\": \"agr6usefenergy\"},"
-                    + "{\"method\" : \"GET\", \"domain\": \"agr7.usef.energy\"}"
+                    + "{\"method\" : \"GET\", \"gebied\": \"agr7.usef.energy\"}"
                     + "]";
 
             List<RestResult> result = service.processAggregatorBatch(jsonText);
 
             String resultString = JsonUtil.createJsonText(result);
 
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).persist(agr0);
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).delete(agr0);
-
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).persist(agr1);
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).delete(agr1);
-
-            Mockito.verify(aggregatorRepository, Mockito.times(1)).persist(agr2);
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).delete(agr2);
-
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).persist(agr3);
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).delete(agr3);
-
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).persist(agr4);
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).delete(agr4);
-
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).persist(agr5);
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).delete(agr5);
-
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).persist(agr6);
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).delete(agr6);
-
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).persist(agr7);
-            Mockito.verify(aggregatorRepository, Mockito.times(0)).delete(agr7);
+            verifyAggregatorCalls("agr0.usef.energy", 0, 1);
+            verifyAggregatorCalls("agr1.usef.energy", 1, 0);
+            verifyAggregatorCalls("agr2.usef.energy", 0, 0);
+            verifyAggregatorCalls("agr3.usef.energy", 0, 0);
+            verifyAggregatorCalls("agr4.usef.energy", 0, 0);
+            verifyAggregatorCalls("agr5.usef.energy", 0, 0);
+            verifyAggregatorCalls("agr6.usef.energy", 0, 0);
+            verifyAggregatorCalls("agr7.usef.energy", 0, 0);
 
             assertNotNull(resultString);
 
@@ -141,66 +110,58 @@ public class CommonReferenceOperatorTopologyBusinessServiceTest {
         }
     }
 
+    private void verifyAggregatorCalls(String domain, int persists, int deletes) {
+        Mockito.verify(aggregatorRepository, Mockito.times(persists)).persist(new Aggregator(domain));
+        Mockito.verify(aggregatorRepository, Mockito.times(deletes)).deleteByDomain(domain);
+    }
+
+
+    private void mockAggregeator(Long id, String domain, boolean exists)  throws BusinessValidationException{
+        Aggregator participant = createAggregator(id, domain);
+        if (exists) {
+            Mockito.when(aggregatorRepository.find(Matchers.eq(participant))).thenReturn(participant);
+            Mockito.doNothing().when(aggregatorRepository).deleteByDomain(domain);
+            Mockito.doThrow(new BusinessValidationException(RestError.DUPLICATE, "Aggregator", domain))
+                    .when(validationService)
+                    .checkDuplicateAggregatorDomain(Matchers.matches(domain));
+        } else {
+            Mockito.doThrow(new BusinessValidationException(RestError.NOT_FOUND, "Aggregator", domain))
+                    .when(validationService)
+                    .checkExistingAggregatorDomain(Matchers.matches(domain));
+        }
+    }
+
     @Test
     public void testBalanceResponsiblePartyBatch() throws Exception  {
-        BalanceResponsibleParty brp0 = mockBalanceResponsibleParty(null, "brp0.usef.energy", false);
-        BalanceResponsibleParty brp1 = mockBalanceResponsibleParty(1L, "brp1.usef.energy", false);
-        BalanceResponsibleParty brp2 = mockBalanceResponsibleParty(null, "brp2.usef.energy", true);
-        BalanceResponsibleParty brp3 = mockBalanceResponsibleParty(null, "brp3.usef.energy", false);
-        BalanceResponsibleParty brp4 = mockBalanceResponsibleParty(4L, "brp4.usef.energy", true);
-        BalanceResponsibleParty brp5 = mockBalanceResponsibleParty(null, "brp5.usef.energy", true);
-        BalanceResponsibleParty brp6 = mockBalanceResponsibleParty(null, "brp6usefenergy", false);
-        BalanceResponsibleParty brp7 = mockBalanceResponsibleParty(7L, "brp7.usef.energy", true);
-
-        Assert.assertNull(brp0);
-        Assert.assertNull(brp1);
-        assertNotNull(brp2);
-        Assert.assertNull(brp3);
-        assertNotNull(brp4);
-        assertNotNull(brp5);
-        Assert.assertNull(brp6);
-        assertNotNull(brp7);
-
+        mockBalanceResponsibleParty(0L, "brp0.usef.energy", true);
+        mockBalanceResponsibleParty(null, "brp1.usef.energy", false);
+        mockBalanceResponsibleParty(null, "brp2.usef.energy", false);
+        mockBalanceResponsibleParty(-3L, "brp3.usef.energy", true);
 
         try {
             String jsonText = "["
                     + "{\"method\" : \"DELETE\", \"domain\": \"brp0.usef.energy\"},"
-                    + "{\"method\" : \"MAIL\", \"domain\": \"brp1.usef.energy\"},"
-                    + "{\"method\" : \"POST\", \"domain\": \"brp2.usef.energy\"},"
-                    + "{\"method\" : \"POST\", \"gebied\": \"brp3.usef.energy\", \"subdomain\": \"www.usef-example.com\"},"
-                    + "{\"method\" : \"DELETE\", \"domain\": \"brp4.usef.energy\"},"
+                    + "{\"method\" : \"POST\", \"domain\": \"brp1.usef.energy\"},"
+                    + "{\"method\" : \"DELETE\", \"domain\": \"brp2.usef.energy\"},"
+                    + "{\"method\" : \"POST\", \"domain\": \"brp3.usef.energy\"},"
+                    + "{\"method\" : \"DELETE\", \"domain\": \"brp4.usef.energy\", \"subdomain\": \"www.usef-example.com\"},"
                     + "{\"methode\" : \"POST\", \"domain\": \"brp5.usef.energy\"},"
                     + "{\"method\" : \"POST\", \"domain\": \"brp6usefenergy\"},"
-                    + "{\"method\" : \"GET\", \"domain\": \"brp7.usef.energy\"}"
+                    + "{\"method\" : \"GET\", \"gebied\": \"brp7.usef.energy\"}"
                     + "]";
 
             List<RestResult> result = service.processBalanceResponsiblePartyBatch(jsonText);
 
             String resultString = JsonUtil.createJsonText(result);
 
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).persist(brp0);
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).delete(brp0);
-
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).persist(brp1);
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).delete(brp1);
-
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(1)).persist(brp2);
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).delete(brp2);
-
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).persist(brp3);
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).delete(brp3);
-
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).persist(brp4);
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).delete(brp4);
-
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).persist(brp5);
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).delete(brp5);
-
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).persist(brp6);
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).delete(brp6);
-
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).persist(brp7);
-            Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(0)).delete(brp7);
+            verifyBalanceResponsiblePartyCalls("brp0.usef.energy", 0, 1);
+            verifyBalanceResponsiblePartyCalls("brp1.usef.energy", 1, 0);
+            verifyBalanceResponsiblePartyCalls("brp2.usef.energy", 0, 0);
+            verifyBalanceResponsiblePartyCalls("brp3.usef.energy", 0, 0);
+            verifyBalanceResponsiblePartyCalls("brp4.usef.energy", 0, 0);
+            verifyBalanceResponsiblePartyCalls("brp5.usef.energy", 0, 0);
+            verifyBalanceResponsiblePartyCalls("brp6.usef.energy", 0, 0);
+            verifyBalanceResponsiblePartyCalls("brp7.usef.energy", 0, 0);
 
             assertNotNull(resultString);
 
@@ -209,66 +170,57 @@ public class CommonReferenceOperatorTopologyBusinessServiceTest {
         }
     }
 
+    private void verifyBalanceResponsiblePartyCalls(String domain, int persists, int deletes) {
+        Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(persists)).persist(new BalanceResponsibleParty(domain));
+        Mockito.verify(balanceResponsiblePartyRepository, Mockito.times(deletes)).deleteByDomain(domain);
+    }
+
+    private void mockBalanceResponsibleParty(Long id, String domain, boolean exists)  throws BusinessValidationException{
+        BalanceResponsibleParty participant = createBalanceResponsibleParty(id, domain);
+        if (exists) {
+            Mockito.when(balanceResponsiblePartyRepository.find(Matchers.eq(participant))).thenReturn(participant);
+            Mockito.doNothing().when(balanceResponsiblePartyRepository).deleteByDomain(domain);
+            Mockito.doThrow(new BusinessValidationException(RestError.DUPLICATE, "BalanceResponsibleParty", domain))
+                    .when(validationService)
+                    .checkDuplicateBalanceResponsiblePartyDomain(Matchers.matches(domain));
+        } else {
+            Mockito.doThrow(new BusinessValidationException(RestError.NOT_FOUND, "BalanceResponsibleParty", domain))
+                    .when(validationService)
+                    .checkExistingBalanceResponsiblePartyDomain(Matchers.matches(domain));
+        }
+    }
+
     @Test
-    public void testDistributionSystemOperatorBatch() throws Exception {
-        DistributionSystemOperator dso0 = mockDistributionSystemOperator(null, "dso0.usef.energy", false);
-        DistributionSystemOperator dso1 = mockDistributionSystemOperator(1L, "dso1.usef.energy", false);
-        DistributionSystemOperator dso2 = mockDistributionSystemOperator(null, "dso2.usef.energy", true);
-        DistributionSystemOperator dso3 = mockDistributionSystemOperator(null, "dso3.usef.energy", false);
-        DistributionSystemOperator dso4 = mockDistributionSystemOperator(4L, "dso4.usef.energy", true);
-        DistributionSystemOperator dso5 = mockDistributionSystemOperator(null, "dso.usef.energy", true);
-        DistributionSystemOperator dso6 = mockDistributionSystemOperator(null, "dso6usefenergy", false);
-        DistributionSystemOperator dso7 = mockDistributionSystemOperator(7L, "dso7.usef.energy", true);
-
-        Assert.assertNull(dso0);
-        Assert.assertNull(dso1);
-        assertNotNull(dso2);
-        Assert.assertNull(dso3);
-        assertNotNull(dso4);
-        assertNotNull(dso5);
-        Assert.assertNull(dso6);
-        assertNotNull(dso7);
-
+    public void testDistributionSystemOperatorBatch() throws Exception  {
+        mockDistributionSystemOperator(0L, "dso0.usef.energy", true);
+        mockDistributionSystemOperator(null, "dso1.usef.energy", false);
+        mockDistributionSystemOperator(null, "dso2.usef.energy", false);
+        mockDistributionSystemOperator(-3L, "dso3.usef.energy", true);
 
         try {
             String jsonText = "["
                     + "{\"method\" : \"DELETE\", \"domain\": \"dso0.usef.energy\"},"
-                    + "{\"method\" : \"MAIL\", \"domain\": \"dso1.usef.energy\"},"
-                    + "{\"method\" : \"POST\", \"domain\": \"dso2.usef.energy\"},"
-                    + "{\"method\" : \"POST\", \"gebied\": \"dso3.usef.energy\", \"subdomain\": \"www.usef-example.com\"},"
-                    + "{\"method\" : \"DELETE\", \"domain\": \"dso4.usef.energy\"},"
+                    + "{\"method\" : \"POST\", \"domain\": \"dso1.usef.energy\"},"
+                    + "{\"method\" : \"DELETE\", \"domain\": \"dso2.usef.energy\"},"
+                    + "{\"method\" : \"POST\", \"domain\": \"dso3.usef.energy\"},"
+                    + "{\"method\" : \"DELETE\", \"domain\": \"dso4.usef.energy\", \"subdomain\": \"www.usef-example.com\"},"
                     + "{\"methode\" : \"POST\", \"domain\": \"dso5.usef.energy\"},"
                     + "{\"method\" : \"POST\", \"domain\": \"dso6usefenergy\"},"
-                    + "{\"method\" : \"GET\", \"domain\": \"dso7.usef.energy\"}"
+                    + "{\"method\" : \"GET\", \"gebied\": \"dso7.usef.energy\"}"
                     + "]";
 
             List<RestResult> result = service.processDistributionSystemOperatorBatch(jsonText);
 
             String resultString = JsonUtil.createJsonText(result);
 
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).persist(dso0);
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).delete(dso0);
-
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).persist(dso1);
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).delete(dso1);
-
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(1)).persist(dso2);
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).delete(dso2);
-
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).persist(dso3);
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).delete(dso3);
-
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).persist(dso4);
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).delete(dso4);
-
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).persist(dso5);
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).delete(dso5);
-
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).persist(dso6);
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).delete(dso6);
-
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).persist(dso7);
-            Mockito.verify(distributionSystemOperatorRepository, Mockito.times(0)).delete(dso7);
+            verifyDistributionSystemOperatorCalls("dso0.usef.energy", 0, 1);
+            verifyDistributionSystemOperatorCalls("dso1.usef.energy", 1, 0);
+            verifyDistributionSystemOperatorCalls("dso2.usef.energy", 0, 0);
+            verifyDistributionSystemOperatorCalls("dso3.usef.energy", 0, 0);
+            verifyDistributionSystemOperatorCalls("dso4.usef.energy", 0, 0);
+            verifyDistributionSystemOperatorCalls("dso5.usef.energy", 0, 0);
+            verifyDistributionSystemOperatorCalls("dso6.usef.energy", 0, 0);
+            verifyDistributionSystemOperatorCalls("dso7.usef.energy", 0, 0);
 
             assertNotNull(resultString);
 
@@ -277,71 +229,82 @@ public class CommonReferenceOperatorTopologyBusinessServiceTest {
         }
     }
 
+    private void verifyDistributionSystemOperatorCalls(String domain, int persists, int deletes) {
+        Mockito.verify(distributionSystemOperatorRepository, Mockito.times(persists)).persist(new DistributionSystemOperator(domain));
+        Mockito.verify(distributionSystemOperatorRepository, Mockito.times(deletes)).deleteByDomain(domain);
+    }
+
+    private void mockDistributionSystemOperator(Long id, String domain, boolean exists)  throws BusinessValidationException{
+        DistributionSystemOperator participant = createDistributionSystemOperator(id, domain);
+        if (exists) {
+            Mockito.when(distributionSystemOperatorRepository.find(Matchers.eq(participant))).thenReturn(participant);
+            Mockito.doNothing().when(distributionSystemOperatorRepository).deleteByDomain(domain);
+            Mockito.doThrow(new BusinessValidationException(RestError.DUPLICATE, "DistributionSystemOperator", domain))
+                    .when(validationService)
+                    .checkDuplicateDistributionSystemOperatorDomain(Matchers.matches(domain));
+        } else {
+            Mockito.doThrow(new BusinessValidationException(RestError.NOT_FOUND, "DistributionSystemOperator", domain))
+                    .when(validationService)
+                    .checkExistingDistributionSystemOperatorDomain(Matchers.matches(domain));
+        }
+    }
+
     @Test
-    public void testMeterDataCompanyBatch() throws Exception {
-        MeterDataCompany mdc0 = mockMeterDataCompany(null, "mdc0.usef.energy", false);
-        MeterDataCompany mdc1 = mockMeterDataCompany(1L, "mdc1.usef.energy", false);
-        MeterDataCompany mdc2 = mockMeterDataCompany(null, "mdc2.usef.energy", true);
-        MeterDataCompany mdc3 = mockMeterDataCompany(null, "mdc3.usef.energy", false);
-        MeterDataCompany mdc4 = mockMeterDataCompany(4L, "mdc4.usef.energy", true);
-        MeterDataCompany mdc5 = mockMeterDataCompany(null, "mdc.usef.energy", true);
-        MeterDataCompany mdc6 = mockMeterDataCompany(null, "mdc6usefenergy", false);
-        MeterDataCompany mdc7 = mockMeterDataCompany(7L, "mdc7.usef.energy", true);
-
-        Assert.assertNull(mdc0);
-        Assert.assertNull(mdc1);
-        assertNotNull(mdc2);
-        Assert.assertNull(mdc3);
-        assertNotNull(mdc4);
-        assertNotNull(mdc5);
-        Assert.assertNull(mdc6);
-        assertNotNull(mdc7);
-
+    public void testMeterDataCompanyBatch() throws Exception  {
+        mockMeterDataCompany(0L, "mdc0.usef.energy", true);
+        mockMeterDataCompany(null, "mdc1.usef.energy", false);
+        mockMeterDataCompany(null, "mdc2.usef.energy", false);
+        mockMeterDataCompany(-3L, "mdc3.usef.energy", true);
 
         try {
             String jsonText = "["
                     + "{\"method\" : \"DELETE\", \"domain\": \"mdc0.usef.energy\"},"
-                    + "{\"method\" : \"MAIL\", \"domain\": \"mdc1.usef.energy\"},"
-                    + "{\"method\" : \"POST\", \"domain\": \"mdc2.usef.energy\"},"
-                    + "{\"method\" : \"POST\", \"gebied\": \"mdc3.usef.energy\", \"subdomain\": \"www.usef-example.com\"},"
-                    + "{\"method\" : \"DELETE\", \"domain\": \"mdc4.usef.energy\"},"
+                    + "{\"method\" : \"POST\", \"domain\": \"mdc1.usef.energy\"},"
+                    + "{\"method\" : \"DELETE\", \"domain\": \"mdc2.usef.energy\"},"
+                    + "{\"method\" : \"POST\", \"domain\": \"mdc3.usef.energy\"},"
+                    + "{\"method\" : \"DELETE\", \"domain\": \"mdc4.usef.energy\", \"subdomain\": \"www.usef-example.com\"},"
                     + "{\"methode\" : \"POST\", \"domain\": \"mdc5.usef.energy\"},"
                     + "{\"method\" : \"POST\", \"domain\": \"mdc6usefenergy\"},"
-                    + "{\"method\" : \"GET\", \"domain\": \"mdc7.usef.energy\"}"
+                    + "{\"method\" : \"GET\", \"gebied\": \"mdc7.usef.energy\"}"
                     + "]";
 
             List<RestResult> result = service.processMeterDataCompanyBatch(jsonText);
 
             String resultString = JsonUtil.createJsonText(result);
 
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).persist(mdc0);
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).delete(mdc0);
-
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).persist(mdc1);
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).delete(mdc1);
-
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(1)).persist(mdc2);
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).delete(mdc2);
-
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).persist(mdc3);
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).delete(mdc3);
-
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).persist(mdc4);
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).delete(mdc4);
-
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).persist(mdc5);
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).delete(mdc5);
-
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).persist(mdc6);
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).delete(mdc6);
-
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).persist(mdc7);
-            Mockito.verify(meterDataCompanyRepository, Mockito.times(0)).delete(mdc7);
+            verifyMeterDataCompanyCalls("mdc0.usef.energy", 0, 1);
+            verifyMeterDataCompanyCalls("mdc1.usef.energy", 1, 0);
+            verifyMeterDataCompanyCalls("mdc2.usef.energy", 0, 0);
+            verifyMeterDataCompanyCalls("mdc3.usef.energy", 0, 0);
+            verifyMeterDataCompanyCalls("mdc4.usef.energy", 0, 0);
+            verifyMeterDataCompanyCalls("mdc5.usef.energy", 0, 0);
+            verifyMeterDataCompanyCalls("mdc6.usef.energy", 0, 0);
+            verifyMeterDataCompanyCalls("mdc7.usef.energy", 0, 0);
 
             assertNotNull(resultString);
 
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void verifyMeterDataCompanyCalls(String domain, int persists, int deletes) {
+        Mockito.verify(meterDataCompanyRepository, Mockito.times(persists)).persist(new MeterDataCompany(domain));
+        Mockito.verify(meterDataCompanyRepository, Mockito.times(deletes)).deleteByDomain(domain);
+    }
+
+    private void mockMeterDataCompany(Long id, String domain, boolean exists)  throws BusinessValidationException{
+        MeterDataCompany participant = createMeterDataCompany(id, domain);
+        if (exists) {
+            Mockito.when(meterDataCompanyRepository.find(Matchers.eq(participant))).thenReturn(participant);
+            Mockito.doNothing().when(meterDataCompanyRepository).deleteByDomain(domain);
+            Mockito.doThrow(new BusinessValidationException(RestError.DUPLICATE, "MeterDataCompany", domain))
+                    .when(validationService)
+                    .checkDuplicateMeterDataCompanyDomain(Matchers.matches(domain));
+        } else {
+            Mockito.doThrow(new BusinessValidationException(RestError.NOT_FOUND, "MeterDataCompany", domain))
+                    .when(validationService)
+                    .checkExistingMeterDataCompanyDomain(Matchers.matches(domain));
         }
     }
 
@@ -434,19 +397,6 @@ public class CommonReferenceOperatorTopologyBusinessServiceTest {
         return participant;
     }
 
-    private BalanceResponsibleParty mockBalanceResponsibleParty(Long id, String domain, boolean exists)  throws BusinessValidationException{
-        if (exists) {
-            BalanceResponsibleParty particicpant = createBalanceResponsibleParty(id, domain);
-            Mockito.when(balanceResponsiblePartyRepository.findByDomain(Matchers.eq(domain))).thenReturn(particicpant);
-            return particicpant;
-        } else {
-            Mockito.doThrow(new BusinessValidationException(RestError.NOT_FOUND, "BalanceResponsibleParty", domain))
-                    .when(validationService)
-                    .checkExistingBalanceResponsiblePartyDomain(Matchers.matches(domain));
-            return null;
-        }
-    }
-
     private DistributionSystemOperator createDistributionSystemOperator(Long id, String domain) {
         DistributionSystemOperator participant = new DistributionSystemOperator();
         participant.setId(id);
@@ -454,36 +404,10 @@ public class CommonReferenceOperatorTopologyBusinessServiceTest {
         return participant;
     }
 
-    private DistributionSystemOperator mockDistributionSystemOperator(Long id, String domain, boolean exists)  throws BusinessValidationException{
-        if (exists) {
-            DistributionSystemOperator particicpant = createDistributionSystemOperator(id, domain);
-            Mockito.when(distributionSystemOperatorRepository.findByDomain(Matchers.eq(domain))).thenReturn(particicpant);
-            return particicpant;
-        } else {
-            Mockito.doThrow(new BusinessValidationException(RestError.NOT_FOUND, "DistributionSystemOperator", domain))
-                    .when(validationService)
-                    .checkExistingDistributionSystemOperatorDomain(Matchers.matches(domain));
-            return null;
-        }
-    }
-
     private MeterDataCompany createMeterDataCompany(Long id, String domain) {
         MeterDataCompany participant = new MeterDataCompany();
         participant.setId(id);
         participant.setDomain(domain);
         return participant;
-    }
-
-    private MeterDataCompany mockMeterDataCompany(Long id, String domain, boolean exists)  throws BusinessValidationException{
-        if (exists) {
-            MeterDataCompany particicpant = createMeterDataCompany(id, domain);
-            Mockito.when(meterDataCompanyRepository.findByDomain(Matchers.eq(domain))).thenReturn(particicpant);
-            return particicpant;
-        } else {
-            Mockito.doThrow(new BusinessValidationException(RestError.NOT_FOUND, "MeterDataCompany", domain))
-                    .when(validationService)
-                    .checkExistingMeterDataCompanyDomain(Matchers.matches(domain));
-            return null;
-        }
     }
 }
