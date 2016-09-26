@@ -143,7 +143,7 @@ public class DistributionSystemOperatorTopologyBusinessService {
             // Bow process all the actions that have the correct syntax.
             for (int entry = 0; entry < actions.size(); entry++) {
                 if (!resultMap.containsKey(entry)) {
-                    resultMap.put(entry, processParticipantNode(role, actions.get(entry)));
+                    resultMap.put(entry, processCommonReferenceOperatorNode(actions.get(entry)));
                 }
             }
         }
@@ -153,7 +153,7 @@ public class DistributionSystemOperatorTopologyBusinessService {
         return result;
     }
 
-    private RestResult processParticipantNode(Role role, ParticipantAction action) throws IOException {
+    private RestResult processCommonReferenceOperatorNode(ParticipantAction action) throws IOException {
         String method = action.getMethod();
         String domain = action.getDomain();
         RestResult result = new RestResult();
@@ -161,48 +161,12 @@ public class DistributionSystemOperatorTopologyBusinessService {
 
         switch (method) {
         case HttpMethod.GET:
-            result = findParticipant(role, domain);
+            result = findAllCommonReferenceOperators();
             break;
         case HttpMethod.POST:
-            result = createParticipant(role, domain);
-            break;
-        case HttpMethod.DELETE:
-            result = deleteParticipant(role, domain);
-            break;
-        }
-        return result;
-    }
-
-    private RestResult findParticipant(Role role, String domain) throws IOException {
-        RestResult result = new RestResult();
-        result.setCode(HttpResponseCodes.SC_INTERNAL_SERVER_ERROR);
-
-        switch (role) {
-        case CRO:
-            result = findCommonReferenceOperator(domain);
-            break;
-        }
-        return result;
-    }
-
-    private RestResult createParticipant(Role role, String domain) throws IOException {
-        RestResult result = new RestResult();
-        result.setCode(HttpResponseCodes.SC_INTERNAL_SERVER_ERROR);
-
-        switch (role) {
-        case CRO:
             result = createCommonReferenceOperator(domain);
             break;
-        }
-        return result;
-    }
-
-    private RestResult deleteParticipant(Role role, String domain) throws IOException {
-        RestResult result = new RestResult();
-        result.setCode(HttpResponseCodes.SC_INTERNAL_SERVER_ERROR);
-
-        switch (role) {
-        case CRO:
+        case HttpMethod.DELETE:
             result = deleteCommonReferenceOperator(domain);
             break;
         }

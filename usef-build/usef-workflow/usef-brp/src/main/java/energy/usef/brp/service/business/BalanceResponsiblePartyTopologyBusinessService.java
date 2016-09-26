@@ -117,10 +117,7 @@ public class BalanceResponsiblePartyTopologyBusinessService {
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public List<RestResult> processCommonReferenceOperatorBatch(String jsonText) throws IOException, ProcessingException {
         LOGGER.info("Start processing Common Reference Operator batch.");
-        return processParticipantBatch(CRO, jsonText);
-    }
 
-    private List<RestResult> processParticipantBatch(Role role, String jsonText) throws IOException, ProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode root = objectMapper.readTree(jsonText);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -143,7 +140,7 @@ public class BalanceResponsiblePartyTopologyBusinessService {
             // Bow process all the actions that have the correct syntax.
             for (int entry = 0; entry < actions.size(); entry++) {
                 if (!resultMap.containsKey(entry)) {
-                    resultMap.put(entry, processParticipantNode(role, actions.get(entry)));
+                    resultMap.put(entry, processCommonReferenceOperatorNode(actions.get(entry)));
                 }
             }
         }
@@ -153,7 +150,7 @@ public class BalanceResponsiblePartyTopologyBusinessService {
         return result;
     }
 
-    private RestResult processParticipantNode(Role role, ParticipantAction action) throws IOException {
+    private RestResult processCommonReferenceOperatorNode(ParticipantAction action) throws IOException {
         String method = action.getMethod();
         String domain = action.getDomain();
         RestResult result = new RestResult();
@@ -161,48 +158,12 @@ public class BalanceResponsiblePartyTopologyBusinessService {
 
         switch (method) {
         case HttpMethod.GET:
-            result = findParticipant(role, domain);
-            break;
-        case HttpMethod.POST:
-            result = createParticipant(role, domain);
-            break;
-        case HttpMethod.DELETE:
-            result = deleteParticipant(role, domain);
-            break;
-        }
-        return result;
-    }
-
-    private RestResult findParticipant(Role role, String domain) throws IOException {
-        RestResult result = new RestResult();
-        result.setCode(HttpResponseCodes.SC_INTERNAL_SERVER_ERROR);
-
-        switch (role) {
-        case CRO:
             result = findCommonReferenceOperator(domain);
             break;
-        }
-        return result;
-    }
-
-    private RestResult createParticipant(Role role, String domain) throws IOException {
-        RestResult result = new RestResult();
-        result.setCode(HttpResponseCodes.SC_INTERNAL_SERVER_ERROR);
-
-        switch (role) {
-        case CRO:
+        case HttpMethod.POST:
             result = createCommonReferenceOperator(domain);
             break;
-        }
-        return result;
-    }
-
-    private RestResult deleteParticipant(Role role, String domain) throws IOException {
-        RestResult result = new RestResult();
-        result.setCode(HttpResponseCodes.SC_INTERNAL_SERVER_ERROR);
-
-        switch (role) {
-        case CRO:
+        case HttpMethod.DELETE:
             result = deleteCommonReferenceOperator(domain);
             break;
         }
