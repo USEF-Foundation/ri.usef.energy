@@ -52,6 +52,7 @@ public class JsonUtil {
     public static String createJsonText(Object object) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         mapper.disable(SerializationFeature.WRITE_EMPTY_JSON_ARRAYS);
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         StringWriter writer = new StringWriter();
         JsonGenerator generator = new JsonFactory().createGenerator(writer);
         mapper.writeValue(generator, object);

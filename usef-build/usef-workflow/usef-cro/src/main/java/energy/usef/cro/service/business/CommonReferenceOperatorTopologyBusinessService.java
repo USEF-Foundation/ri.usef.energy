@@ -523,7 +523,7 @@ public class CommonReferenceOperatorTopologyBusinessService {
      */
 
     /**
-     * Try and delete an {@link Aggregator} with the given domain name.
+     * Try and delete an {@link Aggregator} entity with the given domain name.
      *
      * @param domain a {@link String} containing a domain name of the {@link Aggregator} to be deleted.
      * @return a {@Link RestResult}

@@ -22,14 +22,20 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
+import energy.usef.brp.dto.ConnectionAction;
 import energy.usef.brp.dto.ParticipantAction;
+import energy.usef.brp.dto.SynchronisationConnectionDto;
 import energy.usef.brp.model.CommonReferenceOperator;
+import energy.usef.brp.model.SynchronisationConnection;
+import energy.usef.brp.model.SynchronisationConnectionStatus;
+import energy.usef.brp.model.SynchronisationConnectionStatusType;
 import energy.usef.brp.repository.CommonReferenceOperatorRepository;
-import energy.usef.core.config.Role;
+import energy.usef.brp.repository.SynchronisationConnectionRepository;
+import energy.usef.brp.repository.SynchronisationConnectionStatusRepository;
 import energy.usef.core.exception.BusinessValidationException;
-import energy.usef.core.rest.Participant;
 import energy.usef.core.rest.RestResult;
 import energy.usef.core.rest.RestResultFactory;
+import energy.usef.core.util.DateTimeUtil;
 import energy.usef.core.util.JsonUtil;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
@@ -48,7 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static energy.usef.core.config.Role.*;
 import static energy.usef.core.util.JsonUtil.ROOT_KEY;
 import static energy.usef.core.util.JsonUtil.createJsonText;
 
@@ -59,17 +64,110 @@ import static energy.usef.core.util.JsonUtil.createJsonText;
 public class BalanceResponsiblePartyTopologyBusinessService {
     private static final Logger LOGGER = LoggerFactory.getLogger(BalanceResponsiblePartyTopologyBusinessService.class);
 
+    private static final String JSON_DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
+
+    @Inject
+    BalanceResponsiblePartyValidationBusinessService validationService;
+
     @Inject
     CommonReferenceOperatorRepository commonReferenceOperatorRepository;
 
     @Inject
-    BalanceResponsiblePartyValidationBusinessService validationService;
+    SynchronisationConnectionRepository synchronisationConnectionRepository;
+
+    @Inject
+    SynchronisationConnectionStatusRepository synchronisationConnectionStatusRepository;
 
     public BalanceResponsiblePartyTopologyBusinessService() {
     }
 
     /**
-     * Try and retrieve an {@link CommonReferenceOperator} with the given domain name, returning it in a {@Link RestResult}.
+     * Try and retrieve a {@link SynchronisationConnection} with the given entityAddress, returning it in a {@Link RestResult}.
+     *
+     * @param entityAddress a {@link String} containing a entit addressof the {@link SynchronisationConnection} to be retrieved.
+     * @return a {@Link RestResult}
+     */
+    public RestResult findSynchronisationConnection(String entityAddress) throws IOException {
+        RestResult result = RestResultFactory.getJsonRestResult();
+        SynchronisationConnection connection = synchronisationConnectionRepository.findByEntityAddress(entityAddress);
+
+        if (connection != null) {
+            result.setCode(HttpResponseCodes.SC_OK);
+            result.setBody(createJsonText(new SynchronisationConnectionDto(connection.getId(), connection.getEntityAddress(),
+                    DateTimeUtil.printDateTime(connection.getLastModificationTime(),JSON_DATE_TIME_FORMAT))));
+        } else {
+            result.setCode(HttpResponseCodes.SC_NOT_FOUND);
+            result.getErrors().add("SynchronisationConnection " + entityAddress + " not found.");
+        }
+        return result;
+    }
+
+    /**
+     * Try and retrieve all {@link SynchronisationConnection} instances.
+     */
+    public RestResult findAllSynchronisationConnections() throws IOException {
+        RestResult result = RestResultFactory.getJsonRestResult();
+
+        List<SynchronisationConnectionDto> connectionList = new ArrayList<>();
+        synchronisationConnectionRepository.findAll().stream().forEach(connection -> {
+            connectionList.add(new SynchronisationConnectionDto(connection.getId(), connection.getEntityAddress(),
+                    DateTimeUtil.printDateTime(connection.getLastModificationTime(),JSON_DATE_TIME_FORMAT)));
+        });
+
+        result.setCode(HttpResponseCodes.SC_OK);
+        result.setBody(createJsonText(connectionList));
+
+        return result;
+    }
+
+    /**
+     * Process a batch of {@Link SynchronisationConnection} updates.
+     *
+     * @param jsonText a json {@link String} containing a batch of {@Link SynchronisationConnection} updates.
+     * @return a {@Link Response} message containing batch update results
+     */
+
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public List<RestResult> processSynchronisationConnectionBatch(String jsonText) throws IOException, ProcessingException {
+        LOGGER.info("Start processing Common Reference Operator batch.");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode root = objectMapper.readTree(jsonText);
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        Map<Integer, RestResult> resultMap = new HashMap<>();
+
+        JsonFactory factory = new JsonFactory();
+        StringWriter stringWriter = new StringWriter();
+
+        JsonGenerator generator = factory.createGenerator(stringWriter);
+        generator.writeStartArray();
+
+        JsonUtil.validateNodeSyntax("/connection-schema.json", root, resultMap);
+
+        if (!resultMap.containsKey(ROOT_KEY)) {
+            LOGGER.error("Valid Json message");
+            List<ConnectionAction> actions = objectMapper.readValue(jsonText, new TypeReference<List<ConnectionAction>>() {
+            });
+
+            List<CommonReferenceOperator> existingCommonReferenceOperators = commonReferenceOperatorRepository.findAll();
+
+            // Bow process all the actions that have the correct syntax.
+            for (int entry = 0; entry < actions.size(); entry++) {
+                if (!resultMap.containsKey(entry)) {
+                    resultMap
+                            .put(entry, processSynchronisationConnectionNode(actions.get(entry), existingCommonReferenceOperators));
+                }
+            }
+        }
+
+        List<RestResult> result = resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue())
+                .collect(Collectors.toList());
+        return result;
+    }
+
+    /**
+     * Try and retrieve a {@link CommonReferenceOperator} with the given domain name, returning it in a {@Link RestResult}.
      *
      * @param domain a {@link String} containing a domain name of the {@link CommonReferenceOperator} to be retrieved.
      * @return a {@Link RestResult}
@@ -80,7 +178,8 @@ public class BalanceResponsiblePartyTopologyBusinessService {
 
         if (participant != null) {
             result.setCode(HttpResponseCodes.SC_OK);
-            result.setBody(createJsonText(new Participant(participant.getId(), participant.getDomain())));
+            //            result.setBody(createJsonText(new Participant(participant.getId(), participant.getDomain())));
+            result.setBody(createJsonText(participant));
         } else {
             result.setCode(HttpResponseCodes.SC_NOT_FOUND);
             result.getErrors().add("Common Reference Operator " + domain + " not found.");
@@ -94,15 +193,16 @@ public class BalanceResponsiblePartyTopologyBusinessService {
     public RestResult findAllCommonReferenceOperators() throws IOException {
         RestResult result = RestResultFactory.getJsonRestResult();
 
-        List<Participant> participantList = new ArrayList<>();
-        commonReferenceOperatorRepository.findAll().stream().forEach(a -> {
-            Participant participant = new Participant();
-            participant.setId(a.getId());
-            participant.setDomain(a.getDomain());
-            participantList.add(participant);
-        });
+        //        List<Participant> participantList = new ArrayList<>();
+        //        commonReferenceOperatorRepository.findAll().stream().forEach(a -> {
+        //            Participant participant = new Participant();
+        //            participant.setId(a.getId());
+        //            participant.setDomain(a.getDomain());
+        //            participantList.add(participant);
+        //        });
         result.setCode(HttpResponseCodes.SC_OK);
-        result.setBody(createJsonText(participantList));
+        //        result.setBody(createJsonText(participantList));
+        result.setBody(createJsonText(commonReferenceOperatorRepository.findAll()));
 
         return result;
     }
@@ -137,10 +237,13 @@ public class BalanceResponsiblePartyTopologyBusinessService {
             List<ParticipantAction> actions = objectMapper.readValue(jsonText, new TypeReference<List<ParticipantAction>>() {
             });
 
+            List<SynchronisationConnection> existingSynchronisationConnections = synchronisationConnectionRepository.findAll();
+
+
             // Bow process all the actions that have the correct syntax.
             for (int entry = 0; entry < actions.size(); entry++) {
                 if (!resultMap.containsKey(entry)) {
-                    resultMap.put(entry, processCommonReferenceOperatorNode(actions.get(entry)));
+                    resultMap.put(entry, processCommonReferenceOperatorNode(actions.get(entry), existingSynchronisationConnections));
                 }
             }
         }
@@ -150,7 +253,7 @@ public class BalanceResponsiblePartyTopologyBusinessService {
         return result;
     }
 
-    private RestResult processCommonReferenceOperatorNode(ParticipantAction action) throws IOException {
+    private RestResult processCommonReferenceOperatorNode(ParticipantAction action, List<SynchronisationConnection> existingSynchronisationConnections) throws IOException {
         String method = action.getMethod();
         String domain = action.getDomain();
         RestResult result = new RestResult();
@@ -161,10 +264,31 @@ public class BalanceResponsiblePartyTopologyBusinessService {
             result = findCommonReferenceOperator(domain);
             break;
         case HttpMethod.POST:
-            result = createCommonReferenceOperator(domain);
+            result = createCommonReferenceOperator(domain, existingSynchronisationConnections);
             break;
         case HttpMethod.DELETE:
             result = deleteCommonReferenceOperator(domain);
+            break;
+        }
+        return result;
+    }
+
+    private RestResult processSynchronisationConnectionNode(ConnectionAction action,
+            List<CommonReferenceOperator> existingCommonReferenceOperators) throws IOException {
+        String method = action.getMethod();
+        String entityAddress = action.getEntityAddress();
+        RestResult result = new RestResult();
+        result.setCode(HttpResponseCodes.SC_INTERNAL_SERVER_ERROR);
+
+        switch (method) {
+        case HttpMethod.GET:
+            result = findSynchronisationConnection(entityAddress);
+            break;
+        case HttpMethod.POST:
+            result = createSynchronisationConnection(entityAddress, existingCommonReferenceOperators);
+            break;
+        case HttpMethod.DELETE:
+            result = deleteSynchronisationConnection(entityAddress);
             break;
         }
         return result;
@@ -176,14 +300,22 @@ public class BalanceResponsiblePartyTopologyBusinessService {
      * @param domain a {@link String} containing a domain name of the {@link CommonReferenceOperator} to be created.
      * @return a {@Link RestResult}
      */
-    private RestResult createCommonReferenceOperator(String domain) {
+    private RestResult createCommonReferenceOperator(String domain, List<SynchronisationConnection> existingSynchronisationConnections) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
             validationService.checkDuplicateCommonReferenceOperatorDomain(domain);
 
-            CommonReferenceOperator participant = new CommonReferenceOperator();
-            participant.setDomain(domain);
-            commonReferenceOperatorRepository.persist(participant);
+            CommonReferenceOperator commonReferenceOperator = new CommonReferenceOperator();
+            commonReferenceOperator.setDomain(domain);
+            commonReferenceOperatorRepository.persist(commonReferenceOperator);
+
+            existingSynchronisationConnections.forEach(synchronisationConnection -> {
+                SynchronisationConnectionStatus synchronisationConnectionStatus = new SynchronisationConnectionStatus();
+                synchronisationConnectionStatus.setSynchronisationConnection(synchronisationConnection);
+                synchronisationConnectionStatus.setCommonReferenceOperator(commonReferenceOperator);
+                synchronisationConnectionStatus.setStatus(SynchronisationConnectionStatusType.MODIFIED);
+                synchronisationConnectionStatusRepository.persist(synchronisationConnectionStatus);
+            });
 
             result.setCode(HttpResponseCodes.SC_CREATED);
             LOGGER.info("Common Reference Operator {} created", domain);
@@ -195,16 +327,13 @@ public class BalanceResponsiblePartyTopologyBusinessService {
         return result;
     }
 
-    /**
-     * Try and delete an {@link CommonReferenceOperator} with the given domain name.
-     *
-     * @param domain a {@link String} containing a domain name of the {@link CommonReferenceOperator} to be deleted.
-     * @return a {@Link RestResult}
-     */
     private RestResult deleteCommonReferenceOperator(String domain) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
             validationService.checkExistingCommonReferenceOperatorDomain(domain);
+            CommonReferenceOperator commonReferenceOperator = commonReferenceOperatorRepository.findByDomain(domain);
+            synchronisationConnectionStatusRepository.deleteFor(commonReferenceOperator);
+
             commonReferenceOperatorRepository.deleteByDomain(domain);
             result.setCode(HttpResponseCodes.SC_OK);
             LOGGER.info("Common Reference Operator {} deleted", domain);
@@ -212,6 +341,52 @@ public class BalanceResponsiblePartyTopologyBusinessService {
             result.setCode(HttpResponseCodes.SC_NOT_FOUND);
             result.getErrors().add(e.getMessage());
             LOGGER.info("Common Reference Operator {} not found", domain);
+        }
+        return result;
+    }
+
+    private RestResult createSynchronisationConnection(String entityAddress,
+            List<CommonReferenceOperator> existingCommonReferenceOperators) {
+        RestResult result = RestResultFactory.getJsonRestResult();
+        try {
+            validationService.checkDuplicateSynchronisationConnection(entityAddress);
+
+            SynchronisationConnection synchronisationConnection = new SynchronisationConnection();
+            synchronisationConnection.setEntityAddress(entityAddress);
+            synchronisationConnection.setLastModificationTime(DateTimeUtil.getCurrentDateTime());
+            synchronisationConnectionRepository.persist(synchronisationConnection);
+
+            existingCommonReferenceOperators.forEach(commonReferenceOperator -> {
+                SynchronisationConnectionStatus synchronisationConnectionStatus = new SynchronisationConnectionStatus();
+                synchronisationConnectionStatus.setSynchronisationConnection(synchronisationConnection);
+                synchronisationConnectionStatus.setCommonReferenceOperator(commonReferenceOperator);
+                synchronisationConnectionStatus.setStatus(SynchronisationConnectionStatusType.MODIFIED);
+                synchronisationConnectionStatusRepository.persist(synchronisationConnectionStatus);
+            });
+
+            result.setCode(HttpResponseCodes.SC_CREATED);
+            LOGGER.info("SynchronisationConnection {} created", entityAddress);
+        } catch (BusinessValidationException e) {
+            result.setCode(HttpResponseCodes.SC_CONFLICT);
+            result.getErrors().add(e.getMessage());
+            LOGGER.info("Duplicate SynchronisationConnection {} not created", entityAddress);
+        }
+        return result;
+    }
+
+    private RestResult deleteSynchronisationConnection(String entityAddress) {
+        RestResult result = RestResultFactory.getJsonRestResult();
+        try {
+            validationService.checkExistingSynchronisationConnection(entityAddress);
+            SynchronisationConnection connection = synchronisationConnectionRepository.findByEntityAddress(entityAddress);
+            synchronisationConnectionStatusRepository.deleteFor(connection);
+            synchronisationConnectionRepository.deleteByEntityAddress(entityAddress);
+            result.setCode(HttpResponseCodes.SC_OK);
+            LOGGER.info("SynchronisationConnection {} deleted", entityAddress);
+        } catch (BusinessValidationException e) {
+            result.setCode(HttpResponseCodes.SC_NOT_FOUND);
+            result.getErrors().add(e.getMessage());
+            LOGGER.info("SynchronisationConnection {} not found", entityAddress);
         }
         return result;
     }

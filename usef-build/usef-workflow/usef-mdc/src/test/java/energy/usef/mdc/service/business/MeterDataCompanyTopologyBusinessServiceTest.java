@@ -120,6 +120,20 @@ public class MeterDataCompanyTopologyBusinessServiceTest {
         Mockito.verify(mdcConnectionRepository, Mockito.times(persists)).persist(new Connection(entityAddress));
         Mockito.verify(mdcConnectionRepository, Mockito.times(deletes)).deleteByEntityAddress(entityAddress);
     }
+    private void mockConnection(String entityAddress, boolean exists)  throws BusinessValidationException{
+        Connection connection = createConnection(entityAddress);
+        if (exists) {
+            Mockito.when(mdcConnectionRepository.find(Matchers.eq(connection))).thenReturn(connection);
+            Mockito.doNothing().when(mdcConnectionRepository).deleteByEntityAddress(entityAddress);
+            Mockito.doThrow(new BusinessValidationException(RestError.DUPLICATE, "Connection", entityAddress))
+                    .when(validationService)
+                    .checkDuplicateConnection(Matchers.matches(entityAddress));
+        } else {
+            Mockito.doThrow(new BusinessValidationException(RestError.NOT_FOUND, "Connection", entityAddress))
+                    .when(validationService)
+                    .checkExistingConnection(Matchers.matches(entityAddress));
+        }
+    }
 
     @Test
     public void testBalanceResponsiblePartyBatch() throws Exception  {
@@ -315,11 +329,10 @@ public class MeterDataCompanyTopologyBusinessServiceTest {
     }
 
     private Connection createConnection(String entityAddress) {
-        Connection participant = new Connection();
-        participant.setEntityAddress(entityAddress);
-        return participant;
+        Connection connection = new Connection();
+        connection.setEntityAddress(entityAddress);
+        return connection;
     }
-
 
     private BalanceResponsibleParty createBalanceResponsibleParty(String domain) {
         BalanceResponsibleParty participant = new BalanceResponsibleParty();
@@ -381,20 +394,6 @@ public class MeterDataCompanyTopologyBusinessServiceTest {
             Mockito.doThrow(new BusinessValidationException(RestError.NOT_FOUND, "CommonReferenceOperator", domain))
                     .when(validationService)
                     .checkExistingCommonReferenceOperatorDomain(Matchers.matches(domain));
-        }
-    }
-    private void mockConnection(String entityAddress, boolean exists)  throws BusinessValidationException{
-        Connection connection = createConnection(entityAddress);
-        if (exists) {
-            Mockito.when(mdcConnectionRepository.find(Matchers.eq(connection))).thenReturn(connection);
-            Mockito.doNothing().when(mdcConnectionRepository).deleteByEntityAddress(entityAddress);
-            Mockito.doThrow(new BusinessValidationException(RestError.DUPLICATE, "Connection", entityAddress))
-                    .when(validationService)
-                    .checkDuplicateConnection(Matchers.matches(entityAddress));
-        } else {
-            Mockito.doThrow(new BusinessValidationException(RestError.NOT_FOUND, "Connection", entityAddress))
-                    .when(validationService)
-                    .checkExistingConnection(Matchers.matches(entityAddress));
         }
     }
 }

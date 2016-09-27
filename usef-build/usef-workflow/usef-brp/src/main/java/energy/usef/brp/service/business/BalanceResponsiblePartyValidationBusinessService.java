@@ -16,6 +16,7 @@
 package energy.usef.brp.service.business;
 
 import energy.usef.brp.repository.CommonReferenceOperatorRepository;
+import energy.usef.brp.repository.SynchronisationConnectionRepository;
 import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.exception.RestError;
 
@@ -31,6 +32,9 @@ public class BalanceResponsiblePartyValidationBusinessService {
 
     @Inject
     CommonReferenceOperatorRepository commonReferenceOperatorRepository;
+
+    @Inject
+    SynchronisationConnectionRepository synchronisationConnectionRepository;
 
     /**
      * Throws a {@link BusinessValidationException} if domain is a duplicate common reference operator domain.
@@ -53,6 +57,29 @@ public class BalanceResponsiblePartyValidationBusinessService {
     public void checkExistingCommonReferenceOperatorDomain(String domain) throws BusinessValidationException {
         if (commonReferenceOperatorRepository.findByDomain(domain) == null) {
             throw new BusinessValidationException(RestError.NOT_FOUND, "Common Reference Operator", domain);
+        }
+    }
+    /**
+     * Throws a {@link BusinessValidationException} if entityAddress is a duplicate SynchronisationConnection entityAddress.
+     *
+     * @param entityAddress an entityAddress
+     * @throws BusinessValidationException
+     */
+    public void checkDuplicateSynchronisationConnection(String entityAddress) throws BusinessValidationException {
+        if (synchronisationConnectionRepository.findByEntityAddress(entityAddress) != null) {
+            throw new BusinessValidationException(RestError.DUPLICATE, "SynchronisationConnection", entityAddress);
+        }
+    }
+
+    /**
+     * Throws a {@link BusinessValidationException} if domain is a non-existent SynchronisationConnection entityAddress.
+     *
+     * @param entityAddress domain an entityAddress
+     * @throws BusinessValidationException
+     */
+    public void checkExistingSynchronisationConnection(String entityAddress) throws BusinessValidationException {
+        if (synchronisationConnectionRepository.findByEntityAddress(entityAddress) == null) {
+            throw new BusinessValidationException(RestError.NOT_FOUND, "SynchronisationConnection", entityAddress);
         }
     }
 }
