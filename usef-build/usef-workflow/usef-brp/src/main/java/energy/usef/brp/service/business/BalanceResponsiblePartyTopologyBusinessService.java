@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
-import energy.usef.brp.dto.ConnectionAction;
-import energy.usef.brp.dto.ParticipantAction;
+import energy.usef.brp.dto.ConnectionActionDto;
+import energy.usef.brp.dto.ParticipantActionDto;
 import energy.usef.brp.dto.SynchronisationConnectionDto;
 import energy.usef.brp.model.CommonReferenceOperator;
 import energy.usef.brp.model.SynchronisationConnection;
@@ -147,7 +147,7 @@ public class BalanceResponsiblePartyTopologyBusinessService {
 
         if (!resultMap.containsKey(ROOT_KEY)) {
             LOGGER.error("Valid Json message");
-            List<ConnectionAction> actions = objectMapper.readValue(jsonText, new TypeReference<List<ConnectionAction>>() {
+            List<ConnectionActionDto> actions = objectMapper.readValue(jsonText, new TypeReference<List<ConnectionActionDto>>() {
             });
 
             List<CommonReferenceOperator> existingCommonReferenceOperators = commonReferenceOperatorRepository.findAll();
@@ -234,7 +234,7 @@ public class BalanceResponsiblePartyTopologyBusinessService {
 
         if (!resultMap.containsKey(ROOT_KEY)) {
             LOGGER.error("Valid Json message");
-            List<ParticipantAction> actions = objectMapper.readValue(jsonText, new TypeReference<List<ParticipantAction>>() {
+            List<ParticipantActionDto> actions = objectMapper.readValue(jsonText, new TypeReference<List<ParticipantActionDto>>() {
             });
 
             List<SynchronisationConnection> existingSynchronisationConnections = synchronisationConnectionRepository.findAll();
@@ -253,7 +253,7 @@ public class BalanceResponsiblePartyTopologyBusinessService {
         return result;
     }
 
-    private RestResult processCommonReferenceOperatorNode(ParticipantAction action, List<SynchronisationConnection> existingSynchronisationConnections) throws IOException {
+    private RestResult processCommonReferenceOperatorNode(ParticipantActionDto action, List<SynchronisationConnection> existingSynchronisationConnections) throws IOException {
         String method = action.getMethod();
         String domain = action.getDomain();
         RestResult result = new RestResult();
@@ -273,7 +273,7 @@ public class BalanceResponsiblePartyTopologyBusinessService {
         return result;
     }
 
-    private RestResult processSynchronisationConnectionNode(ConnectionAction action,
+    private RestResult processSynchronisationConnectionNode(ConnectionActionDto action,
             List<CommonReferenceOperator> existingCommonReferenceOperators) throws IOException {
         String method = action.getMethod();
         String entityAddress = action.getEntityAddress();

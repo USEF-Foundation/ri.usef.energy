@@ -18,16 +18,16 @@ package energy.usef.brp.dto;
 /**
  * A data transfer object for relevant Participant data.
  */
-public class ConnectionAction {
+public class ParticipantActionDto {
     private String method;
-    private String entityAddress;
+    private String domain;
 
-    public ConnectionAction() {
+    public ParticipantActionDto() {
     }
 
-    public ConnectionAction(String method, String entityAddress) {
+    public ParticipantActionDto(String method, String domain) {
         this.method = method;
-        this.entityAddress = entityAddress;
+        this.domain = domain;
     }
 
     public String getMethod() {
@@ -38,11 +38,11 @@ public class ConnectionAction {
         this.method = method;
     }
 
-    public String getEntityAddress() {
-        return entityAddress;
+    public String getDomain() {
+        return domain;
     }
 
-    public void setEntityAddress(String entityAddress) {
-        this.entityAddress = entityAddress;
+    public void setDomain(String domain) {
+        this.domain = domain;
     }
 }
