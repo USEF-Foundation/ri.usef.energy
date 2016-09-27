@@ -44,15 +44,6 @@ public class CommonReferenceOperator {
     public CommonReferenceOperator() {
     }
 
-    /***
-     * Create an aggregator instance with a domain.
-     *
-     * @param domain the domain the aggregator is connected to.
-     */
-    public CommonReferenceOperator(String domain) {
-        this.domain = domain;
-    }
-
     public Long getId() {
         return id;
     }

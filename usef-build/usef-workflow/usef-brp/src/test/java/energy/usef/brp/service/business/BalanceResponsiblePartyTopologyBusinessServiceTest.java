@@ -191,10 +191,15 @@ public class BalanceResponsiblePartyTopologyBusinessServiceTest {
     }
 
     private void verifyCommonReferenceOperatorCalls(String domain, int persists, int deletes) {
-        Mockito.verify(commonReferenceOperatorRepository, Mockito.times(persists)).persist(new CommonReferenceOperator(domain));
+        Mockito.verify(commonReferenceOperatorRepository, Mockito.times(persists)).persist(newCommonReferenceOperator(domain));
         Mockito.verify(commonReferenceOperatorRepository, Mockito.times(deletes)).deleteByDomain(domain);
     }
 
+    private CommonReferenceOperator newCommonReferenceOperator(String domain) {
+        CommonReferenceOperator object = new CommonReferenceOperator();
+        object.setDomain(domain);
+        return object;
+    }
 
     private CommonReferenceOperator createCommonReferenceOperator(Long id, String domain) {
         CommonReferenceOperator participant = new CommonReferenceOperator();

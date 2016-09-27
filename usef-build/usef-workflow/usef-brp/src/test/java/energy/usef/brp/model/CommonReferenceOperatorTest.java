@@ -28,9 +28,9 @@ public class CommonReferenceOperatorTest {
      */
     @Test
     public void testEquals() {
-        CommonReferenceOperator participant1 = new CommonReferenceOperator("domain1");
-        CommonReferenceOperator participant2 = new CommonReferenceOperator("domain2");
-        CommonReferenceOperator participant3 = new CommonReferenceOperator("domain1");
+        CommonReferenceOperator participant1 = newCommonReferenceOperator("domain1");
+        CommonReferenceOperator participant2 = newCommonReferenceOperator("domain2");
+        CommonReferenceOperator participant3 = newCommonReferenceOperator("domain1");
 
         Assert.assertTrue(participant1.equals(participant1));
         Assert.assertTrue(!participant1.equals(null));
@@ -38,4 +38,9 @@ public class CommonReferenceOperatorTest {
         Assert.assertTrue(participant1.equals(participant3));
     }
 
+    private CommonReferenceOperator newCommonReferenceOperator(String domain) {
+        CommonReferenceOperator object = new CommonReferenceOperator();
+        object.setDomain(domain);
+        return object;
+    }
 }
