@@ -15,30 +15,29 @@
  */
 package energy.usef.agr.dto;
 
-import energy.usef.agr.model.SynchronisationConnection;
-
 /**
- * A data transfer object for relevant {@link SynchronisationConnection} data.
+ * A data transfer object for relevant Participant data.
  */
-public class SynchronisationConnectionDto {
-    private Long id;
+public class ConnectionActionDto {
+    private String method;
     private String entityAddress;
-    private Boolean isCustomer;
-    private String lastModificationTime;
+    private boolean isCustomer;
 
-    public SynchronisationConnectionDto(Long id, String entityAddress, Boolean isCustomer, String lastModificationTime) {
-        this.id = id;
+    public ConnectionActionDto() {
+    }
+
+    public ConnectionActionDto(String method, String entityAddress, boolean isCustomer) {
+        this.method = method;
         this.entityAddress = entityAddress;
         this.isCustomer = isCustomer;
-        this.lastModificationTime = lastModificationTime;
     }
 
-    public Long getId() {
-        return id;
+    public String getMethod() {
+        return method;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setMethod(String method) {
+        this.method = method;
     }
 
     public String getEntityAddress() {
@@ -49,19 +48,11 @@ public class SynchronisationConnectionDto {
         this.entityAddress = entityAddress;
     }
 
-    public Boolean getCustomer() {
+    public boolean isCustomer() {
         return isCustomer;
     }
 
-    public void setCustomer(Boolean customer) {
-        isCustomer = customer;
-    }
-
-    public String getLastModificationTime() {
-        return lastModificationTime;
-    }
-
-    public void setLastModificationTime(String lastModificationTime) {
-        this.lastModificationTime = lastModificationTime;
+    public void setIsCustomer(boolean isCustomer) {
+        this.isCustomer = isCustomer;
     }
 }

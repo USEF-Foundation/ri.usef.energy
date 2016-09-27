@@ -82,7 +82,7 @@ public class SynchronisationConnectionRepository extends BaseRepository<Synchron
     }
 
     /**
-     * Deletes {@Link CommonReferenceOperator} entity by its domain.
+     * Deletes {@Link SynchronisationConnection} entity by its entity address.
      *
      * @param domain commonReferenceOperator domain
      */

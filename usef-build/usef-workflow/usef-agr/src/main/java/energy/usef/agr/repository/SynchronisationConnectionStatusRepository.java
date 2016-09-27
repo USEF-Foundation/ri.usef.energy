@@ -72,4 +72,31 @@ public class SynchronisationConnectionStatusRepository extends BaseRepository<Sy
         query.executeUpdate();
     }
 
+    /**
+     * Deletes all the {@link SynchronisationConnectionStatus} object for a {@Link CommonReferenceOperator}.
+     *
+     * @param commonReferenceOperator
+     */
+    public void deleteFor (CommonReferenceOperator commonReferenceOperator) {
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("DELETE FROM SynchronisationConnectionStatus scs ");
+        queryBuilder.append("WHERE scs.commonReferenceOperator = :commonReferenceOperator");
+
+        Query query = entityManager.createQuery(queryBuilder.toString());
+        query.setParameter("commonReferenceOperator", commonReferenceOperator).executeUpdate();
+    }
+
+    /**
+     * Deletes all the {@link SynchronisationConnectionStatus} object for a {@Link SynchronisationConnection}.
+     *
+     * @param synchronisationConnection
+     */
+    public void deleteFor (SynchronisationConnection synchronisationConnection) {
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("DELETE FROM SynchronisationConnectionStatus scs ");
+        queryBuilder.append("WHERE scs.synchronisationConnection = :synchronisationConnection");
+
+        Query query = entityManager.createQuery(queryBuilder.toString());
+        query.setParameter("synchronisationConnection", synchronisationConnection).executeUpdate();
+    }
 }

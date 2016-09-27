@@ -156,7 +156,6 @@ public class SynchronisationConnection {
         return "SynchronisationConnection" + "[" +
                 "id=" + id +
                 ", entityAddress='" + entityAddress + "'" +
-//                ", isCustomer=" + isCustomer +
                 ", lastSynchronisationTime=" + lastSynchronisationTime +
                 ", lastModificationTime=" + lastModificationTime +
                 "]";
