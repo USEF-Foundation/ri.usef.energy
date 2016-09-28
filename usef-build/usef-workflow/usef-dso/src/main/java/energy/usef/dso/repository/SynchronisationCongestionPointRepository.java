@@ -79,6 +79,39 @@ public class SynchronisationCongestionPointRepository extends BaseRepository<Syn
     }
 
     /**
+     * Gets SynchronisationCongestionPoint entity by its entity address.
+     *
+     * @param entityAddress SynchronisationCongestionPoint entity address
+     *
+     * @return SynchronisationCongestionPoint entity
+     */
+    @SuppressWarnings("unchecked")
+    public SynchronisationCongestionPoint findByEntityAddress(String entityAddress) {
+
+        List<SynchronisationCongestionPoint> result = entityManager
+                .createQuery(
+                        "SELECT scp FROM SynchronisationCongestionPoint scp WHERE scp.entityAddress = :entityAddress")
+                .setParameter("entityAddress", entityAddress).getResultList();
+        if (result == null || result.isEmpty()) {
+            return null;
+        }
+        return result.get(0);
+    }
+
+    /**
+     * Deletes {@Link SynchronisationCongestionPoint} entity by its entity address.
+     *
+     * @param domain SynchronisationCongestionPoint entityAddress
+     */
+    @SuppressWarnings("unchecked")
+    public void deleteByEntityAddress(String entityAddress) {
+        SynchronisationCongestionPoint synchronisationCongestionPoint = findByEntityAddress(entityAddress);
+        if (synchronisationCongestionPoint != null) {
+            entityManager.remove(synchronisationCongestionPoint);
+        }
+    }
+
+    /**
      * Deletes all {@link SynchronisationConnection} entities.
      */
     public void deleteAll() {

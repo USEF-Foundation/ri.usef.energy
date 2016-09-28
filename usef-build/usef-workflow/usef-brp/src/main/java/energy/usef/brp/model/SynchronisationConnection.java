@@ -150,7 +150,6 @@ public class SynchronisationConnection {
         return true;
     }
 
-
     @Override
     public String toString() {
         return "SynchronisationConnection" + "[" +

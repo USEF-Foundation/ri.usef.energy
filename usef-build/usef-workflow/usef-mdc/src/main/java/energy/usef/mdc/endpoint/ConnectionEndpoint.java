@@ -46,7 +46,8 @@ public class ConnectionEndpoint {
         try {
             return Response.ok(JsonUtil.createJsonText(service.findAllConnections()), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed request to get all Connection");
         }
@@ -55,7 +56,7 @@ public class ConnectionEndpoint {
     /**
      * Endpoint to get an {@Link Connection} givenit's entityAddress.
      *
-     * @param domain {@link String} containing the entityAddress of the {@Link Connection}
+     * @param entityAddress {@link String} containing the entityAddress of the {@Link Connection}
      * @return a {@Link Response} message containing the requested information
      */
     @GET
@@ -66,7 +67,8 @@ public class ConnectionEndpoint {
         try {
             return Response.ok(JsonUtil.createJsonText(service.findConnection(entityAddress)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed request to get Connection {}", entityAddress);
         }
@@ -85,7 +87,8 @@ public class ConnectionEndpoint {
             LOGGER.info("Received update batch for Connections {}", jsonText);
             return Response.ok(JsonUtil.createJsonText(service.processConnectionBatch(jsonText)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException | com.github.fge.jsonschema.core.exceptions.ProcessingException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed update batch for Connections  {}", jsonText);
         }

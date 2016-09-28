@@ -30,6 +30,7 @@ import java.io.IOException;
 public class DistributionSystemOperatorEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DistributionSystemOperatorEndpoint.class);
+    public static final String EXCEPTION_TAG = "{\"exception\": ";
 
     @Inject
     CommonReferenceOperatorTopologyBusinessService service;
@@ -46,7 +47,8 @@ public class DistributionSystemOperatorEndpoint {
         try {
             return Response.ok(JsonUtil.createJsonText(service.findAllDistributionSystemOperators()), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed request to get all DistributionSystemOperators");
         }
@@ -66,7 +68,8 @@ public class DistributionSystemOperatorEndpoint {
         try {
             return Response.ok(JsonUtil.createJsonText(service.findDistributionSystemOperator(domain)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed request to get DistributionSystemOperator {}", domain);
         }
@@ -85,7 +88,8 @@ public class DistributionSystemOperatorEndpoint {
             LOGGER.info("Received update batch for DistributionSystemOperators {}", jsonText);
             return Response.ok(JsonUtil.createJsonText(service.processDistributionSystemOperatorBatch(jsonText)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException | com.github.fge.jsonschema.core.exceptions.ProcessingException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed update batch for DistributionSystemOperators");
         }

@@ -18,14 +18,14 @@ package energy.usef.dso.workflow.dto;
 /**
  * A data transfer object for relevant Participant data.
  */
-public class ParticipantAction {
+public class ParticipantActionDto {
     private String method;
     private String domain;
 
-    public ParticipantAction() {
+    public ParticipantActionDto() {
     }
 
-    public ParticipantAction(String method, String domain) {
+    public ParticipantActionDto(String method, String domain) {
         this.method = method;
         this.domain = domain;
     }

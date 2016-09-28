@@ -26,71 +26,71 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 
-@Path("/commonreferenceoperators")
-public class CommonReferenceOperatorEndpoint {
+@Path("/synchronisationcongestionpoints")
+public class SynchronisationCongestionPointEndpoint {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CommonReferenceOperatorEndpoint.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SynchronisationCongestionPointEndpoint.class);
 
     @Inject
     DistributionSystemOperatorTopologyBusinessService service;
 
     /**
-     * Endpoint to get all {@Link CommonReferenceOperator} objects.
+     * Endpoint to get all {@Link SynchronisationCongestionPoint} objects.
      *
      * @return a {@Link Response} message containing the requested information
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllCommonReferenceOperators() {
-        LOGGER.info("Received request to get all Common Reference Operators");
+    public Response getAllSynchronisationCongestionPointEndpoints() {
+        LOGGER.info("Received request to get all Synchronisation Congestion Points");
         try {
-            return Response.ok(JsonUtil.createJsonText(service.findAllCommonReferenceOperators()), MediaType.APPLICATION_JSON_TYPE).build();
+            return Response.ok(JsonUtil.createJsonText(service.findAllSynchronisationCongestionPoints()), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
             LOGGER.error("{}", e);
             return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
-            LOGGER.info("Processed request to get all Common Reference Operators");
+            LOGGER.info("Processed request to get all SynchronisationsCongestionPoints");
         }
     }
 
     /**
-     * Endpoint to get an {@Link CommonReferenceOperator} given it's domain name.
+     * Endpoint to get an {@Link SynchronisationCongestionPoint} given it's entityAddress name.
      *
-     * @param domain {@link String} containing the domain name of the {@Link CommonReferenceOperator}
+     * @param entityAddress {@link String} containing the entityAddress name of the {@Link SynchronisationCongestionPoint}
      * @return a {@Link Response} message containing the requested information
      */
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    @Path("/{domain}")
-    public Response getCommonReferenceOperatorByDomain(@PathParam("domain") String domain) {
-        LOGGER.info("Received request to get Common Reference Operator {}", domain);
+    @Path("/{entityAddress}")
+    public Response getSynchronisationCongestionPointEndpointByEntitAddress(@PathParam("entityAddress") String entityAddress) {
+        LOGGER.info("Received request to get Synchronisation Congestion Point {}", entityAddress);
         try {
-            return Response.ok(JsonUtil.createJsonText(service.findCommonReferenceOperator(domain)), MediaType.APPLICATION_JSON_TYPE).build();
+            return Response.ok(JsonUtil.createJsonText(service.findSynchronisationCongestionPoint(entityAddress)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
             LOGGER.error("{}", e);
             return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
-            LOGGER.info("Processed request to get Common Reference Operator {}", domain);
+            LOGGER.info("Processed request to get Synchronisation CongestionPoint {}", entityAddress);
         }
     }
 
     /**
-     * Endpoint to post a batch of {@Link CommonReferenceOperator} updates.
+     * Endpoint to post a batch of {@Link CongestionPoint} updates.
      *
-     * @param jsonText a json {@link String} containing a batch of {@Link CommonReferenceOperator} updates.
+     * @param jsonText a json {@link String} containing a batch of {@Link CongestionPoint} updates.
      * @return a {@Link Response} message containing batch update results
      */
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response postCommonreferenceOperatorUpdateBatch(String jsonText) {
+    public Response postCongestionPointUpdateBatch(String jsonText) {
         try {
-            LOGGER.info("Received update batch for Common Reference Operators {}", jsonText);
-            return Response.ok(JsonUtil.createJsonText(service.processCommonReferenceOperatorBatch(jsonText)), MediaType.APPLICATION_JSON_TYPE).build();
+            LOGGER.info("Received update batch for Congestion Points {}", jsonText);
+            return Response.ok(JsonUtil.createJsonText(service.processSynchronisationCongestionPointBatch(jsonText)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException | com.github.fge.jsonschema.core.exceptions.ProcessingException e) {
             LOGGER.error("{}", e);
             return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
-            LOGGER.info("Processed update batch for Common Reference Operator  {}", jsonText);
+            LOGGER.info("Processed update batch for Congestion Points  {}", jsonText);
         }
     }
 }

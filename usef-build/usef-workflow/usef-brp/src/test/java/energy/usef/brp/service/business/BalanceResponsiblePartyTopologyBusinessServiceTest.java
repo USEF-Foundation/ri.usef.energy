@@ -70,7 +70,7 @@ public class BalanceResponsiblePartyTopologyBusinessServiceTest {
     }
 
     @Test
-    public void testProcessConnectionBatch() throws Exception
+    public void testProcessSynchronisationConnectionBatch() throws Exception
     {
         List<CommonReferenceOperator> participants = new ArrayList<>();
         participants.add(createCommonReferenceOperator(1L, "cro1.usef.example.com"));
@@ -148,8 +148,6 @@ public class BalanceResponsiblePartyTopologyBusinessServiceTest {
         synchronisationConnection.setLastModificationTime(new LocalDateTime());
         return synchronisationConnection;
     }
-
-
 
     @Test
     public void testCommonReferenceOperatorBatch() throws Exception  {

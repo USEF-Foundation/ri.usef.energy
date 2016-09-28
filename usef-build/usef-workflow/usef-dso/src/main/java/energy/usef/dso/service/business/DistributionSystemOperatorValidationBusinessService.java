@@ -17,10 +17,15 @@ package energy.usef.dso.service.business;
 
 import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.exception.RestError;
+import energy.usef.dso.model.SynchronisationConnection;
 import energy.usef.dso.repository.CommonReferenceOperatorRepository;
+import energy.usef.dso.repository.SynchronisationCongestionPointRepository;
+import energy.usef.dso.repository.SynchronisationConnectionRepository;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This service class implements the business logic related to the CRO part of the common reference query.
@@ -31,6 +36,12 @@ public class DistributionSystemOperatorValidationBusinessService {
 
     @Inject
     CommonReferenceOperatorRepository commonReferenceOperatorRepository;
+
+    @Inject
+    SynchronisationCongestionPointRepository synchronisationCongestionPointRepository;
+
+    @Inject
+    SynchronisationConnectionRepository synchronisationConnectionRepository;
 
     /**
      * Throws a {@link BusinessValidationException} if domain is a duplicate common reference operator domain.
@@ -55,4 +66,44 @@ public class DistributionSystemOperatorValidationBusinessService {
             throw new BusinessValidationException(RestError.NOT_FOUND, "Common Reference Operator", domain);
         }
     }
+
+    /**
+     * Throws a {@link BusinessValidationException} if entityAddress is a duplicate common reference operator entityAddress.
+     *
+     * @param entityAddress domain name
+     * @throws BusinessValidationException
+     */
+    public void checkDuplicateSynchronisationCongestionPoint(String entityAddress) throws BusinessValidationException {
+        if (synchronisationCongestionPointRepository.findByEntityAddress(entityAddress) != null) {
+            throw new BusinessValidationException(RestError.DUPLICATE, "Synchronisation Congestion Point", entityAddress);
+        }
+    }
+
+    /**
+     * Throws a {@link BusinessValidationException} if entityAddress is a non-existent common reference operator entityAddress.
+     *
+     * @param entityAddress entityAddress name
+     * @throws BusinessValidationException
+     */
+    public void checkExistingSynchronisationCongestionPoint(String entityAddress) throws BusinessValidationException {
+        if (synchronisationCongestionPointRepository.findByEntityAddress(entityAddress) == null) {
+            throw new BusinessValidationException(RestError.NOT_FOUND, "Synchronisation Congestion Point", entityAddress);
+        }
+    }
+
+    /**
+     * Throws a {@link BusinessValidationException} if any entityAddress is a duplicate SynchronisationConnection entityAddress.
+     *
+     * @param entityAddresses a list of entityAddresses
+     * @throws BusinessValidationException
+     */
+    public void checkDuplicateSynchronisationConnections(List<String> entityAddresses) throws BusinessValidationException {
+        List<SynchronisationConnection> synchronisationConnections = synchronisationConnectionRepository.findByEntityAddresses(entityAddresses);
+
+        if ( synchronisationConnections.size() != 0) {
+            throw new BusinessValidationException(RestError.DUPLICATE, "Synchronisation Connection(s)", synchronisationConnections.stream().map(e -> e.getEntityAddress()).collect(Collectors.toList()));
+        }
+    }
+
+
 }

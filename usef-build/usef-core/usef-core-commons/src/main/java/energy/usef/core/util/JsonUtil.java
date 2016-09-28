@@ -61,6 +61,10 @@ public class JsonUtil {
         return writer.toString();
     }
 
+    public static String exceptionBody(Exception e) {
+        return "{\"exception\": " + e.getMessage() + "\"}";
+    }
+
     /**
      * Create a {@Link JsonNode} from a resource
      *

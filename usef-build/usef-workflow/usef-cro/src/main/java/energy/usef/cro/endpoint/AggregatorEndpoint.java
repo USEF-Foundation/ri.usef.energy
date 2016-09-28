@@ -46,7 +46,8 @@ public class AggregatorEndpoint {
         try {
             return Response.ok(JsonUtil.createJsonText(service.findAllAggregators()), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed request to get all Aggregators");
         }
@@ -66,7 +67,8 @@ public class AggregatorEndpoint {
         try {
             return Response.ok(JsonUtil.createJsonText(service.findAggregator(domain)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed request to get Aggregator {}", domain);
         }
@@ -85,7 +87,8 @@ public class AggregatorEndpoint {
             LOGGER.info("Received update batch for Aggregators {}", jsonText);
             return Response.ok(JsonUtil.createJsonText(service.processAggregatorBatch(jsonText)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException | com.github.fge.jsonschema.core.exceptions.ProcessingException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed update batch for Aggregators  {}", jsonText);
         }

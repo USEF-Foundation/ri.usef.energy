@@ -104,6 +104,4 @@ public class SynchronisationConnectionRepository extends BaseRepository<Synchron
             entityManager.remove(synchronisationConnection);
         }
     }
-
-
 }

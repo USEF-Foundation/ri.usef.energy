@@ -47,7 +47,8 @@ public class MeterDataCompanyEndpoint {
         try {
             return Response.ok(JsonUtil.createJsonText(service.findAllMeterDataCompanies()), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed request to get all MeterDataCompanies");
         }
@@ -67,7 +68,8 @@ public class MeterDataCompanyEndpoint {
         try {
             return Response.ok(JsonUtil.createJsonText(service.findMeterDataCompany(domain)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed request to get MeterDataCompany {}", domain);
         }
@@ -86,7 +88,8 @@ public class MeterDataCompanyEndpoint {
             LOGGER.info("Received update batch for MeterDataCompanies {}", jsonText);
             return Response.ok(JsonUtil.createJsonText(service.processMeterDataCompanyBatch(jsonText)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException | ProcessingException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed update batch for MeterDataCompanies");
         }

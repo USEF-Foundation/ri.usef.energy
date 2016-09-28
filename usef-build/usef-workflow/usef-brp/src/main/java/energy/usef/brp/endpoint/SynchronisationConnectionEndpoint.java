@@ -46,7 +46,8 @@ public class SynchronisationConnectionEndpoint {
         try {
             return Response.ok(JsonUtil.createJsonText(service.findAllSynchronisationConnections()), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed request to get all SynchronisationConnection");
         }
@@ -66,7 +67,8 @@ public class SynchronisationConnectionEndpoint {
         try {
             return Response.ok(JsonUtil.createJsonText(service.findSynchronisationConnection(entityAddress)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed request to get SynchronisationConnection {}", entityAddress);
         }
@@ -85,7 +87,8 @@ public class SynchronisationConnectionEndpoint {
             LOGGER.info("Received update batch for SynchronisationConnection {}", jsonText);
             return Response.ok(JsonUtil.createJsonText(service.processSynchronisationConnectionBatch(jsonText)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException | com.github.fge.jsonschema.core.exceptions.ProcessingException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed update batch for SynchronisationConnection {}", jsonText);
         }

@@ -47,7 +47,8 @@ public class CommonReferenceOperatorEndpoint {
         try {
             return Response.ok(JsonUtil.createJsonText(service.findAllCommonReferenceOperators()), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed request to get all CommonReferenceOperator");
         }
@@ -67,7 +68,8 @@ public class CommonReferenceOperatorEndpoint {
         try {
             return Response.ok(JsonUtil.createJsonText(service.findCommonReferenceOperator(domain)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed request to get MeterDataCompany {}", domain);
         }
@@ -86,7 +88,8 @@ public class CommonReferenceOperatorEndpoint {
             LOGGER.info("Received update batch for MeterDataCompanies {}", jsonText);
             return Response.ok(JsonUtil.createJsonText(service.processCommonReferenceOperatorBatch(jsonText)), MediaType.APPLICATION_JSON_TYPE).build();
         } catch (IOException | ProcessingException e) {
-            return Response.serverError().entity("{\"exception\": " + e.getMessage() + "\"}").build();
+            LOGGER.error("{}", e);
+            return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
         } finally {
             LOGGER.info("Processed update batch for MeterDataCompanies");
         }
