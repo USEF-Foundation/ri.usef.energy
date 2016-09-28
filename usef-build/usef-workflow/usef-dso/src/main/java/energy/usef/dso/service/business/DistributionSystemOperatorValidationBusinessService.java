@@ -27,6 +27,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
 /**
  * This service class implements the business logic related to the CRO part of the common reference query.
  *
@@ -100,10 +101,8 @@ public class DistributionSystemOperatorValidationBusinessService {
     public void checkDuplicateSynchronisationConnections(List<String> entityAddresses) throws BusinessValidationException {
         List<SynchronisationConnection> synchronisationConnections = synchronisationConnectionRepository.findByEntityAddresses(entityAddresses);
 
-        if ( synchronisationConnections.size() != 0) {
+        if ( !synchronisationConnections.isEmpty()) {
             throw new BusinessValidationException(RestError.DUPLICATE, "Synchronisation Connection(s)", synchronisationConnections.stream().map(e -> e.getEntityAddress()).collect(Collectors.toList()));
         }
     }
-
-
 }

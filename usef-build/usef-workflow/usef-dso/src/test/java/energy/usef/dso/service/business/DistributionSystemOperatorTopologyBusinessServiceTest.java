@@ -15,18 +15,17 @@
  */
 package energy.usef.dso.service.business;
 
+import energy.usef.core.exception.BusinessValidationException;
+import energy.usef.core.exception.RestError;
+import energy.usef.core.rest.RestResult;
+import energy.usef.core.util.JsonUtil;
 import energy.usef.dso.model.CommonReferenceOperator;
 import energy.usef.dso.model.SynchronisationCongestionPoint;
 import energy.usef.dso.model.SynchronisationCongestionPointStatus;
 import energy.usef.dso.model.SynchronisationConnection;
 import energy.usef.dso.repository.CommonReferenceOperatorRepository;
-import energy.usef.core.exception.BusinessValidationException;
-import energy.usef.core.exception.RestError;
-import energy.usef.core.rest.RestResult;
-import energy.usef.core.util.JsonUtil;
 import energy.usef.dso.repository.SynchronisationCongestionPointRepository;
 import energy.usef.dso.repository.SynchronisationCongestionPointStatusRepository;
-import energy.usef.dso.repository.SynchronisationCongestionPointRepository;
 import energy.usef.dso.repository.SynchronisationConnectionRepository;
 import org.joda.time.LocalDateTime;
 import org.junit.Before;
