@@ -80,14 +80,6 @@ public class CommonReferenceOperatorTopologyBusinessService {
     @Inject
     CommonReferenceOperatorValidationBusinessService validationService;
 
-    public CommonReferenceOperatorTopologyBusinessService() {
-    }
-
-
-    /*
-     * Methods to find individual Participants
-     */
-
     /**
      * Try and retrieve an {@link Aggregator} with the given domain name, returning it in a {@Link RestResult}.
      *
@@ -368,6 +360,8 @@ public class CommonReferenceOperatorTopologyBusinessService {
         case MDC:
             result = findMeterDataCompany(domain);
             break;
+        default:
+            result = JsonUtil.unknownRole(role.toString());
         }
         return result;
     }
@@ -389,6 +383,8 @@ public class CommonReferenceOperatorTopologyBusinessService {
         case MDC:
             result = createMeterDataCompany(domain);
             break;
+        default:
+            result = JsonUtil.unknownRole(role.toString());
         }
         return result;
     }
@@ -410,20 +406,12 @@ public class CommonReferenceOperatorTopologyBusinessService {
         case MDC:
             result = deleteMeterDataCompany(domain);
             break;
+        default:
+            result = JsonUtil.unknownRole(role.toString());
         }
         return result;
     }
 
-    /*
-     * Methods to create Participants
-     */
-
-    /**
-     * Try and create an {@link Aggregator} with the given domain name.
-     *
-     * @param domain a {@link String} containing a domain name of the {@link Aggregator} to be created.
-     * @return a {@Link RestResult}
-     */
     private RestResult createAggregator(String domain) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
@@ -443,12 +431,6 @@ public class CommonReferenceOperatorTopologyBusinessService {
         return result;
     }
 
-    /**
-     * Try and create a {@link BalanceResponsibleParty} with the given domain name.
-     *
-     * @param domain a {@link String} containing a domain name of the {@link BalanceResponsibleParty} to be created.
-     * @return a {@Link RestResult}
-     */
     private RestResult createBalanceResponsibleParty(String domain) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
@@ -468,12 +450,6 @@ public class CommonReferenceOperatorTopologyBusinessService {
         return result;
     }
 
-    /**
-     * Try and create a {@link DistributionSystemOperator} with the given domain name.
-     *
-     * @param domain a {@link String} containing a domain name of the {@link DistributionSystemOperator} to be created.
-     * @return a {@Link RestResult}
-     */
     private RestResult createDistributionSystemOperator(String domain) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
@@ -493,12 +469,6 @@ public class CommonReferenceOperatorTopologyBusinessService {
         return result;
     }
 
-    /**
-     * Try and create a {@link MeterDataCompany} with the given domain name.
-     *
-     * @param domain a {@link String} containing a domain name of the {@link MeterDataCompany} to be created.
-     * @return a {@Link RestResult}
-     */
     private RestResult createMeterDataCompany(String domain) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
@@ -518,16 +488,6 @@ public class CommonReferenceOperatorTopologyBusinessService {
         return result;
     }
 
-    /*
-     * Methods to delete Participants
-     */
-
-    /**
-     * Try and delete an {@link Aggregator} entity with the given domain name.
-     *
-     * @param domain a {@link String} containing a domain name of the {@link Aggregator} to be deleted.
-     * @return a {@Link RestResult}
-     */
     private RestResult deleteAggregator(String domain) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
@@ -543,12 +503,6 @@ public class CommonReferenceOperatorTopologyBusinessService {
         return result;
     }
 
-    /**
-     * Try and delete a {@Link BalanceResponsibleParty} with the given domain name.
-     *
-     * @param domain a {@link String} containing a domain name of the {@Link BalanceResponsibleParty} to be deleted.
-     * @return a {@Link RestResult}
-     */
     private RestResult deleteBalanceResponsibleParty(String domain) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
@@ -564,12 +518,6 @@ public class CommonReferenceOperatorTopologyBusinessService {
         return result;
     }
 
-    /**
-     * Try and delete a {@Link BalanceResponsibleParty} with the given domain name.
-     *
-     * @param domain a {@link String} containing a domain name of the {@Link BalanceResponsibleParty} to be deleted.
-     * @return a {@Link RestResult}
-     */
     private RestResult deleteDistributionSystemOperator(String domain) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
@@ -585,12 +533,6 @@ public class CommonReferenceOperatorTopologyBusinessService {
         return result;
     }
 
-    /**
-     * Try and delete a {@Link MeterDataCompany} with the given domain name.
-     *
-     * @param domain a {@link String} containing a domain name of the {@Link MeterDataCompany} to be deleted.
-     * @return a {@Link RestResult}
-     */
     private RestResult deleteMeterDataCompany(String domain) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {

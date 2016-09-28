@@ -91,7 +91,7 @@ public class JsonUtil {
         return getSchemaNode(schemaNode);
     }
 
-    /*
+    /**
      * Validate a {@Link JsonNode} against a {@Link JsonSchema}.
      *
      * @param jsonSchemaNode the {@Link JsonSchema} to validate against
@@ -113,7 +113,7 @@ public class JsonUtil {
         return factory.getJsonSchema(jsonNode);
     }
 
-    /*
+    /**
      * Validate a {@Link JsonNode} against a json schema.
      *
      * @param schemaResource a {@Link String} indication the resource containing a json schema
@@ -141,7 +141,7 @@ public class JsonUtil {
         }
     }
 
-    /*
+    /**
      * Construct a RestResult stating that the method is not supported for a given entity
      *
      * @param method a http method
@@ -158,6 +158,21 @@ public class JsonUtil {
         return result;
     }
 
+    /**
+     * Construct a RestResult stating that the role is not supported in a certain context
+     *
+     * @param role a http method
+     *
+     * @return a {@Link RestResult}
+     */
+
+    public static RestResult unknownRole (String role) {
+        RestResult result = new RestResult();
+        result.setCode(HttpResponseCodes.SC_INTERNAL_SERVER_ERROR);
+        result.getErrors().add(role + " is not supported in this context");
+
+        return result;
+    }
 
     private static void addRestResult(Map<Integer, RestResult> report, String message, Integer entry, int httpCode) {
         if (report.containsKey(entry)) {

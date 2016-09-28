@@ -29,18 +29,12 @@ public class NaClTest extends TestCase {
 
     private static final String VERSION = "1.0.8";
 
-    private VersionUtil comparator;
-
     @Before
     public void init() throws Exception {
-        comparator = new VersionUtil();
     }
 
     @Test
     public void testVersion () {
-
-        String sodiumVersion = NaCl.sodium().sodium_version_string();
-
         assertTrue(VersionUtil.compareVersions(VERSION, NaCl.sodium().sodium_version_string()) <= 0);
     }
 }

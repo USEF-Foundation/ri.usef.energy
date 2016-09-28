@@ -78,9 +78,6 @@ public class BalanceResponsiblePartyTopologyBusinessService {
     @Inject
     SynchronisationConnectionStatusRepository synchronisationConnectionStatusRepository;
 
-    public BalanceResponsiblePartyTopologyBusinessService() {
-    }
-
     /**
      * Try and retrieve a {@link SynchronisationConnection} with the given entityAddress, returning it in a {@Link RestResult}.
      *
@@ -176,7 +173,6 @@ public class BalanceResponsiblePartyTopologyBusinessService {
 
         if (participant != null) {
             result.setCode(HttpResponseCodes.SC_OK);
-            //            result.setBody(createJsonText(new Participant(participant.getId(), participant.getDomain())));
             result.setBody(createJsonText(participant));
         } else {
             result.setCode(HttpResponseCodes.SC_NOT_FOUND);
@@ -191,15 +187,7 @@ public class BalanceResponsiblePartyTopologyBusinessService {
     public RestResult findAllCommonReferenceOperators() throws IOException {
         RestResult result = RestResultFactory.getJsonRestResult();
 
-        //        List<Participant> participantList = new ArrayList<>();
-        //        commonReferenceOperatorRepository.findAll().stream().forEach(a -> {
-        //            Participant participant = new Participant();
-        //            participant.setId(a.getId());
-        //            participant.setDomain(a.getDomain());
-        //            participantList.add(participant);
-        //        });
         result.setCode(HttpResponseCodes.SC_OK);
-        //        result.setBody(createJsonText(participantList));
         result.setBody(createJsonText(commonReferenceOperatorRepository.findAll()));
 
         return result;
@@ -293,12 +281,6 @@ public class BalanceResponsiblePartyTopologyBusinessService {
         return result;
     }
 
-    /**
-     * Try and create an {@link CommonReferenceOperator} with the given domain name.
-     *
-     * @param domain a {@link String} containing a domain name of the {@link CommonReferenceOperator} to be created.
-     * @return a {@Link RestResult}
-     */
     private RestResult createCommonReferenceOperator(String domain, List<SynchronisationConnection> existingSynchronisationConnections) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {

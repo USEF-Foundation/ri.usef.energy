@@ -20,6 +20,9 @@ package energy.usef.environment.tool.util;
  */
 public class VersionUtil {
 
+    private VersionUtil() {
+        // Hide default constructor
+    }
     /**
      * Compares two semantic version numebers
      *

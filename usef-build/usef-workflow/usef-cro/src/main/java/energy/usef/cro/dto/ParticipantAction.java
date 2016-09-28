@@ -23,6 +23,7 @@ public class ParticipantAction {
     private String domain;
 
     public ParticipantAction() {
+        // Required for json deserialisation
     }
 
     public ParticipantAction(String method, String domain) {

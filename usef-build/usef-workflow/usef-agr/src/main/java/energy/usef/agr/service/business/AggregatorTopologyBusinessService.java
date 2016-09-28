@@ -33,7 +33,6 @@ import energy.usef.agr.repository.CommonReferenceOperatorRepository;
 import energy.usef.agr.repository.SynchronisationConnectionRepository;
 import energy.usef.agr.repository.SynchronisationConnectionStatusRepository;
 import energy.usef.core.exception.BusinessValidationException;
-import energy.usef.core.exception.RestError;
 import energy.usef.core.rest.RestResult;
 import energy.usef.core.rest.RestResultFactory;
 import energy.usef.core.util.DateTimeUtil;
@@ -79,9 +78,6 @@ public class AggregatorTopologyBusinessService {
     @Inject
     SynchronisationConnectionStatusRepository synchronisationConnectionStatusRepository;
 
-    public AggregatorTopologyBusinessService() {
-    }
-
     /**
      * Try and retrieve a {@link SynchronisationConnection} with the given entityAddress, returning it in a {@Link RestResult}.
      *
@@ -110,10 +106,9 @@ public class AggregatorTopologyBusinessService {
         RestResult result = RestResultFactory.getJsonRestResult();
 
         List<SynchronisationConnectionDto> connectionList = new ArrayList<>();
-        synchronisationConnectionRepository.findAll().stream().forEach(connection -> {
+        synchronisationConnectionRepository.findAll().stream().forEach(connection ->
             connectionList.add(new SynchronisationConnectionDto(connection.getId(), connection.getEntityAddress(), connection.isCustomer(),
-                    DateTimeUtil.printDateTime(connection.getLastModificationTime(),JSON_DATE_TIME_FORMAT)));
-        });
+                    DateTimeUtil.printDateTime(connection.getLastModificationTime(),JSON_DATE_TIME_FORMAT))));
 
         result.setCode(HttpResponseCodes.SC_OK);
         result.setBody(createJsonText(connectionList));

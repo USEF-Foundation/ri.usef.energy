@@ -21,6 +21,10 @@ package energy.usef.core.util;
  */
 public class VersionUtil {
 
+    private VersionUtil() {
+        // Hide default constructor
+    }
+
     /**
      * Compares two semantic version numebers
      *

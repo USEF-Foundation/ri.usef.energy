@@ -85,9 +85,6 @@ public class DistributionSystemOperatorTopologyBusinessService {
     @Inject
     SynchronisationCongestionPointStatusRepository synchronisationCongestionPointStatusRepository;
 
-    public DistributionSystemOperatorTopologyBusinessService() {
-    }
-
     /**
      * Try and retrieve an {@link CommonReferenceOperator} with the given domain name, returning it in a {@Link RestResult}.
      *
