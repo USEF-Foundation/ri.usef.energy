@@ -23,6 +23,7 @@ public class ConnectionActionDto {
     private String entityAddress;
 
     public ConnectionActionDto() {
+        // Default constructor required for json deserialisation.
     }
 
     public ConnectionActionDto(String method, String entityAddress) {

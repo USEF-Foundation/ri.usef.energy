@@ -23,6 +23,7 @@ public class ParticipantActionDto {
     private String domain;
 
     public ParticipantActionDto() {
+        // Default constructor required for json deserialisation.
     }
 
     public ParticipantActionDto(String method, String domain) {

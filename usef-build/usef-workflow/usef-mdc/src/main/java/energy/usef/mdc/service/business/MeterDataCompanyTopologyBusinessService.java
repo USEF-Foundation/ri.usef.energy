@@ -339,6 +339,8 @@ public class MeterDataCompanyTopologyBusinessService {
         case HttpMethod.DELETE:
             result = deleteConnection(entityAddress);
             break;
+        default:
+            result = JsonUtil.notSupported(method, "Connection");
         }
         return result;
     }
@@ -359,6 +361,8 @@ public class MeterDataCompanyTopologyBusinessService {
         case HttpMethod.DELETE:
             result = deleteParticipant(role, domain);
             break;
+        default:
+            result = JsonUtil.notSupported(method, "Particicpant");
         }
         return result;
     }

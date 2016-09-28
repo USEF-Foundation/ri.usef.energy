@@ -283,6 +283,8 @@ public class DistributionSystemOperatorTopologyBusinessService {
         case HttpMethod.DELETE:
             result = deleteCommonReferenceOperator(domain);
             break;
+        default:
+            result = JsonUtil.notSupported(method, "CommonReferenceOperator");
         }
         return result;
     }
@@ -351,6 +353,8 @@ public class DistributionSystemOperatorTopologyBusinessService {
         case HttpMethod.DELETE:
             result = deleteSynchronisationCongestionPoint(entityAddress);
             break;
+        default:
+            result = JsonUtil.notSupported(method, "SynchronisationCongestionPoint");
         }
         return result;
     }

@@ -23,6 +23,10 @@ import javax.ws.rs.core.MediaType;
  */
 public class RestResultFactory {
 
+    private RestResultFactory() {
+        // Hide default constructor
+    }
+
     /**
      * Create a {@Link RestResult} for JSON texts
      *

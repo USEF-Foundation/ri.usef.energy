@@ -24,6 +24,7 @@ public class ConnectionActionDto {
     private boolean isCustomer;
 
     public ConnectionActionDto() {
+        // Default constructor required for json deserialisation.
     }
 
     public ConnectionActionDto(String method, String entityAddress, boolean isCustomer) {

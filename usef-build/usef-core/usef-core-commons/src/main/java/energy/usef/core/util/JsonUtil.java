@@ -43,6 +43,11 @@ public class JsonUtil {
 
     public static final int ROOT_KEY = -1;
 
+    private JsonUtil() {
+        // Hide default constructor
+    }
+
+
     /**
      * Convert any {@Link Object} to a json {@Link String}
      *
@@ -135,6 +140,24 @@ public class JsonUtil {
             addRestResult(report, message, entry, HttpResponseCodes.SC_BAD_REQUEST);
         }
     }
+
+    /*
+     * Construct a RestResult stating that the method is not supported for a given entity
+     *
+     * @param method a http method
+     * @param entity an entity name
+     *
+     * @return a {@Link RestResult}
+     */
+
+    public static RestResult notSupported (String method, String entity) {
+        RestResult result = new RestResult();
+        result.setCode(HttpResponseCodes.SC_NOT_IMPLEMENTED);
+        result.getErrors().add(method + " is not supported for " + entity);
+
+        return result;
+    }
+
 
     private static void addRestResult(Map<Integer, RestResult> report, String message, Integer entry, int httpCode) {
         if (report.containsKey(entry)) {

@@ -28,6 +28,7 @@ public class CongestionPointActionDto {
     private List<ConnectionActionDto> connections;
 
     public CongestionPointActionDto() {
+        // Default constructor required for json deserialisation.
     }
 
     public CongestionPointActionDto(String method, String entityAddress) {

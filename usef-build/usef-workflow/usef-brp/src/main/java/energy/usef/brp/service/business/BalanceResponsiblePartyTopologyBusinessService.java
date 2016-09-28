@@ -264,6 +264,8 @@ public class BalanceResponsiblePartyTopologyBusinessService {
         case HttpMethod.DELETE:
             result = deleteCommonReferenceOperator(domain);
             break;
+        default:
+            result = JsonUtil.notSupported(method, "CommonReferenceOperator");
         }
         return result;
     }
@@ -285,6 +287,8 @@ public class BalanceResponsiblePartyTopologyBusinessService {
         case HttpMethod.DELETE:
             result = deleteSynchronisationConnection(entityAddress);
             break;
+        default:
+            result = JsonUtil.notSupported(method, "SynchronisationConnection");
         }
         return result;
     }

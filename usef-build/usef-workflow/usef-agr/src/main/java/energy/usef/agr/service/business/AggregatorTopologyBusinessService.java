@@ -33,6 +33,7 @@ import energy.usef.agr.repository.CommonReferenceOperatorRepository;
 import energy.usef.agr.repository.SynchronisationConnectionRepository;
 import energy.usef.agr.repository.SynchronisationConnectionStatusRepository;
 import energy.usef.core.exception.BusinessValidationException;
+import energy.usef.core.exception.RestError;
 import energy.usef.core.rest.RestResult;
 import energy.usef.core.rest.RestResultFactory;
 import energy.usef.core.util.DateTimeUtil;
@@ -176,7 +177,6 @@ public class AggregatorTopologyBusinessService {
 
         if (participant != null) {
             result.setCode(HttpResponseCodes.SC_OK);
-            //            result.setBody(createJsonText(new Participant(participant.getId(), participant.getDomain())));
             result.setBody(createJsonText(participant));
         } else {
             result.setCode(HttpResponseCodes.SC_NOT_FOUND);
@@ -236,9 +236,7 @@ public class AggregatorTopologyBusinessService {
             }
         }
 
-        List<RestResult> result = resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue())
-                .collect(Collectors.toList());
-        return result;
+        return resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue()).collect(Collectors.toList());
     }
 
     private RestResult processCommonReferenceOperatorNode(ParticipantActionDto action, List<SynchronisationConnection> existingSynchronisationConnections) throws IOException {
@@ -257,6 +255,8 @@ public class AggregatorTopologyBusinessService {
         case HttpMethod.DELETE:
             result = deleteCommonReferenceOperator(domain);
             break;
+        default:
+            result = JsonUtil.notSupported(method, "CommonReferenceOperator");
         }
         return result;
     }
@@ -282,6 +282,8 @@ public class AggregatorTopologyBusinessService {
         case HttpMethod.DELETE:
             result = deleteSynchronisationConnection(entityAddress);
             break;
+        default:
+            result = JsonUtil.notSupported(method, "SynchronisationConnection");
         }
         return result;
     }

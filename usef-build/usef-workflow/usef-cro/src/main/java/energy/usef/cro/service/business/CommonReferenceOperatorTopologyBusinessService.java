@@ -345,6 +345,8 @@ public class CommonReferenceOperatorTopologyBusinessService {
         case HttpMethod.DELETE:
             result = deleteParticipant(role, domain);
             break;
+        default:
+            result = JsonUtil.notSupported(method, "Participant");
         }
         return result;
     }
