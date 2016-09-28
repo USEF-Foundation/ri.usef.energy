@@ -91,7 +91,7 @@ public class BalanceResponsiblePartyTopologyBusinessService {
         if (connection != null) {
             result.setCode(HttpResponseCodes.SC_OK);
             result.setBody(createJsonText(new SynchronisationConnectionDto(connection.getId(), connection.getEntityAddress(),
-                    DateTimeUtil.printDateTime(connection.getLastModificationTime(),JSON_DATE_TIME_FORMAT))));
+                    DateTimeUtil.printDateTime(connection.getLastModificationTime(), JSON_DATE_TIME_FORMAT))));
         } else {
             result.setCode(HttpResponseCodes.SC_NOT_FOUND);
             result.getErrors().add("SynchronisationConnection " + entityAddress + " not found.");
@@ -106,10 +106,9 @@ public class BalanceResponsiblePartyTopologyBusinessService {
         RestResult result = RestResultFactory.getJsonRestResult();
 
         List<SynchronisationConnectionDto> connectionList = new ArrayList<>();
-        synchronisationConnectionRepository.findAll().stream().forEach(connection -> {
-            connectionList.add(new SynchronisationConnectionDto(connection.getId(), connection.getEntityAddress(),
-                    DateTimeUtil.printDateTime(connection.getLastModificationTime(),JSON_DATE_TIME_FORMAT)));
-        });
+        synchronisationConnectionRepository.findAll().stream().forEach(
+                connection -> connectionList.add(new SynchronisationConnectionDto(connection.getId(), connection.getEntityAddress(),
+                        DateTimeUtil.printDateTime(connection.getLastModificationTime(), JSON_DATE_TIME_FORMAT))));
 
         result.setCode(HttpResponseCodes.SC_OK);
         result.setBody(createJsonText(connectionList));
@@ -228,7 +227,8 @@ public class BalanceResponsiblePartyTopologyBusinessService {
             // Now process all the actions that have the correct syntax.
             for (int entry = 0; entry < actions.size(); entry++) {
                 if (!resultMap.containsKey(entry)) {
-                    resultMap.put(entry, processCommonReferenceOperatorNode(actions.get(entry), existingSynchronisationConnections));
+                    resultMap
+                            .put(entry, processCommonReferenceOperatorNode(actions.get(entry), existingSynchronisationConnections));
                 }
             }
         }
@@ -236,7 +236,8 @@ public class BalanceResponsiblePartyTopologyBusinessService {
         return resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue()).collect(Collectors.toList());
     }
 
-    private RestResult processCommonReferenceOperatorNode(ParticipantActionDto action, List<SynchronisationConnection> existingSynchronisationConnections) throws IOException {
+    private RestResult processCommonReferenceOperatorNode(ParticipantActionDto action,
+            List<SynchronisationConnection> existingSynchronisationConnections) throws IOException {
         String method = action.getMethod();
         String domain = action.getDomain();
         RestResult result = new RestResult();
@@ -281,7 +282,8 @@ public class BalanceResponsiblePartyTopologyBusinessService {
         return result;
     }
 
-    private RestResult createCommonReferenceOperator(String domain, List<SynchronisationConnection> existingSynchronisationConnections) {
+    private RestResult createCommonReferenceOperator(String domain,
+            List<SynchronisationConnection> existingSynchronisationConnections) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
             validationService.checkDuplicateCommonReferenceOperatorDomain(domain);

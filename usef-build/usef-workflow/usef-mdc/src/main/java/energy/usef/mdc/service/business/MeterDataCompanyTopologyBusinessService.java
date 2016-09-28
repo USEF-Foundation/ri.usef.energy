@@ -30,7 +30,6 @@ import energy.usef.core.rest.RestResult;
 import energy.usef.core.rest.RestResultFactory;
 import energy.usef.core.util.JsonUtil;
 import energy.usef.mdc.dto.ParticipantAction;
-import energy.usef.mdc.model.Aggregator;
 import energy.usef.mdc.model.BalanceResponsibleParty;
 import energy.usef.mdc.model.DistributionSystemOperator;
 import energy.usef.mdc.model.CommonReferenceOperator;
@@ -378,6 +377,8 @@ public class MeterDataCompanyTopologyBusinessService {
         case DSO:
             result = findDistributionSystemOperator(domain);
             break;
+        default:
+            result = JsonUtil.unknownRole(role.toString());
         }
         return result;
     }
@@ -396,6 +397,8 @@ public class MeterDataCompanyTopologyBusinessService {
         case DSO:
             result = createDistributionSystemOperator(domain);
             break;
+        default:
+            result = JsonUtil.unknownRole(role.toString());
         }
         return result;
     }
@@ -414,6 +417,8 @@ public class MeterDataCompanyTopologyBusinessService {
         case DSO:
             result = deleteDistributionSystemOperator(domain);
             break;
+        default:
+            result = JsonUtil.unknownRole(role.toString());
         }
         return result;
     }
