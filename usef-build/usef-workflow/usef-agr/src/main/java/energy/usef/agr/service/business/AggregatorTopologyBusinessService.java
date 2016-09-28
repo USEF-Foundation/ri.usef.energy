@@ -152,7 +152,7 @@ public class AggregatorTopologyBusinessService {
 
             List<CommonReferenceOperator> existingCommonReferenceOperators = commonReferenceOperatorRepository.findAll();
 
-            // Bow process all the actions that have the correct syntax.
+            // now process all the actions that have the correct syntax.
             for (int entry = 0; entry < actions.size(); entry++) {
                 if (!resultMap.containsKey(entry)) {
                     resultMap
@@ -161,9 +161,7 @@ public class AggregatorTopologyBusinessService {
             }
         }
 
-        List<RestResult> result = resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue())
-                .collect(Collectors.toList());
-        return result;
+        return resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue()).collect(Collectors.toList());
     }
 
     /**
@@ -192,16 +190,7 @@ public class AggregatorTopologyBusinessService {
      */
     public RestResult findAllCommonReferenceOperators() throws IOException {
         RestResult result = RestResultFactory.getJsonRestResult();
-
-        //        List<Participant> participantList = new ArrayList<>();
-        //        commonReferenceOperatorRepository.findAll().stream().forEach(a -> {
-        //            Participant participant = new Participant();
-        //            participant.setId(a.getId());
-        //            participant.setDomain(a.getDomain());
-        //            participantList.add(participant);
-        //        });
         result.setCode(HttpResponseCodes.SC_OK);
-        //        result.setBody(createJsonText(participantList));
         result.setBody(createJsonText(commonReferenceOperatorRepository.findAll()));
 
         return result;
@@ -239,8 +228,7 @@ public class AggregatorTopologyBusinessService {
 
             List<SynchronisationConnection> existingSynchronisationConnections = synchronisationConnectionRepository.findAll();
 
-
-            // Bow process all the actions that have the correct syntax.
+            // Now process all the actions that have the correct syntax.
             for (int entry = 0; entry < actions.size(); entry++) {
                 if (!resultMap.containsKey(entry)) {
                     resultMap.put(entry, processCommonReferenceOperatorNode(actions.get(entry), existingSynchronisationConnections));

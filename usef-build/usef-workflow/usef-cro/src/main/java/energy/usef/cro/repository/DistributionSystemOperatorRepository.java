@@ -17,7 +17,6 @@
 package energy.usef.cro.repository;
 
 import energy.usef.core.repository.BaseRepository;
-import energy.usef.cro.model.BalanceResponsibleParty;
 import energy.usef.cro.model.DistributionSystemOperator;
 
 import java.util.List;

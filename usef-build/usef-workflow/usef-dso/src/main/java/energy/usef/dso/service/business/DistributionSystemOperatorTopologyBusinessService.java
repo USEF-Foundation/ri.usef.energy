@@ -216,7 +216,7 @@ public class DistributionSystemOperatorTopologyBusinessService {
             List<CommonReferenceOperator> existingCommonReferenceOperators = commonReferenceOperatorRepository.findAll();
 
 
-            // Bow process all the actions that have the correct syntax.
+            // Now process all the actions that have the correct syntax.
             for (int entry = 0; entry < actions.size(); entry++) {
                 if (!resultMap.containsKey(entry)) {
                     resultMap.put(entry, processSynchronisationCongestionPointNode(actions.get(entry), existingCommonReferenceOperators));
@@ -224,9 +224,7 @@ public class DistributionSystemOperatorTopologyBusinessService {
             }
         }
 
-        List<RestResult> result = resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue())
-                .collect(Collectors.toList());
-        return result;
+        return resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue()).collect(Collectors.toList());
     }
     /**
      * Process a batch of {@Link CommonReferenceOperator} updates.
@@ -258,7 +256,7 @@ public class DistributionSystemOperatorTopologyBusinessService {
 
             List<SynchronisationCongestionPoint> existingSynchronisationCongestionPoints = synchronisationCongestionPointRepository.findAll();
 
-            // Bow process all the actions that have the correct syntax.
+            // Now process all the actions that have the correct syntax.
             for (int entry = 0; entry < actions.size(); entry++) {
                 if (!resultMap.containsKey(entry)) {
                     resultMap.put(entry, processCommonReferenceOperatorNode(actions.get(entry), existingSynchronisationCongestionPoints));
@@ -266,9 +264,7 @@ public class DistributionSystemOperatorTopologyBusinessService {
             }
         }
 
-        List<RestResult> result = resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue())
-                .collect(Collectors.toList());
-        return result;
+        return resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue()).collect(Collectors.toList());
     }
 
     private RestResult processCommonReferenceOperatorNode(ParticipantActionDto action, List<SynchronisationCongestionPoint> existingSynchronisationCongestionPoints) throws IOException {

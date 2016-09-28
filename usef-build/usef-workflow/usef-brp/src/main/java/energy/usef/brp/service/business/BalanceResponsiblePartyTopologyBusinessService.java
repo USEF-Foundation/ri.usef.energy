@@ -152,7 +152,7 @@ public class BalanceResponsiblePartyTopologyBusinessService {
 
             List<CommonReferenceOperator> existingCommonReferenceOperators = commonReferenceOperatorRepository.findAll();
 
-            // Bow process all the actions that have the correct syntax.
+            // Now process all the actions that have the correct syntax.
             for (int entry = 0; entry < actions.size(); entry++) {
                 if (!resultMap.containsKey(entry)) {
                     resultMap
@@ -161,9 +161,7 @@ public class BalanceResponsiblePartyTopologyBusinessService {
             }
         }
 
-        List<RestResult> result = resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue())
-                .collect(Collectors.toList());
-        return result;
+        return resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue()).collect(Collectors.toList());
     }
 
     /**
@@ -239,8 +237,7 @@ public class BalanceResponsiblePartyTopologyBusinessService {
 
             List<SynchronisationConnection> existingSynchronisationConnections = synchronisationConnectionRepository.findAll();
 
-
-            // Bow process all the actions that have the correct syntax.
+            // Now process all the actions that have the correct syntax.
             for (int entry = 0; entry < actions.size(); entry++) {
                 if (!resultMap.containsKey(entry)) {
                     resultMap.put(entry, processCommonReferenceOperatorNode(actions.get(entry), existingSynchronisationConnections));
@@ -248,9 +245,7 @@ public class BalanceResponsiblePartyTopologyBusinessService {
             }
         }
 
-        List<RestResult> result = resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue())
-                .collect(Collectors.toList());
-        return result;
+        return resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue()).collect(Collectors.toList());
     }
 
     private RestResult processCommonReferenceOperatorNode(ParticipantActionDto action, List<SynchronisationConnection> existingSynchronisationConnections) throws IOException {

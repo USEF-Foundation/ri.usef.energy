@@ -1,9 +1,5 @@
 package energy.usef.dso.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import org.joda.time.LocalDateTime;
-
 public class SynchronisationConnectionDto {
 
     private Long id;

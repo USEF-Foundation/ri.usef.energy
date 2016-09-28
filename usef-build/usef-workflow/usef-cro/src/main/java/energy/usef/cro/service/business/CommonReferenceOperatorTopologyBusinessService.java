@@ -318,7 +318,7 @@ public class CommonReferenceOperatorTopologyBusinessService {
             List<ParticipantAction> actions = objectMapper.readValue(jsonText, new TypeReference<List<ParticipantAction>>() {
             });
 
-            // Bow process all the actions that have the correct syntax.
+            // Now process all the actions that have the correct syntax.
             for (int entry = 0; entry < actions.size(); entry++) {
                 if (!resultMap.containsKey(entry)) {
                     resultMap.put(entry, processParticipantNode(role, actions.get(entry)));
@@ -326,9 +326,7 @@ public class CommonReferenceOperatorTopologyBusinessService {
             }
         }
 
-        List<RestResult> result = resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue())
-                .collect(Collectors.toList());
-        return result;
+        return resultMap.entrySet().stream().sorted(Map.Entry.comparingByKey()).map(a -> a.getValue()).collect(Collectors.toList());
     }
 
     private RestResult processParticipantNode(Role role, ParticipantAction action) throws IOException {

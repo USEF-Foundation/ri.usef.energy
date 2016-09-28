@@ -35,7 +35,6 @@ import java.io.IOException;
 public class CommonReferenceOperatorEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommonReferenceOperatorEndpoint.class);
-    public static final String EXCEPTION_TAG = "{\"exception\": ";
 
     @Inject
     AggregatorTopologyBusinessService service;

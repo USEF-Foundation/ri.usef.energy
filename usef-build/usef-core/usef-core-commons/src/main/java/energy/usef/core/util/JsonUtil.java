@@ -73,7 +73,7 @@ public class JsonUtil {
      */
     public static JsonNode getJsonNodeFromResource(String resource) throws IOException {
         return JsonLoader.fromResource(resource);
-    } // getJsonNode(Resource) ends
+    }
 
     /**
      * Create a {@Link JsonSchema} from a resource
@@ -95,8 +95,7 @@ public class JsonUtil {
      * @return a {@Link ProcesingReport}
      */
     public static ProcessingReport isJsonValid(JsonSchema jsonSchemaNode, JsonNode jsonNode) throws ProcessingException {
-        ProcessingReport report = jsonSchemaNode.validate(jsonNode, true);
-        return report;
+        return jsonSchemaNode.validate(jsonNode, true);
     }
 
     private static JsonSchema getSchemaNode(JsonNode jsonNode) throws ProcessingException {
@@ -149,5 +148,4 @@ public class JsonUtil {
             report.put(entry, dto);
         }
     }
-
 }
