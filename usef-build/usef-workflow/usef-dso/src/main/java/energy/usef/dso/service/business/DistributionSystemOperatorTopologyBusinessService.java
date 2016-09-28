@@ -194,14 +194,7 @@ public class DistributionSystemOperatorTopologyBusinessService {
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode root = objectMapper.readTree(jsonText);
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-
         Map<Integer, RestResult> resultMap = new HashMap<>();
-
-        JsonFactory factory = new JsonFactory();
-        StringWriter stringWriter = new StringWriter();
-
-        JsonGenerator generator = factory.createGenerator(stringWriter);
-        generator.writeStartArray();
 
         JsonUtil.validateNodeSyntax("/congestion-point-schema.json", root, resultMap);
 
@@ -237,13 +230,6 @@ public class DistributionSystemOperatorTopologyBusinessService {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         Map<Integer, RestResult> resultMap = new HashMap<>();
-
-        JsonFactory factory = new JsonFactory();
-        StringWriter stringWriter = new StringWriter();
-
-        JsonGenerator generator = factory.createGenerator(stringWriter);
-        generator.writeStartArray();
-
         JsonUtil.validateNodeSyntax("/participant-schema.json", root, resultMap);
 
         if (!resultMap.containsKey(ROOT_KEY)) {

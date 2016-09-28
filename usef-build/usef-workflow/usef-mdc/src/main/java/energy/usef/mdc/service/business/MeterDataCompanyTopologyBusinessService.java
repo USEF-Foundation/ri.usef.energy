@@ -15,8 +15,6 @@
  */
 package energy.usef.mdc.service.business;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,18 +22,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.fge.jsonschema.core.exceptions.ProcessingException;
 import energy.usef.core.config.Role;
 import energy.usef.core.exception.BusinessValidationException;
-import energy.usef.mdc.dto.ConnectionAction;
-import energy.usef.mdc.model.Connection;
 import energy.usef.core.rest.RestResult;
 import energy.usef.core.rest.RestResultFactory;
 import energy.usef.core.util.JsonUtil;
+import energy.usef.mdc.dto.ConnectionAction;
 import energy.usef.mdc.dto.ParticipantAction;
 import energy.usef.mdc.model.BalanceResponsibleParty;
-import energy.usef.mdc.model.DistributionSystemOperator;
 import energy.usef.mdc.model.CommonReferenceOperator;
+import energy.usef.mdc.model.Connection;
+import energy.usef.mdc.model.DistributionSystemOperator;
 import energy.usef.mdc.repository.BalanceResponsiblePartyRepository;
-import energy.usef.mdc.repository.DistributionSystemOperatorRepository;
 import energy.usef.mdc.repository.CommonReferenceOperatorRepository;
+import energy.usef.mdc.repository.DistributionSystemOperatorRepository;
 import energy.usef.mdc.repository.MdcConnectionRepository;
 import org.jboss.resteasy.util.HttpResponseCodes;
 import org.slf4j.Logger;
@@ -47,7 +45,6 @@ import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.ws.rs.HttpMethod;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -227,13 +224,6 @@ public class MeterDataCompanyTopologyBusinessService {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         Map<Integer, RestResult> resultMap = new HashMap<>();
-
-        JsonFactory factory = new JsonFactory();
-        StringWriter stringWriter = new StringWriter();
-
-        JsonGenerator generator = factory.createGenerator(stringWriter);
-        generator.writeStartArray();
-
         JsonUtil.validateNodeSyntax("/connection-schema.json", root, resultMap);
 
         if (!resultMap.containsKey(ROOT_KEY)) {
@@ -294,13 +284,6 @@ public class MeterDataCompanyTopologyBusinessService {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         Map<Integer, RestResult> resultMap = new HashMap<>();
-
-        JsonFactory factory = new JsonFactory();
-        StringWriter stringWriter = new StringWriter();
-
-        JsonGenerator generator = factory.createGenerator(stringWriter);
-        generator.writeStartArray();
-
         JsonUtil.validateNodeSyntax("/participant-schema.json", root, resultMap);
 
         if (!resultMap.containsKey(ROOT_KEY)) {
