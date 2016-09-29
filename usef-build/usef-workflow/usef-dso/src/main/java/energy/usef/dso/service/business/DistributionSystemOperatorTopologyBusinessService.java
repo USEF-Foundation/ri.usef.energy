@@ -344,7 +344,6 @@ public class DistributionSystemOperatorTopologyBusinessService {
         String entityAddress = action.getEntityAddress();
         try {
             validationService.checkDuplicateSynchronisationCongestionPoint(entityAddress);
-
             validationService.checkDuplicateSynchronisationConnections(action.getConnections().stream().map(e -> e.getEntityAddress()).collect(Collectors.toList()));
 
             SynchronisationCongestionPoint synchronisationCongestionPoint = new SynchronisationCongestionPoint();
@@ -352,20 +351,7 @@ public class DistributionSystemOperatorTopologyBusinessService {
             synchronisationCongestionPoint.setLastModificationTime(DateTimeUtil.getCurrentDateTime());
             synchronisationCongestionPointRepository.persist(synchronisationCongestionPoint);
 
-            action.getConnections().stream().forEach(scDto -> {
-                SynchronisationConnection sc = new SynchronisationConnection();
-                sc.setCongestionPoint(synchronisationCongestionPoint);
-                sc.setEntityAddress(scDto.getEntityAddress());
-                synchronisationConnectionRepository.persist(sc);
-            });
-
-            existingCommonReferenceOperators.forEach(cro -> {
-                SynchronisationCongestionPointStatus status = new SynchronisationCongestionPointStatus();
-                status.setSynchronisationCongestionPoint(synchronisationCongestionPoint);
-                status.setCommonReferenceOperator(cro);
-                status.setStatus(SynchronisationConnectionStatusType.MODIFIED);
-                synchronisationCongestionPointStatusRepository.persist(status);
-            });
+            createChildren(action, existingCommonReferenceOperators, synchronisationCongestionPoint);
             result.setCode(HttpResponseCodes.SC_CREATED);
             LOGGER.info("Synchronisation Congestion Point {} created", entityAddress);
         } catch (BusinessValidationException e) {
@@ -381,9 +367,7 @@ public class DistributionSystemOperatorTopologyBusinessService {
         String entityAddress = action.getEntityAddress();
         try {
             validationService.checkExistingSynchronisationCongestionPoint(entityAddress);
-
             SynchronisationCongestionPoint synchronisationCongestionPoint = synchronisationCongestionPointRepository.findByEntityAddress(entityAddress);
-
 
             synchronisationCongestionPoint.setLastModificationTime(DateTimeUtil.getCurrentDateTime());
 
@@ -391,21 +375,10 @@ public class DistributionSystemOperatorTopologyBusinessService {
             synchronisationConnectionRepository.deleteFor(synchronisationCongestionPoint);
             synchronisationCongestionPointStatusRepository.deleteFor(synchronisationCongestionPoint);
 
-            // Create new synchronisationConnections and synchronisationCongestionStatuses
-            action.getConnections().stream().forEach(scDto -> {
-                SynchronisationConnection sc = new SynchronisationConnection();
-                sc.setCongestionPoint(synchronisationCongestionPoint);
-                sc.setEntityAddress(scDto.getEntityAddress());
-                synchronisationConnectionRepository.persist(sc);
-            });
+            validationService.checkDuplicateSynchronisationConnections(action.getConnections().stream().map(e -> e.getEntityAddress()).collect(Collectors.toList()));
 
-            existingCommonReferenceOperators.forEach(cro -> {
-                SynchronisationCongestionPointStatus status = new SynchronisationCongestionPointStatus();
-                status.setSynchronisationCongestionPoint(synchronisationCongestionPoint);
-                status.setCommonReferenceOperator(cro);
-                status.setStatus(SynchronisationConnectionStatusType.MODIFIED);
-                synchronisationCongestionPointStatusRepository.persist(status);
-            });
+            createChildren(action, existingCommonReferenceOperators, synchronisationCongestionPoint);
+
             result.setCode(HttpResponseCodes.SC_OK);
             LOGGER.info("Synchronisation Congestion Point {} updated", entityAddress);
         } catch (BusinessValidationException e) {
@@ -416,7 +389,26 @@ public class DistributionSystemOperatorTopologyBusinessService {
         return result;
     }
 
-     private RestResult deleteSynchronisationCongestionPoint(String entityAddress) {
+    private void createChildren(CongestionPointActionDto action, List<CommonReferenceOperator> existingCommonReferenceOperators,
+            SynchronisationCongestionPoint synchronisationCongestionPoint) {
+        // Create new synchronisationConnections and synchronisationCongestionStatuses
+        action.getConnections().stream().forEach(scDto -> {
+            SynchronisationConnection sc = new SynchronisationConnection();
+            sc.setCongestionPoint(synchronisationCongestionPoint);
+            sc.setEntityAddress(scDto.getEntityAddress());
+            synchronisationConnectionRepository.persist(sc);
+        });
+
+        existingCommonReferenceOperators.forEach(cro -> {
+            SynchronisationCongestionPointStatus status = new SynchronisationCongestionPointStatus();
+            status.setSynchronisationCongestionPoint(synchronisationCongestionPoint);
+            status.setCommonReferenceOperator(cro);
+            status.setStatus(SynchronisationConnectionStatusType.MODIFIED);
+            synchronisationCongestionPointStatusRepository.persist(status);
+        });
+    }
+
+    private RestResult deleteSynchronisationCongestionPoint(String entityAddress) {
         RestResult result = RestResultFactory.getJsonRestResult();
         try {
             validationService.checkExistingSynchronisationCongestionPoint(entityAddress);
