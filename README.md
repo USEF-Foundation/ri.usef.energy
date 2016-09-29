@@ -5,7 +5,7 @@
 ###Delivered items###
 	*   Changed Libsodium support to version 1.0.8 and up
 	*   REST interface created for all participants to populate required database tables
-	*   Additional pluggable business components added
+	*   Additional pluggable business components with well-defined outputs for testing purposes
 	*   Provide cleanup through non-demo endpoint
 	*   Aggregator cleanup extended with UDI tabel
 	*   Fixed an issue related to the Aggregator receiving multiple A-Plan approvals
