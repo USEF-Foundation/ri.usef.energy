@@ -145,7 +145,7 @@ public class PbcFeederService {
     }
 
     /**
-     * This method sets the uncontrolled load on the ConnectionDto. This method can return data for multiple dates, so the ptu
+     * This method sets the uncontrolled load on the SynchronisationConnectionDto. This method can return data for multiple dates, so the ptu
      * index in the map is not a ptu index for one single day!
      *
      * @param date

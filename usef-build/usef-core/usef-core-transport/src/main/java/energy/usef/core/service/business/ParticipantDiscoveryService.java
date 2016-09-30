@@ -16,6 +16,27 @@
 
 package energy.usef.core.service.business;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.UnknownHostException;
+import java.util.Collections;
+import java.util.List;
+
+import javax.ejb.Singleton;
+import javax.inject.Inject;
+
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.xbill.DNS.DClass;
+import org.xbill.DNS.ExtendedResolver;
+import org.xbill.DNS.Name;
+import org.xbill.DNS.Record;
+import org.xbill.DNS.Resolver;
+import org.xbill.DNS.Section;
+import org.xbill.DNS.TXTRecord;
+import org.xbill.DNS.Type;
+
 import energy.usef.core.config.AbstractConfig;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
@@ -30,18 +51,6 @@ import energy.usef.core.data.xml.bean.message.USEFRole;
 import energy.usef.core.exception.BusinessException;
 import energy.usef.core.exception.VersionError;
 import energy.usef.core.service.business.error.ParticipantDiscoveryError;
-import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.xbill.DNS.*;
-
-import javax.ejb.Singleton;
-import javax.inject.Inject;
-import java.io.File;
-import java.io.IOException;
-import java.net.UnknownHostException;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Service class in charge of the discovery of the participants on the network when a message arrives.
@@ -52,6 +61,7 @@ public class ParticipantDiscoveryService {
     private static final Logger LOGGER_CONFIDENTIAL = LoggerFactory.getLogger(USEFLogCategory.CONFIDENTIAL);
     private static final String PUBLIC_KEY_PREFIX = "cs1.";
     private static final String PARTICIPANTS_YAML = "participants_dns_info.yaml";
+    private static final String SUPPORTED_USEF_VERSION = "2015";
 
     private static Resolver resolver = null;
 
@@ -197,10 +207,7 @@ public class ParticipantDiscoveryService {
     protected static String getUsefEndpoint(String participantDomain) throws BusinessException {
         String version = getUsefVersion(participantDomain);
 
-        switch (version) {
-            case "2015":
-                break;
-            default:
+        if(! SUPPORTED_USEF_VERSION.equals(version)) {
                 throw new BusinessException(VersionError.VERSION_NOT_SUPPORTED, version);
         }
         return "https://" + participantDomain + "/USEF/" + getUsefVersion(participantDomain) + "/SignedMessage";

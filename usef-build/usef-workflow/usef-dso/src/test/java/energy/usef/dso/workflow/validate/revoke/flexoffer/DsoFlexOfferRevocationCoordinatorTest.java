@@ -136,6 +136,39 @@ public class DsoFlexOfferRevocationCoordinatorTest {
     }
 
     @Test
+    public void testInvokeWorkflowOrdered() throws XpathException, SAXException, IOException {
+        PowerMockito.when(planboardBusinessService.findPtuFlexOffer(Matchers.any(Long.class), Matchers.any(String.class)))
+                .thenReturn(buildFlexOffers().stream().collect(Collectors.toMap(fo -> fo.getPtuContainer().getPtuIndex(),
+                        Function.identity())));
+
+        PtuState ptuState = new PtuState();
+        ptuState.setState(PtuContainerState.PlanValidate);
+
+        PowerMockito.when(
+                ptuStateRepository.findOrCreatePtuState(Matchers.any(PtuContainer.class), Matchers.any(ConnectionGroup.class)))
+                .thenReturn(ptuState);
+
+        PowerMockito.when(planboardBusinessService.findPlanboardMessages(Matchers.any(Long.class), Matchers.any(DocumentType.class),
+                Matchers.anyString())).
+                thenReturn(buildPlanboardMessageList());
+        //used to find orders
+        PowerMockito.when(planboardBusinessService.findPlanboardMessagesWithOriginSequence(Matchers.any(Long.class), Matchers.any(DocumentType.class),
+                Matchers.anyString())).
+                thenReturn(buildPlanboardMessageList());
+
+        coordinator.handleEvent(new FlexOfferRevocationEvent(buildContext()));
+
+        ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(jmsHelperService, Mockito.times(1)).sendMessageToOutQueue(messageCaptor.capture());
+        String responseMessage = messageCaptor.getValue();
+        Assert.assertNotNull(responseMessage);
+        XMLAssert.assertXpathEvaluatesTo("Rejected", "/FlexOfferRevocationResponse/@Result", responseMessage);
+
+        LOGGER.info("Response message:\n{}", responseMessage);
+    }
+
+
+    @Test
     public void testInvokeWorkflowFailsForNoPlanboardMessage() throws XpathException, SAXException, IOException {
         PowerMockito.when(planboardBusinessService.findPtuFlexOffer(Matchers.any(Long.class), Matchers.any(String.class)))
                 .thenReturn(buildFlexOffers().stream().collect(Collectors.toMap(fo -> fo.getPtuContainer().getPtuIndex(),

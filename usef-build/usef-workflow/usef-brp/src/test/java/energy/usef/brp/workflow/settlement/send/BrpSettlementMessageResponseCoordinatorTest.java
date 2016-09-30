@@ -19,6 +19,7 @@ package energy.usef.brp.workflow.settlement.send;
 import static org.powermock.reflect.Whitebox.setInternalState;
 
 import energy.usef.core.data.xml.bean.message.DispositionAcceptedDisputed;
+import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
 import energy.usef.core.model.PlanboardMessage;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
@@ -57,8 +58,11 @@ public class BrpSettlementMessageResponseCoordinatorTest {
     @Test
     public void testProcessPtuSettlements() throws Exception {
         Mockito.when(corePlanboardBusinessService
-                .findPlanboardMessagesWithOriginSequence(Matchers.anyLong(), Matchers.eq(DocumentType.FLEX_ORDER_SETTLEMENT),
-                        Matchers.eq("agr1.usef-example.com"))).thenReturn(Arrays.asList(new PlanboardMessage()));
+                .findPlanboardMessagesWithOriginSequence(Matchers.eq(1l), Matchers.eq(DocumentType.FLEX_ORDER_SETTLEMENT),
+                        Matchers.eq("agr1.usef-example.com"))).thenReturn(Arrays.asList(buildPlanboardMessage()));
+        Mockito.when(corePlanboardBusinessService
+                .findPlanboardMessagesWithOriginSequence(Matchers.eq(2l), Matchers.eq(DocumentType.FLEX_ORDER_SETTLEMENT),
+                        Matchers.eq("agr1.usef-example.com"))).thenReturn(Arrays.asList(buildPlanboardMessage()));
 
         coordinator.processPtuSettlements(Arrays.asList(1l, 2l), DispositionAcceptedDisputed.ACCEPTED, "agr1.usef-example.com");
 
@@ -70,5 +74,11 @@ public class BrpSettlementMessageResponseCoordinatorTest {
                         Matchers.eq("agr1.usef-example.com"));
         Mockito.verify(corePlanboardBusinessService, Mockito.times(2)).updatePlanboardMessage(Matchers.any(PlanboardMessage.class));
 
+    }
+
+    private PlanboardMessage buildPlanboardMessage() {
+        PlanboardMessage planboardMessage = new PlanboardMessage();
+        planboardMessage.setDocumentStatus(DocumentStatus.SENT);
+        return planboardMessage;
     }
 }

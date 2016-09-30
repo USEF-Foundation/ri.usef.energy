@@ -16,8 +16,6 @@
 
 package energy.usef.core.service.business;
 
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 
 import org.joda.time.LocalDate;

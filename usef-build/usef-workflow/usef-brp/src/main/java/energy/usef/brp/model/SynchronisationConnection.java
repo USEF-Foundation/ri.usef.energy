@@ -45,9 +45,6 @@ public class SynchronisationConnection {
     @Column(name = "ENTITY_ADDRESS", nullable = false, unique = true)
     private String entityAddress;
 
-    @Column(name = "IS_CUSTOMER", nullable = false)
-    private boolean isCustomer;
-
     @Column(name = "LAST_SYNCHRONISATION_TIME", nullable = true)
     private Date lastSynchronisationTime;
 
@@ -80,14 +77,6 @@ public class SynchronisationConnection {
 
     public void setEntityAddress(String entityAddress) {
         this.entityAddress = entityAddress;
-    }
-
-    public boolean isCustomer() {
-        return isCustomer;
-    }
-
-    public void setCustomer(boolean isCustomer) {
-        this.isCustomer = isCustomer;
     }
 
     public LocalDateTime getLastSynchronisationTime() {
@@ -132,11 +121,40 @@ public class SynchronisationConnection {
     }
 
     @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((entityAddress == null) ? 0 : entityAddress.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        SynchronisationConnection other = (SynchronisationConnection) obj;
+        if (entityAddress == null) {
+            if (other.entityAddress != null) {
+                return false;
+            }
+        } else if (!entityAddress.equals(other.entityAddress)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
     public String toString() {
         return "SynchronisationConnection" + "[" +
                 "id=" + id +
                 ", entityAddress='" + entityAddress + "'" +
-                ", isCustomer=" + isCustomer +
                 ", lastSynchronisationTime=" + lastSynchronisationTime +
                 ", lastModificationTime=" + lastModificationTime +
                 "]";

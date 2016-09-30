@@ -1,0 +1,32 @@
+{
+  "title": "REST Result",
+  "type": "object",
+  "properties": {
+    "code": {
+      "type": "integer"
+    },
+    "headers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "body": {"type": "string"
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["code", "headers"]
+}

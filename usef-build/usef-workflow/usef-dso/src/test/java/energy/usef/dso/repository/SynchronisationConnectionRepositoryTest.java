@@ -22,6 +22,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
+import energy.usef.dso.model.SynchronisationCongestionPoint;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -85,6 +86,24 @@ public class SynchronisationConnectionRepositoryTest {
         // assert that all records have been removed after deleting
         count = repository.getEntityManager().createQuery("SELECT s FROM SynchronisationConnection s").getResultList().size();
         Assert.assertEquals(0, count);
+
+        entityManager.getTransaction().rollback();
+    }
+
+    @Test
+    public void testDeleteFor() {
+        entityManager.getTransaction().begin();
+
+        // make sure there are SynchronisationConnection records before deleting
+        long count = repository.getEntityManager().createQuery("SELECT s FROM SynchronisationConnection s").getResultList().size();
+        Assert.assertNotEquals(0, count);
+
+
+        repository.deleteFor(null);
+
+        // assert that all records have been removed after deleting
+        count = repository.getEntityManager().createQuery("SELECT s FROM SynchronisationConnection s").getResultList().size();
+        Assert.assertEquals(2, count);
 
         entityManager.getTransaction().rollback();
     }

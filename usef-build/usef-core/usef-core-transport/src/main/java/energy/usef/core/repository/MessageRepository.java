@@ -37,6 +37,9 @@ import energy.usef.core.model.MessageDirection;
 @Stateless
 public class MessageRepository extends BaseRepository<Message> {
 
+    private static final String COMMON_REFERENCE_QUERY = "CommonReferenceQuery ";
+    private static final String COMMON_REFERENCE_QUERY_RESPONSE = "CommonReferenceQueryResponse";
+
     /**
      * Gets an ingoing message entity corresponding to an response message.
      *
@@ -121,8 +124,6 @@ public class MessageRepository extends BaseRepository<Message> {
      * @return <code>true</code> if every query has a response.
      */
     public boolean hasEveryCommonReferenceQuerySentAResponseReceived(LocalDateTime period) {
-        final String COMMON_REFERENCE_QUERY = "CommonReferenceQuery ";
-        final String COMMON_REFERENCE_QUERY_RESPONSE = "CommonReferenceQueryResponse";
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT queries FROM Message queries WHERE queries.conversationId NOT IN (");
         sql.append("  SELECT responses.conversationId FROM Message responses ");
@@ -159,6 +160,7 @@ public class MessageRepository extends BaseRepository<Message> {
         StringBuilder sql = new StringBuilder();
         sql.append("DELETE FROM Message m WHERE m.creationTime >= :start AND m.creationTime < :end");
 
-        return entityManager.createQuery(sql.toString()).setParameter("start", start, TIMESTAMP).setParameter("end", end, TIMESTAMP).executeUpdate();
+        return entityManager.createQuery(sql.toString()).setParameter("start", start, TIMESTAMP).setParameter("end", end, TIMESTAMP)
+                .executeUpdate();
     }
 }

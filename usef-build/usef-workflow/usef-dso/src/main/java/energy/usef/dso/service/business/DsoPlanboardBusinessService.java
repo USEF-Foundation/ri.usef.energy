@@ -363,6 +363,12 @@ public class DsoPlanboardBusinessService {
         PlanboardMessage flexOrderMessage = planboardMessageRepository.findSinglePlanboardMessage(sequence,
                 DocumentType.FLEX_ORDER, aggregatorDomain);
 
+        if (!DocumentStatus.SENT.equals(flexOrderMessage.getDocumentStatus())) {
+            LOGGER.error("A response has already been processed for this flex order %s. Invalid response received " +
+                            "from %s. ", sequence, aggregatorDomain);
+            return null;
+        }
+
         flexOrderMessage.setDocumentStatus(DocumentStatusUtil.toDocumentStatus(acknowledgementStatus));
 
         List<PtuFlexOrder> flexOrders = ptuFlexOrderRepository.findFlexOrdersBySequence(sequence);

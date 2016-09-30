@@ -56,6 +56,13 @@ public class FlexRequestResponseController extends BaseIncomingResponseMessageCo
                 DocumentType.FLEX_REQUEST,
                 message.getMessageMetadata().getSenderDomain());
 
+        if (!DocumentStatus.SENT.equals(flexRequestMessage.getDocumentStatus())) {
+            LOGGER.error("A response has already been processed for this flex request %s. Invalid response received " +
+                            "from %s. ",
+                    message.getSequence(), message.getMessageMetadata().getSenderDomain());
+            return;
+        }
+
         DocumentStatus documentStatus = DocumentStatusUtil.toDocumentStatus(message.getResult());
         flexRequestMessage.setDocumentStatus(documentStatus);
         if (DocumentStatus.REJECTED == documentStatus) {

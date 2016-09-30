@@ -59,10 +59,9 @@ public class AgrReOptimizePortfolioStubUtil {
     /**
      * Creates a map structure linking the connection group entity addresses to their list of {@link ConnectionPortfolioDto} items.
      *
-     * @param connectionPortfolio {@link List} of {@link ConnectionPortfolioDto} the connection portfolio.
-     * @param connectionGroupToConnections
-     * {@link Map} with {@link String} USEF identifier of the connection group as key and {@link List} of {@link String}
-     * connection entity addresses of the connection group as value.
+     * @param connectionPortfolio          {@link List} of {@link ConnectionPortfolioDto} the connection portfolio.
+     * @param connectionGroupToConnections {@link Map} with {@link String} USEF identifier of the connection group as key and {@link List} of {@link String}
+     *                                     connection entity addresses of the connection group as value.
      * @return a {@link Map} of {@link String} USEF identifier of the connection group as key and {@link List} of
      * {@link ConnectionPortfolioDto} partial connection portfolio as value.
      */
@@ -79,12 +78,12 @@ public class AgrReOptimizePortfolioStubUtil {
     /**
      * Groups and sum the power of a list of prognoses per connection group entity address and ptu index.
      *
-     * @param aPlans {@link List} of {@link PrognosisDto} A-Plans.
+     * @param aPlans     {@link List} of {@link PrognosisDto} A-Plans.
      * @param dPrognosis {@link List} of {@link PrognosisDto} D-Prognoses.
      * @return a {@link Map} like <code>connection_group_identifier > PTU_index > sum_of_the_power</code>.
      */
     public static Map<String, Map<Integer, BigInteger>> mapPrognosisPowerPerPtuPerConnectionGroup(List<PrognosisDto> aPlans,
-            List<PrognosisDto> dPrognosis) {
+                                                                                                  List<PrognosisDto> dPrognosis) {
         // No distinction between a-plans and d-prognosis needed, so join both lists into one
         List<PrognosisDto> prognosisDtos = new ArrayList<>(dPrognosis);
         prognosisDtos.addAll(aPlans);
@@ -113,13 +112,12 @@ public class AgrReOptimizePortfolioStubUtil {
     /**
      * Sums the forecast power values from the connection portfolio per connection group identifier and PTU index.
      *
-     * @param connectionPortfolioPerConnectionGroup
-     * {@link Map} of {@link String} connection group identifier as key and {@link List} of {@link ConnectionPortfolioDto} as
-     * value; the connection portfolio already grouped per connection group identifier.
-     * @param period {@link LocalDate} the period for which the method is called (needed to know the amount of PTUs for that
-     * period).
-     * @param ptuDuration {@link Integer} the duration of a PTU in minutes (needed to know the amount of PTUs for the period and
-     * to know the amount of DTUs per PTU).
+     * @param connectionPortfolioPerConnectionGroup {@link Map} of {@link String} connection group identifier as key and {@link List} of {@link ConnectionPortfolioDto} as
+     *                                              value; the connection portfolio already grouped per connection group identifier.
+     * @param period                                {@link LocalDate} the period for which the method is called (needed to know the amount of PTUs for that
+     *                                              period).
+     * @param ptuDuration                           {@link Integer} the duration of a PTU in minutes (needed to know the amount of PTUs for the period and
+     *                                              to know the amount of DTUs per PTU).
      * @return a {@link Map} like <code>connection_group_identifier > PTU_index > sum_of_the_power </code>.
      */
     public static Map<String, Map<Integer, BigInteger>> sumForecastPowerPerPtuPerConnectionGroup(
@@ -135,7 +133,7 @@ public class AgrReOptimizePortfolioStubUtil {
     }
 
     private static void addUdiForecast(LocalDate period, Integer ptuDuration, Map<String, Map<Integer, BigInteger>> result,
-            String connectionGroupId, List<ConnectionPortfolioDto> connectionPortfolioList) {
+                                       String connectionGroupId, List<ConnectionPortfolioDto> connectionPortfolioList) {
         connectionPortfolioList.stream()
                 .flatMap(connectionPortfolioDTO -> connectionPortfolioDTO.getUdis().stream())
                 .map(udi -> PowerContainerDtoUtil.average(udi, period, ptuDuration))
@@ -149,7 +147,7 @@ public class AgrReOptimizePortfolioStubUtil {
     }
 
     private static void addConnectionForecast(Map<String, Map<Integer, BigInteger>> result, String connectionGroupId,
-            List<ConnectionPortfolioDto> connectionPortfolioList) {
+                                              List<ConnectionPortfolioDto> connectionPortfolioList) {
         connectionPortfolioList.stream()
                 .map(ConnectionPortfolioDto::getConnectionPowerPerPTU)
                 .forEach(connectionPowerPerPtuMap -> connectionPowerPerPtuMap.forEach((ptuIndex, powerContainerDto) -> {
@@ -168,11 +166,11 @@ public class AgrReOptimizePortfolioStubUtil {
      * ordered flex power and forecasted power.
      *
      * @param prognosisPowerPerPtuPerConnectionGroup {@link Map} with the prognoses power aggregated as
-     * <code>connection_group_identifier > ptu_index > sum_of_the_power</code>.
-     * @param orderedPowerPerPtuPerConnectionGroup {@link Map} with the ordered power aggregated as
-     * <code>connection_group_identifier > ptu_index > sum_of_the_power</code>.
-     * @param forecastPowerPerPtuPerConnectionGroup {@link Map} with the forecasted power aggregated as
-     * <code>connection_group_identifier > ptu_index > sum_of_the_power</code>.
+     *                                               <code>connection_group_identifier > ptu_index > sum_of_the_power</code>.
+     * @param orderedPowerPerPtuPerConnectionGroup   {@link Map} with the ordered power aggregated as
+     *                                               <code>connection_group_identifier > ptu_index > sum_of_the_power</code>.
+     * @param forecastPowerPerPtuPerConnectionGroup  {@link Map} with the forecasted power aggregated as
+     *                                               <code>connection_group_identifier > ptu_index > sum_of_the_power</code>.
      * @return the target power (prognosis + order - forecast) in a {@link Map} aggregated as <code>connection_group_identifier >
      * ptu_index > sum_of_the_power</code>.
      */
@@ -204,13 +202,12 @@ public class AgrReOptimizePortfolioStubUtil {
     /**
      * Aggregates the potential flexibility of consumption of the connection portfolio per connection group and PTU index.
      *
-     * @param connectionsPerConnectionGroup
-     * {@link Map} of {@link String} connection group identifier as key and {@link List} of {@link ConnectionPortfolioDto} as
-     * value; the connection portfolio already grouped per connection group identifier.
-     * @param period {@link LocalDate} the period for which the method is called (needed to know the amount of PTUs for that
-     * period).
-     * @param ptuDuration {@link Integer} the duration of a PTU in minutes (needed to know the amount of PTUs for the period and
-     * to know the amount of DTUs per PTU).
+     * @param connectionsPerConnectionGroup {@link Map} of {@link String} connection group identifier as key and {@link List} of {@link ConnectionPortfolioDto} as
+     *                                      value; the connection portfolio already grouped per connection group identifier.
+     * @param period                        {@link LocalDate} the period for which the method is called (needed to know the amount of PTUs for that
+     *                                      period).
+     * @param ptuDuration                   {@link Integer} the duration of a PTU in minutes (needed to know the amount of PTUs for the period and
+     *                                      to know the amount of DTUs per PTU).
      * @return the potential flex of the portfolio aggregated in a {@link Map} as <code>connection_group_identifier > ptu_index >
      * sum_of_the_potential_flex</code>.
      */
@@ -249,11 +246,11 @@ public class AgrReOptimizePortfolioStubUtil {
      * Aggregates the potential flexibility of production of the connection portfolio per connection group and PTU index.
      *
      * @param connectionsPerConnectionGroup {@link Map} of {@link String} connection group identifier as key and {@link List} of {@link ConnectionPortfolioDto} as
-     * value; the connection portfolio already grouped per connection group identifier.
-     * @param period {@link LocalDate} the period for which the method is called (needed to know the amount of PTUs for that
-     * period).
-     * @param ptuDuration {@link Integer} the duration of a PTU in minutes (needed to know the amount of PTUs for the period and
-     * to know the amount of DTUs per PTU).
+     *                                      value; the connection portfolio already grouped per connection group identifier.
+     * @param period                        {@link LocalDate} the period for which the method is called (needed to know the amount of PTUs for that
+     *                                      period).
+     * @param ptuDuration                   {@link Integer} the duration of a PTU in minutes (needed to know the amount of PTUs for the period and
+     *                                      to know the amount of DTUs per PTU).
      * @return the potential flex of the portfolio aggregated in a {@link Map} as <code>connection_group_identifier > ptu_index >
      * sum_of_the_potential_flex</code>.
      */
@@ -296,12 +293,12 @@ public class AgrReOptimizePortfolioStubUtil {
     /**
      * Computes the flex factor for the portfolio re-optimization, using the target power and the potential flex available.
      *
-     * @param targetPowerPerPtuPerConnectionGroup {@link Map} with the target power aggregated as
-     * <code>connection_group_identifier > ptu_index > sum_of_the_power</code>.
+     * @param targetPowerPerPtuPerConnectionGroup                    {@link Map} with the target power aggregated as
+     *                                                               <code>connection_group_identifier > ptu_index > sum_of_the_power</code>.
      * @param summedPotentialFlexConsumptionPerPtuPerConnectionGroup {@link Map} with the potential flex consumption aggregated as
-     * <code>connection_group_identifier > ptu_index > sum_of_potential_flex</code>.
-     * @param summedPotentialFlexProductionPerPtuPerConnectionGroup {@link Map} with the potential flex production aggregated as
-     * <code>connection_group_identifier > ptu_index > sum_of_potential_flex</code>.
+     *                                                               <code>connection_group_identifier > ptu_index > sum_of_potential_flex</code>.
+     * @param summedPotentialFlexProductionPerPtuPerConnectionGroup  {@link Map} with the potential flex production aggregated as
+     *                                                               <code>connection_group_identifier > ptu_index > sum_of_potential_flex</code>.
      * @return the flex factor (target_power / potential_flex, bounded to [0,1]) in a {@link Map} as
      * <code>connection_group_identifier > ptu_index > flex_factor</code>.
      */
@@ -314,16 +311,7 @@ public class AgrReOptimizePortfolioStubUtil {
         targetPowerPerPtuPerConnectionGroup.forEach((connectionGroupId, targetPowerPerPtu) -> {
             flexFactorPerPtuPerConnectionGroup.put(connectionGroupId, new HashMap<>());
             targetPowerPerPtu.forEach((ptuIndex, targetPower) -> {
-                BigInteger potentialFlex = ZERO;
-                // since we only support reduction of consumption and reduction of production we solve negative targetPowers by
-                // reducing the consumption and positive targetPowers by reducing the production.
-                if (targetPower.compareTo(BigInteger.ZERO) < 0) {
-                    potentialFlex = summedPotentialFlexConsumptionPerPtuPerConnectionGroup
-                            .getOrDefault(connectionGroupId, new HashMap<>()).getOrDefault(ptuIndex, ZERO);
-                } else if (targetPower.compareTo(BigInteger.ZERO) > 0) {
-                    potentialFlex = summedPotentialFlexProductionPerPtuPerConnectionGroup
-                            .getOrDefault(connectionGroupId, new HashMap<>()).getOrDefault(ptuIndex, ZERO);
-                }
+                BigInteger potentialFlex = determinePotentialFlex(summedPotentialFlexConsumptionPerPtuPerConnectionGroup, summedPotentialFlexProductionPerPtuPerConnectionGroup, connectionGroupId, ptuIndex, targetPower);
 
                 if (potentialFlex.equals(ZERO)) {
                     // there is no flex available, so do not flex (factor = ZERO)
@@ -337,6 +325,20 @@ public class AgrReOptimizePortfolioStubUtil {
         });
 
         return flexFactorPerPtuPerConnectionGroup;
+    }
+
+    private static BigInteger determinePotentialFlex(Map<String, Map<Integer, BigInteger>> summedPotentialFlexConsumptionPerPtuPerConnectionGroup, Map<String, Map<Integer, BigInteger>> summedPotentialFlexProductionPerPtuPerConnectionGroup, String connectionGroupId, Integer ptuIndex, BigInteger targetPower) {
+        BigInteger potentialFlex = ZERO;
+        // since we only support reduction of consumption and reduction of production we solve negative targetPowers by
+        // reducing the consumption and positive targetPowers by reducing the production.
+        if (targetPower.compareTo(BigInteger.ZERO) < 0) {
+            potentialFlex = summedPotentialFlexConsumptionPerPtuPerConnectionGroup
+                    .getOrDefault(connectionGroupId, new HashMap<>()).getOrDefault(ptuIndex, ZERO);
+        } else if (targetPower.compareTo(BigInteger.ZERO) > 0) {
+            potentialFlex = summedPotentialFlexProductionPerPtuPerConnectionGroup
+                    .getOrDefault(connectionGroupId, new HashMap<>()).getOrDefault(ptuIndex, ZERO);
+        }
+        return potentialFlex;
     }
 
     private static BigDecimal calculateFactor(Integer ptuIndex, BigInteger potentialFlex, BigInteger targetPower) {

@@ -16,6 +16,8 @@
 
 package energy.usef.core.util.encryption;
 
+import energy.usef.core.util.VersionUtil;
+import org.junit.Before;
 import org.junit.Test;
 
 import junit.framework.TestCase;
@@ -25,10 +27,14 @@ import junit.framework.TestCase;
  */
 public class NaClTest extends TestCase {
 
-    private static final String VERSION = "1.0.10";
+    private static final String VERSION = "1.0.8";
+
+    @Before
+    public void init() throws Exception {
+    }
 
     @Test
-    public static void testVersion () {
-        assertEquals("Sodium Version", VERSION, NaCl.sodium().sodium_version_string());
+    public void testVersion () {
+        assertTrue(VersionUtil.compareVersions(VERSION, NaCl.sodium().sodium_version_string()) <= 0);
     }
 }

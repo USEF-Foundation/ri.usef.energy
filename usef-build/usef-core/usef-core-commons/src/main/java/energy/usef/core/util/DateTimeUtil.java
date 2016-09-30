@@ -53,6 +53,7 @@ public class DateTimeUtil {
 
     private static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     private static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
+
     public static final int SECONDS_PER_MINUTE = 60;
 
     private static volatile long timeFactor = 1;
@@ -200,7 +201,7 @@ public class DateTimeUtil {
     }
 
     /**
-     * Gets string in format "yyyy-MM-dd HH:mm:ss.SSS"  from a LocalDate.
+     * Gets string in format "yyyy-MM-dd HH:mm:ss.SSS"  from a LocalDateTime.
      *
      * @param dateTime {@link LocalDateTime}
      * @return A {@link String} object
@@ -208,6 +209,18 @@ public class DateTimeUtil {
     public static String printDateTime(LocalDateTime dateTime) {
         return DateTimeFormat.forPattern(DEFAULT_DATE_TIME_FORMAT).print(dateTime);
     }
+
+    /**
+     * Gets string in given pattern from a LocalDateTime.
+     *
+     * @param dateTime {@link LocalDateTime}
+     * @param pattern {@link String}
+     * @return A {@link String} object
+     */
+    public static String printDateTime(LocalDateTime dateTime, String pattern) {
+        return DateTimeFormat.forPattern(pattern).print(dateTime);
+    }
+
 
     /**
      * Calculate the number of minutes from midnight to now. The number of minutes depends on summer- and winter time.

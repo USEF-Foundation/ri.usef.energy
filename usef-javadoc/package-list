@@ -17,6 +17,7 @@ energy.usef.agr.service.business
 energy.usef.agr.transformer
 energy.usef.agr.util
 energy.usef.agr.workflow
+energy.usef.agr.workflow.altstep
 energy.usef.agr.workflow.housekeeping
 energy.usef.agr.workflow.nonudi.dto
 energy.usef.agr.workflow.nonudi.goals
@@ -51,6 +52,7 @@ energy.usef.brp.pbcfeederimpl
 energy.usef.brp.repository
 energy.usef.brp.service.business
 energy.usef.brp.workflow
+energy.usef.brp.workflow.altstep
 energy.usef.brp.workflow.housekeeping
 energy.usef.brp.workflow.plan.aplan.finalize
 energy.usef.brp.workflow.plan.aplan.missing
@@ -81,6 +83,7 @@ energy.usef.core.exception
 energy.usef.core.factory
 energy.usef.core.model
 energy.usef.core.repository
+energy.usef.core.rest
 energy.usef.core.service.business
 energy.usef.core.service.business.error
 energy.usef.core.service.helper
@@ -103,6 +106,8 @@ energy.usef.core.workflow.transformer
 energy.usef.core.workflow.util
 energy.usef.cro.config
 energy.usef.cro.controller
+energy.usef.cro.dto
+energy.usef.cro.endpoint
 energy.usef.cro.event.endpoint
 energy.usef.cro.model
 energy.usef.cro.repository
@@ -111,6 +116,8 @@ energy.usef.cro.workflow.housekeeping
 energy.usef.dso.config
 energy.usef.dso.controller
 energy.usef.dso.controller.error
+energy.usef.dso.dto
+energy.usef.dso.endpoint
 energy.usef.dso.event.endpoint
 energy.usef.dso.exception
 energy.usef.dso.model
@@ -118,6 +125,7 @@ energy.usef.dso.pbcfeederimpl
 energy.usef.dso.repository
 energy.usef.dso.service.business
 energy.usef.dso.workflow
+energy.usef.dso.workflow.altstep
 energy.usef.dso.workflow.coloring
 energy.usef.dso.workflow.dto
 energy.usef.dso.workflow.housekeeping
@@ -138,6 +146,7 @@ energy.usef.dso.workflow.validate.revoke.flexoffer
 energy.usef.mdc.config
 energy.usef.mdc.controller
 energy.usef.mdc.dto
+energy.usef.mdc.endpoint
 energy.usef.mdc.event.endpoint
 energy.usef.mdc.model
 energy.usef.mdc.pbcfeederimpl
@@ -145,6 +154,7 @@ energy.usef.mdc.repository
 energy.usef.mdc.service.business
 energy.usef.mdc.transformer
 energy.usef.mdc.workflow
+energy.usef.mdc.workflow.altstep
 energy.usef.mdc.workflow.housekeeping
 energy.usef.mdc.workflow.meterdata
 energy.usef.mdc.workflow.step

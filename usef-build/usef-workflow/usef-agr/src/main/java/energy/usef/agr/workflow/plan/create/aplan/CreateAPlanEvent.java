@@ -16,9 +16,9 @@
 
 package energy.usef.agr.workflow.plan.create.aplan;
 
-import energy.usef.core.event.ExpirableEvent;
 import org.joda.time.LocalDate;
 
+import energy.usef.core.event.ExpirableEvent;
 import energy.usef.core.util.DateTimeUtil;
 
 /**
@@ -32,7 +32,7 @@ public class CreateAPlanEvent implements ExpirableEvent {
     /**
      * Constructor with the given parameters.
      *
-     * @param period {@link LocalDate} day for the a-plan.
+     * @param period         {@link LocalDate} day for the a-plan.
      * @param usefIdentifier {@link String} optional usef identifier.
      */
     public CreateAPlanEvent(LocalDate period, String usefIdentifier) {
@@ -49,7 +49,7 @@ public class CreateAPlanEvent implements ExpirableEvent {
     }
 
     public boolean isExpired() {
-        return (this.period.isBefore(DateTimeUtil.getCurrentDate()));
+        return period.isBefore(DateTimeUtil.getCurrentDate());
     }
 
     @Override

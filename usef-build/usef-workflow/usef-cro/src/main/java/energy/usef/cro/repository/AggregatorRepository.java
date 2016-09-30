@@ -36,8 +36,7 @@ public class AggregatorRepository extends BaseRepository<Aggregator> {
      * @return Aggregator entity
      */
     @SuppressWarnings("unchecked")
-    public Aggregator getAggregatorByDomain(
-            String domain) {
+    public Aggregator findByDomain(String domain) {
 
         List<Aggregator> result = entityManager
                 .createQuery(
@@ -47,6 +46,29 @@ public class AggregatorRepository extends BaseRepository<Aggregator> {
             return null;
         }
         return result.get(0);
+    }
+
+    /**
+     * Deletes {@Link Aggregator} entity by its domain.
+     *
+     * @param domain aggregator domain
+     */
+    @SuppressWarnings("unchecked")
+    public void deleteByDomain(String domain) {
+        Aggregator aggregator = findByDomain(domain);
+        if (aggregator != null) {
+            entityManager.remove(aggregator);
+        }
+    }
+
+    /**
+     * Gets the entire list of {@link Aggregator} known objects by this Common Reference Oparetor.
+     *
+     * @return {@link List} of {@link Aggregator}
+     */
+    @SuppressWarnings("unchecked")
+    public List<Aggregator> findAll() {
+        return getEntityManager().createQuery("SELECT participant FROM Aggregator participant").getResultList();
     }
 
 }

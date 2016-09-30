@@ -1,6 +1,18 @@
 # Release notes USEF Reference Implementation
 
-## Relase v 1.3.5, 6 september 2016 ##
+## Release v 1.3.6, 29 september 2016 ##
+
+###Delivered items###
+	*   Changed Libsodium support to version 1.0.8 and up
+	*   REST interface created for all participants to populate required database tables
+	*   Additional pluggable business components with well-defined outputs for testing purposes
+	*   Provide cleanup through non-demo endpoint
+	*   Aggregator cleanup extended with UDI tabel
+	*   Fixed an issue related to the Aggregator receiving multiple A-Plan approvals
+	*   Fixed an issue related to receiving multiple response messages
+	*   Fixed an issue related to flex offer revocation
+
+## Release v 1.3.5, 6 september 2016 ##
 
 ###Delivered items###
 	*   Added version management to Udi's.

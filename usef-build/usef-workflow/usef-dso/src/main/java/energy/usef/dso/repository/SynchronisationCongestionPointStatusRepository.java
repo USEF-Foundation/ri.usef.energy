@@ -17,9 +17,7 @@
 package energy.usef.dso.repository;
 
 import energy.usef.core.repository.BaseRepository;
-import energy.usef.dso.model.SynchronisationCongestionPointStatus;
-import energy.usef.dso.model.SynchronisationConnection;
-import energy.usef.dso.model.SynchronisationConnectionStatusType;
+import energy.usef.dso.model.*;
 
 import javax.ejb.Stateless;
 import javax.persistence.Query;
@@ -54,4 +52,31 @@ public class SynchronisationCongestionPointStatusRepository extends BaseReposito
         entityManager.createQuery("DELETE FROM SynchronisationCongestionPointStatus").executeUpdate();
     }
 
+    /**
+     * Deletes all the {@link SynchronisationCongestionPointStatus} objects for a {@Link synchronisationCongestionPoint}.
+     *
+     * @param synchronisationCongestionPoint
+     */
+    public void deleteFor (SynchronisationCongestionPoint synchronisationCongestionPoint) {
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("DELETE FROM SynchronisationCongestionPointStatus scs ");
+        queryBuilder.append("WHERE scs.synchronisationCongestionPoint = :synchronisationCongestionPoint");
+
+        Query query = entityManager.createQuery(queryBuilder.toString());
+        query.setParameter("synchronisationCongestionPoint", synchronisationCongestionPoint).executeUpdate();
+    }
+
+    /**
+     * Deletes all the {@link SynchronisationCongestionPointStatus} objects for a {@Link CommonReferenceOperator}.
+     *
+     * @param commonReferenceOperator
+     */
+    public void deleteFor (CommonReferenceOperator commonReferenceOperator) {
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("DELETE FROM SynchronisationCongestionPointStatus scs ");
+        queryBuilder.append("WHERE scs.commonReferenceOperator = :commonReferenceOperator");
+
+        Query query = entityManager.createQuery(queryBuilder.toString());
+        query.setParameter("commonReferenceOperator", commonReferenceOperator).executeUpdate();
+    }
 }

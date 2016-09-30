@@ -21,7 +21,9 @@ import static org.powermock.reflect.Whitebox.setInternalState;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.PersistenceException;
 
+import org.hibernate.PropertyValueException;
 import org.joda.time.LocalDate;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -31,6 +33,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import energy.usef.dso.model.PrognosisUpdateDeviation;
+
+import java.math.BigInteger;
+import java.util.Date;
 
 /**
  * Test class in charge of the unit tests related to the {@link PrognosisUpdateDeviationRepository} class.
@@ -95,4 +100,32 @@ public class PrognosisUpdateDeviationRepositoryTest {
         Assert.assertEquals("Expected deleted objects", 1, repository.cleanup(new LocalDate("2014-11-20")));
         Assert.assertEquals("Expected no deleted objects", 0, repository.cleanup(new LocalDate("2014-11-20")));
     }
+
+
+    // Explicit test for mandatory PtuDate after bugfix.
+    @Test (expected = PersistenceException.class)
+    public void testMandatoryPtuDate() {
+        PrognosisUpdateDeviation prognosisUpdateDeviation = new PrognosisUpdateDeviation();
+        prognosisUpdateDeviation.setAggregatorDomain("usef-example.com");
+        prognosisUpdateDeviation.setPrognosisSequence(-11L);
+        prognosisUpdateDeviation.setOrderedPower(BigInteger.ONE);
+        prognosisUpdateDeviation.setPreviousPrognosedPower(BigInteger.ONE);
+        prognosisUpdateDeviation.setPrognosedPower(BigInteger.ONE);
+        prognosisUpdateDeviation.setPtuIndex(1);
+        entityManager.persist(prognosisUpdateDeviation);
+    }
+
+    // Explicit test for mandatory PtuIndex after bugfix.
+    @Test (expected = PersistenceException.class)
+    public void testMandatoryPtuIndex() {
+        PrognosisUpdateDeviation prognosisUpdateDeviation = new PrognosisUpdateDeviation();
+        prognosisUpdateDeviation.setAggregatorDomain("usef-example.com");
+        prognosisUpdateDeviation.setPrognosisSequence(-11L);
+        prognosisUpdateDeviation.setOrderedPower(BigInteger.ONE);
+        prognosisUpdateDeviation.setPreviousPrognosedPower(BigInteger.ONE);
+        prognosisUpdateDeviation.setPrognosedPower(BigInteger.ONE);
+        prognosisUpdateDeviation.setPtuDate(new Date());
+        entityManager.persist(prognosisUpdateDeviation);
+    }
+
 }

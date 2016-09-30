@@ -113,61 +113,34 @@ public class AgrReOptimizePortfolioStub implements WorkflowStep {
         // Do some mapping, summing and calculation for quick access later in the process
         Map<String, List<ConnectionPortfolioDto>> connectionPortfolioPerConnectionGroup = AgrReOptimizePortfolioStubUtil
                 .mapConnectionPortfolioPerConnectionGroup(
-                connectionPortfolio, connectionGroupsToConnectionMap);
+                        connectionPortfolio, connectionGroupsToConnectionMap);
         Map<String, Map<Integer, BigInteger>> prognosisPowerPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
                 .mapPrognosisPowerPerPtuPerConnectionGroup(
-                aPlans, dPrognosis);
+                        aPlans, dPrognosis);
         Map<String, Map<Integer, BigInteger>> orderedPowerPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
                 .sumOrderedPowerPerPtuPerConnectionGroup(
-                flexOrders);
+                        flexOrders);
         Map<String, Map<Integer, BigInteger>> forecastPowerPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
                 .sumForecastPowerPerPtuPerConnectionGroup(
-                connectionPortfolioPerConnectionGroup, ptuDate, ptuDuration);
+                        connectionPortfolioPerConnectionGroup, ptuDate, ptuDuration);
         Map<String, Map<Integer, BigInteger>> targetPowerPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
                 .fetchTargetPowerPerPtuPerConnectionGroup(
-                prognosisPowerPerPtuPerConnectionGroup, orderedPowerPerPtuPerConnectionGroup,
-                forecastPowerPerPtuPerConnectionGroup);
+                        prognosisPowerPerPtuPerConnectionGroup, orderedPowerPerPtuPerConnectionGroup,
+                        forecastPowerPerPtuPerConnectionGroup);
         Map<String, Map<Integer, BigInteger>> sumPotentialFlexConsumptionPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
                 .sumPotentialFlexConsumptionPerPtuPerConnectionGroup(
-                connectionPortfolioPerConnectionGroup, ptuDate, ptuDuration);
+                        connectionPortfolioPerConnectionGroup, ptuDate, ptuDuration);
         Map<String, Map<Integer, BigInteger>> sumPotentialFlexProductionPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
                 .sumPotentialFlexProductionPerPtuPerConnectionGroup(
-                connectionPortfolioPerConnectionGroup, ptuDate, ptuDuration);
+                        connectionPortfolioPerConnectionGroup, ptuDate, ptuDuration);
         Map<String, Map<Integer, BigDecimal>> flexFactorPerPtuPerConnectionGroup = AgrReOptimizePortfolioStubUtil
                 .fetchFlexFactorPerPtuPerConnectionGroup(
-                targetPowerPerPtuPerConnectionGroup, sumPotentialFlexConsumptionPerPtuPerConnectionGroup,
-                sumPotentialFlexProductionPerPtuPerConnectionGroup);
+                        targetPowerPerPtuPerConnectionGroup, sumPotentialFlexConsumptionPerPtuPerConnectionGroup,
+                        sumPotentialFlexProductionPerPtuPerConnectionGroup);
         Map<String, List<UdiEventDto>> udiEventsPerUdi = mapUdiEvents(udiEvents);
 
-        // do some logging, useful for debugging or understanding what's happening in unit test
-        if (LOGGER.isDebugEnabled()) {
-            connectionPortfolioPerConnectionGroup.keySet().forEach(connectionGroupId -> {
-                LOGGER.debug("=== ConnectionGroup: {} ===", connectionGroupId);
-                prognosisPowerPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
-                        .forEach((ptuIndex, prognosis) -> {
-                    BigInteger target = targetPowerPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
-                            .getOrDefault(ptuIndex, BigInteger.ZERO);
-                    LOGGER.debug("--- PTU Index: {} ---", ptuIndex);
-                    LOGGER.debug("Prognosis: {}", prognosis);
-                    LOGGER.debug("Ordered Power: {}",
-                            orderedPowerPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
-                                    .getOrDefault(ptuIndex, BigInteger.ZERO));
-                    LOGGER.debug("Forecast: {}",
-                            forecastPowerPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
-                                    .getOrDefault(ptuIndex, BigInteger.ZERO));
-                    LOGGER.debug("Target: {} (prognosis + ordered power - forecast)", target);
-                    LOGGER.debug("Potential Flex Consumption: {} {}",
-                            sumPotentialFlexConsumptionPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
-                                    .getOrDefault(ptuIndex, BigInteger.ZERO), (target.compareTo(BigInteger.ZERO) > 0) ? "" : "*");
-                    LOGGER.debug("Potential Flex Production: {} {}",
-                            sumPotentialFlexProductionPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
-                                    .getOrDefault(ptuIndex, BigInteger.ZERO), (target.compareTo(BigInteger.ZERO) > 0) ? "*" : "");
-                    LOGGER.debug("Flex Factor: {}",
-                            flexFactorPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
-                                    .getOrDefault(ptuIndex, BigDecimal.ZERO));
-                });
-            });
-        }
+        logDebugReport(connectionPortfolioPerConnectionGroup, prognosisPowerPerPtuPerConnectionGroup, orderedPowerPerPtuPerConnectionGroup, forecastPowerPerPtuPerConnectionGroup, targetPowerPerPtuPerConnectionGroup, sumPotentialFlexConsumptionPerPtuPerConnectionGroup, sumPotentialFlexProductionPerPtuPerConnectionGroup, flexFactorPerPtuPerConnectionGroup);
+
 
         // Calculate the new portfolio consumption  / production forecast (consumption/production + potentialFlex * factor)
         calculatePortfolioForecast(connectionPortfolioPerConnectionGroup, flexFactorPerPtuPerConnectionGroup, ptuDate,
@@ -181,6 +154,39 @@ public class AgrReOptimizePortfolioStub implements WorkflowStep {
         context.setValue(ReOptimizePortfolioStepParameter.OUT.DEVICE_MESSAGES_OUT.name(), deviceMessages);
 
         return context;
+    }
+
+    private void logDebugReport(Map<String, List<ConnectionPortfolioDto>> connectionPortfolioPerConnectionGroup, Map<String, Map<Integer, BigInteger>> prognosisPowerPerPtuPerConnectionGroup, Map<String, Map<Integer, BigInteger>> orderedPowerPerPtuPerConnectionGroup, Map<String, Map<Integer, BigInteger>> forecastPowerPerPtuPerConnectionGroup, Map<String, Map<Integer, BigInteger>> targetPowerPerPtuPerConnectionGroup, Map<String, Map<Integer, BigInteger>> sumPotentialFlexConsumptionPerPtuPerConnectionGroup, Map<String, Map<Integer, BigInteger>> sumPotentialFlexProductionPerPtuPerConnectionGroup, Map<String, Map<Integer, BigDecimal>> flexFactorPerPtuPerConnectionGroup) {
+        // do some logging, useful for debugging or understanding what's happening in unit test
+        if (LOGGER.isDebugEnabled()) {
+            connectionPortfolioPerConnectionGroup.keySet().forEach(connectionGroupId -> {
+                LOGGER.debug("=== ConnectionGroup: {} ===", connectionGroupId);
+                prognosisPowerPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
+                        .forEach((ptuIndex, prognosis) -> {
+                            BigInteger target = targetPowerPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
+                                    .getOrDefault(ptuIndex, BigInteger.ZERO);
+
+                            LOGGER.debug("--- PTU Index: {} ---", ptuIndex);
+                            LOGGER.debug("Prognosis: {}", prognosis);
+                            LOGGER.debug("Ordered Power: {}",
+                                    orderedPowerPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
+                                            .getOrDefault(ptuIndex, BigInteger.ZERO));
+                            LOGGER.debug("Forecast: {}",
+                                    forecastPowerPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
+                                            .getOrDefault(ptuIndex, BigInteger.ZERO));
+                            LOGGER.debug("Target: {} (prognosis + ordered power - forecast)", target);
+                            LOGGER.debug("Potential Flex Consumption: {} {}",
+                                    sumPotentialFlexConsumptionPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
+                                            .getOrDefault(ptuIndex, BigInteger.ZERO), (target.compareTo(BigInteger.ZERO) > 0) ? "" : "*");
+                            LOGGER.debug("Potential Flex Production: {} {}",
+                                    sumPotentialFlexProductionPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
+                                            .getOrDefault(ptuIndex, BigInteger.ZERO), (target.compareTo(BigInteger.ZERO) > 0) ? "*" : "");
+                            LOGGER.debug("Flex Factor: {}",
+                                    flexFactorPerPtuPerConnectionGroup.getOrDefault(connectionGroupId, new HashMap<>())
+                                            .getOrDefault(ptuIndex, BigDecimal.ZERO));
+                        });
+            });
+        }
     }
 
     private List<DeviceMessageDto> createDeviceMessages(
@@ -212,7 +218,7 @@ public class AgrReOptimizePortfolioStub implements WorkflowStep {
     }
 
     private void distributeTargetPower(Map<String, List<UdiEventDto>> udiEventsPerUdi, LocalDate ptuDate, int ptuDuration,
-            List<DeviceMessageDto> deviceMessageDtoList, int ptuIndex, BigInteger targetPower, List<UdiPortfolioDto> udis) {
+                                       List<DeviceMessageDto> deviceMessageDtoList, int ptuIndex, BigInteger targetPower, List<UdiPortfolioDto> udis) {
         if (targetPower.equals(BigInteger.ZERO)) {
             // nothing to do
             return;
@@ -258,8 +264,8 @@ public class AgrReOptimizePortfolioStub implements WorkflowStep {
     }
 
     private BigInteger createReduceRequestsForUdi(UdiPortfolioDto udi, List<UdiEventDto> udiEvents,
-            List<DeviceMessageDto> deviceMessageDtoList, BigInteger initialPowerToBeDistributed, LocalDate ptuDate, int ptuIndex,
-            int ptuDuration, ConsumptionProductionTypeDto consumptionProductionTypeDto) {
+                                                  List<DeviceMessageDto> deviceMessageDtoList, BigInteger initialPowerToBeDistributed, LocalDate ptuDate, int ptuIndex,
+                                                  int ptuDuration, ConsumptionProductionTypeDto consumptionProductionTypeDto) {
 
         BigInteger toBeDistributed = initialPowerToBeDistributed;
 
@@ -347,7 +353,7 @@ public class AgrReOptimizePortfolioStub implements WorkflowStep {
     }
 
     private void updateAllocatedFlexConsumption(UdiPortfolioDto udi, int dtusPerPtu, int startDtu, BigInteger allocatedFlex,
-            BigInteger reducePower) {
+                                                BigInteger reducePower) {
         // store the allocated flex for this udi and all dtus affected
         for (int dtuIndex = startDtu; dtuIndex < startDtu + dtusPerPtu; dtuIndex++) {
             udi.getUdiPowerPerDTU()
@@ -358,7 +364,7 @@ public class AgrReOptimizePortfolioStub implements WorkflowStep {
     }
 
     private void updateAllocatedFlexProduction(UdiPortfolioDto udi, int dtusPerPtu, int startDtu, BigInteger allocatedFlex,
-            BigInteger reducePower) {
+                                               BigInteger reducePower) {
         // store the allocated flex for this udi and all dtus affected
         for (int dtuIndex = startDtu; dtuIndex < startDtu + dtusPerPtu; dtuIndex++) {
             udi.getUdiPowerPerDTU().get(dtuIndex).getForecast().setAllocatedFlexProduction(allocatedFlex.add(reducePower));
@@ -366,7 +372,7 @@ public class AgrReOptimizePortfolioStub implements WorkflowStep {
     }
 
     private ReduceRequestDto createReduceRequest(LocalDate ptuDate, int dtusPerPtu, int startDtu, UdiEventDto udiEventDto,
-            BigInteger reducePower, ConsumptionProductionTypeDto consumptionProductionTypeDto) {
+                                                 BigInteger reducePower, ConsumptionProductionTypeDto consumptionProductionTypeDto) {
         ReduceRequestDto reduceRequestDto = new ReduceRequestDto();
         reduceRequestDto.setId(UUID.randomUUID().toString());
         reduceRequestDto.setEventID(udiEventDto.getId());
@@ -380,8 +386,8 @@ public class AgrReOptimizePortfolioStub implements WorkflowStep {
 
     // Calculate the new portfolio forecasts (forecast = forecast + summedPotentialFlex * factor)
     private void calculatePortfolioForecast(Map<String, List<ConnectionPortfolioDto>> connectionPortfolioPerConnectionGroup,
-            Map<String, Map<Integer, BigDecimal>> potentialFlexFactorPerPtuPerConnectionGroup, LocalDate ptuDate,
-            int currentPtuIndex, int ptuDuration) {
+                                            Map<String, Map<Integer, BigDecimal>> potentialFlexFactorPerPtuPerConnectionGroup, LocalDate ptuDate,
+                                            int currentPtuIndex, int ptuDuration) {
         final LocalDate currentDate = DateTimeUtil.getCurrentDate();
         connectionPortfolioPerConnectionGroup.forEach(
                 (connectionGroupId, connectionPortfolioList) -> potentialFlexFactorPerPtuPerConnectionGroup.get(connectionGroupId)
@@ -397,7 +403,7 @@ public class AgrReOptimizePortfolioStub implements WorkflowStep {
     }
 
     private void divideFlexOverUdis(ConnectionPortfolioDto connectionPortfolioDTO, BigDecimal factor, int ptuIndex,
-            int ptuDuration) {
+                                    int ptuDuration) {
 
         if (factor.compareTo(BigDecimal.ZERO) == 0) {
             // nothing to do

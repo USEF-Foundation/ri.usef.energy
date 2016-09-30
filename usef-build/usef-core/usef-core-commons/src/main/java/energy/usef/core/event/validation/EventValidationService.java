@@ -15,20 +15,17 @@
  */
 package energy.usef.core.event.validation;
 
+import javax.enterprise.context.Dependent;
+
 import energy.usef.core.event.ExpirableEvent;
 import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.util.DateTimeUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.enterprise.context.Dependent;
 
 /**
  * Service to validate events
  */
 @Dependent
 public class EventValidationService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(EventValidationService.class);
 
     /**
      * Validate if period is not in the past.
@@ -69,6 +66,12 @@ public class EventValidationService {
         }
     }
 
+    /**
+     * Validate if period is today.
+     *
+     * @param event
+     * @throws BusinessValidationException
+     */
     public void validateEventPeriodToday(ExpirableEvent event) throws BusinessValidationException {
         validateEventPeriod(event);
         if(!event.getPeriod().isEqual(DateTimeUtil.getCurrentDate())){
@@ -76,6 +79,12 @@ public class EventValidationService {
         }
     }
 
+    /**
+     * Validate if the period is not null.
+     *
+     * @param event
+     * @throws BusinessValidationException
+     */
     public void validateEventPeriod(ExpirableEvent event) throws BusinessValidationException {
         if (event.getPeriod() == null){
             throw new BusinessValidationException(EventError.INVALID_PERIOD, event.getClass().getSimpleName());

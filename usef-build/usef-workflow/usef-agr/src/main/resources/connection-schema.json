@@ -1,0 +1,31 @@
+{
+  "title": "Connection Schema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "method": {
+        "enum": [
+          "POST",
+          "GET",
+          "PUT",
+          "PATCH",
+          "DELETE"
+        ]
+      },
+      "entityAddress": {
+        "type": "string",
+        "pattern": "(ea1\\.[0-9]{4}-[0-9]{2}\\..{1,244}:.{1,244}|ean\\.[0-9]{12,34})"
+      },
+      "isCustomer" : {
+        "type": "boolean",
+        "default" : true
+      }
+    },
+    "required": [
+      "method",
+      "entityAddress"
+    ],
+    "additionalProperties": false
+  }
+}

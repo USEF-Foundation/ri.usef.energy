@@ -16,8 +16,8 @@
 
 package energy.usef.cro.model;
 
-import org.junit.Assert;
-import org.junit.Test;
+        import org.junit.Assert;
+        import org.junit.Test;
 
 public class AggregatorTest {
 
@@ -26,14 +26,15 @@ public class AggregatorTest {
      */
     @Test
     public void testEquals() {
-        Aggregator aggregator1 = new Aggregator("domain1");
-        Aggregator aggregator2 = new Aggregator("domain2");
-        Aggregator aggregator3 = new Aggregator("domain1");
+        Aggregator participant1 = new Aggregator("domain1");
+        Aggregator participant2 = new Aggregator("domain2");
+        Aggregator participant3 = new Aggregator("domain1");
 
-        Assert.assertTrue(aggregator1.equals(aggregator1));
-        Assert.assertTrue(!aggregator1.equals(null));
-        Assert.assertTrue(!aggregator1.equals(aggregator2));
-        Assert.assertTrue(aggregator1.equals(aggregator3));
+        Assert.assertTrue(participant1.equals(participant1));
+        Assert.assertTrue(!participant1.equals(null));
+        Assert.assertTrue(!participant1.equals(participant2));
+        Assert.assertTrue(participant1.equals(participant3));
     }
+
 
 }

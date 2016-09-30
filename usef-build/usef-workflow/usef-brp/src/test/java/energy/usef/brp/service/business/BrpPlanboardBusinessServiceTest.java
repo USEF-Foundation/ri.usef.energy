@@ -101,8 +101,10 @@ public class BrpPlanboardBusinessServiceTest {
 
     @Test
     public void testUpdateFlexOrdersWithAcknowledgementStatus() {
+        PlanboardMessage planboardMessage = new PlanboardMessage();
+        planboardMessage.setDocumentStatus(DocumentStatus.SENT);
         PowerMockito.when(planboardMessageRepository.findSinglePlanboardMessage(Matchers.any(Long.class),
-                Matchers.eq(DocumentType.FLEX_ORDER), Matchers.any(String.class))).thenReturn(new PlanboardMessage());
+                Matchers.eq(DocumentType.FLEX_ORDER), Matchers.any(String.class))).thenReturn(planboardMessage);
         List<PtuFlexOrder> mockedPtuFlexOrders = buildPtuFlexOrderList();
         PowerMockito.when(ptuFlexOrderRepository.findFlexOrdersBySequence(Matchers.any(Long.class))).thenReturn
                 (mockedPtuFlexOrders);
@@ -159,6 +161,7 @@ public class BrpPlanboardBusinessServiceTest {
 
     private PlanboardMessage buildPlanboardMessage(DocumentType documentType, Long sequence) {
         PlanboardMessage planboardMessage = new PlanboardMessage();
+        planboardMessage.setDocumentStatus(DocumentStatus.SENT);
         planboardMessage.setDocumentType(documentType);
         planboardMessage.setSequence(sequence);
         if (documentType == DocumentType.FLEX_REQUEST || documentType == DocumentType.FLEX_OFFER || documentType == DocumentType.FLEX_ORDER) {

@@ -75,8 +75,8 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
     /**
      * Finds plan board messages.
      *
-     * @param sequence corresponding document sequence
-     * @param documentType document type
+     * @param sequence          corresponding document sequence
+     * @param documentType      document type
      * @param participantDomain - The participantDomain which is being communicated with.
      * @return plan board messages
      */
@@ -105,8 +105,8 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
     /**
      * Finds a single plan board messages.
      *
-     * @param sequence corresponding document sequence
-     * @param documentType document type
+     * @param sequence          corresponding document sequence
+     * @param documentType      document type
      * @param participantDomain - The participantDomain which is being communicated with.
      * @return a single planboard message or <code>null</code>
      */
@@ -122,9 +122,9 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
     /**
      * Finds plan board messages.
      *
-     * @param sequence corresponding document sequence
+     * @param sequence        corresponding document sequence
      * @param congestionPoint congestion point
-     * @param documentType document type
+     * @param documentType    document type
      * @return plan board messages
      */
     @SuppressWarnings("unchecked")
@@ -151,8 +151,8 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
     /**
      * Finds a single plan board message by period.
      *
-     * @param period The period
-     * @param documentType document type
+     * @param period            The period
+     * @param documentType      document type
      * @param participantDomain - The participantDomain which is being communicated with.
      * @return a single planboard message or <code>null</code>
      */
@@ -206,7 +206,7 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
     /**
      * This method finds {@link PlanboardMessage} based on {@link DocumentType} and {@link DocumentStatus}.
      *
-     * @param documentType The type of document, like request, offer or order.
+     * @param documentType   The type of document, like request, offer or order.
      * @param documentStatus The status of document, like new, submitted or rejected.
      * @return The list of {@link PlanboardMessage} which have a specific {@link DocumentType} and {@link DocumentStatus}.
      */
@@ -228,8 +228,8 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
     /**
      * This method finds {@link PlanboardMessage} based on {@link DocumentType} and {@link DocumentStatus}.
      *
-     * @param localDateTime The LocalDateTime the message should be before.
-     * @param documentType The type of document, like request, offer or order.
+     * @param localDateTime  The LocalDateTime the message should be before.
+     * @param documentType   The type of document, like request, offer or order.
      * @param documentStatus The status of document, like new, submitted or rejected.
      * @return The list of {@link PlanboardMessage} which have a specific {@link DocumentType} and {@link DocumentStatus}.
      */
@@ -248,8 +248,8 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
      * This method finds {@link PlanboardMessage} based on {@link DocumentType} and {@link DocumentStatus} within a time frame
      * (startDate - endDate).
      *
-     * @param documentType The type of document, like request, offer or order.
-     * @param period The date of the planboard message
+     * @param documentType   The type of document, like request, offer or order.
+     * @param period         The date of the planboard message
      * @param documentStatus The status of document, like new, submitted or rejected.
      * @return The list of {@link PlanboardMessage} which have a specific {@link DocumentType} and {@link DocumentStatus}.
      */
@@ -282,10 +282,10 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
      * Finds all the planboard messages of a certain {@link DocumentType} for a given participant Optionally, a specific gridpoint
      * and the {@link DocumentStatus} of the document can be specified.
      *
-     * @param documentType {@link DocumentType} mandatory document type.
+     * @param documentType      {@link DocumentType} mandatory document type.
      * @param participantDomain {@link String} mandatory participant domain.
-     * @param usefIdentifier {@link String} optional usefIdentifier of the {@link ConnectionGroup} related to the message.
-     * @param documentStatus {@link DocumentStatus} optional document status.
+     * @param usefIdentifier    {@link String} optional usefIdentifier of the {@link ConnectionGroup} related to the message.
+     * @param documentStatus    {@link DocumentStatus} optional document status.
      * @return a {@link List} of {@link PlanboardMessage}.
      */
     @SuppressWarnings("unchecked")
@@ -323,11 +323,11 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
      * Finds maximal planboard message sequence of a certain {@link DocumentType} for a given participant optionally, a specific
      * USEF identifier and the {@link DocumentStatus} of the planboard message can be specified.
      *
-     * @param documentType {@link DocumentType} mandatory document type.
+     * @param documentType      {@link DocumentType} mandatory document type.
      * @param participantDomain {@link String} mandatory participant domain.
-     * @param period {@link LocalDate} mandatory period.
-     * @param usefIdentifier {@link String} optional usefIdentifier of the {@link ConnectionGroup} related to the message.
-     * @param documentStatus {@link DocumentStatus} optional document status.
+     * @param period            {@link LocalDate} mandatory period.
+     * @param usefIdentifier    {@link String} optional usefIdentifier of the {@link ConnectionGroup} related to the message.
+     * @param documentStatus    {@link DocumentStatus} optional document status.
      * @return a {@link Long} maximal planboard message sequence, if there is no record in the table 0 value is returned .
      */
     public Long findMaxPlanboardMessageSequence(DocumentType documentType, String participantDomain, LocalDate period,
@@ -370,12 +370,12 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
      * Finds all the planboard messages of a certain {@link DocumentType} for a given participant. Optionally, a specific gridpoint
      * and the {@link DocumentStatus} of the document can be specified. Optionally, a period can be defined.
      *
-     * @param documentType {@link DocumentType} mandatory document type.
+     * @param documentType      {@link DocumentType} mandatory document type.
      * @param participantDomain {@link String} mandatory participant domain.
-     * @param usefIdentifier {@link String} optional entity address of the congestion point related to the message.
-     * @param documentStatus {@link DocumentStatus} optional document status.
-     * @param validFrom {@link LocalDate} optional starting date of the period.
-     * @param validUntil {@link LocalDate} optional ending date of the period.
+     * @param usefIdentifier    {@link String} optional entity address of the congestion point related to the message.
+     * @param documentStatus    {@link DocumentStatus} optional document status.
+     * @param validFrom         {@link LocalDate} optional starting date of the period.
+     * @param validUntil        {@link LocalDate} optional ending date of the period.
      * @return a {@link List} of {@link PlanboardMessage}.
      */
     @SuppressWarnings("unchecked")
@@ -395,8 +395,8 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
      * Finds all the {@link PlanboardMessage} entities with the given document type, for a given period and related to a given
      * connection group.
      *
-     * @param documentType {@link DocumentType} of the message.
-     * @param period {@link LocalDate} period of the message.
+     * @param documentType   {@link DocumentType} of the message.
+     * @param period         {@link LocalDate} period of the message.
      * @param usefIdentifier {@link String} USEF identifier of the connection group of the message.
      * @return a {@link List} of {@link PlanboardMessage}.
      */
@@ -469,8 +469,8 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
     /**
      * Find all the planboard messages of a given type for a given participant with the specified origin sequence number.
      *
-     * @param originSequence {@link Long} Origin Sequence Number.
-     * @param documentType {@link DocumentType} document type of the planboard message.
+     * @param originSequence    {@link Long} Origin Sequence Number.
+     * @param documentType      {@link DocumentType} document type of the planboard message.
      * @param participantDomain {@link String} participant domain.
      * @return a {@link List} of {@link PlanboardMessage}.
      */
@@ -497,7 +497,7 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
      * Find all the planboard messages of a given type for a given document status with the specified origin sequence number.
      *
      * @param originSequence {@link Long} origin Sequence Number.
-     * @param documentType {@link DocumentType} document type of the planboard message.
+     * @param documentType   {@link DocumentType} document type of the planboard message.
      * @param documentStatus {@link DocumentStatus} document status.
      * @return the {@link PlanboardMessage} matching the requested parameters.
      */
@@ -525,9 +525,9 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
     /**
      * Find all the planboard messages of a given type for a given document status with a time period (startDate until endDate).
      *
-     * @param documentType {@link DocumentType} document type of the planboard message.
-     * @param startDate {@link LocalDate} starting date of the period.
-     * @param endDate {@link LocalDate} end date of the period.
+     * @param documentType   {@link DocumentType} document type of the planboard message.
+     * @param startDate      {@link LocalDate} starting date of the period.
+     * @param endDate        {@link LocalDate} end date of the period.
      * @param documentStatus {@link DocumentStatus} optional document status.
      * @return the {@link PlanboardMessage} matching the requested parameters.
      */
@@ -562,7 +562,7 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
      * (startDate - endDate).
      *
      * @param documentType The type of document, like request, offer or order.
-     * @param period The date of the planboard message
+     * @param period       The date of the planboard message
      * @return The list of {@link PlanboardMessage} which have a specific {@link DocumentType} and {@link DocumentStatus}.
      */
     @SuppressWarnings("unchecked")
@@ -587,7 +587,7 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
      * Finds A-Plans related to the flex offer.
      *
      * @param flexOfferSequenceNumber flex offer sequence number
-     * @param participantDomain participant domain
+     * @param participantDomain       participant domain
      * @return A-Plans related to the flex offer
      */
     public PlanboardMessage findAPlanRelatedToFlexOffer(Long flexOfferSequenceNumber, String participantDomain) {
@@ -632,7 +632,7 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
      * Find all the flex orders related to prognosis with sequence number and participain domain.
      *
      * @param prognosisSequenceNumber the sequence number of the prognosis
-     * @param participantDomain the participant domain
+     * @param participantDomain       the participant domain
      * @return a {@link List} of {@link PlanboardMessage} objects matching the requested parameters.
      */
     @SuppressWarnings("unchecked")
@@ -706,9 +706,9 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
     /**
      * Find Prognosis for period for connectionGroupIdentifier and/or ParticipantDomain.
      *
-     * @param date period ({@link LocalDate})
+     * @param date                      period ({@link LocalDate})
      * @param connectionGroupIdentifier (optional)
-     * @param participantDomain (optional)
+     * @param participantDomain         (optional)
      * @return A {@link List} of {@link PlanboardMessage} objects
      */
     @SuppressWarnings("unchecked")
@@ -742,7 +742,7 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
     /**
      * Find Prognosis for period for connectionGroupIdentifier.
      *
-     * @param date the period ({@link LocalDate})
+     * @param date                      the period ({@link LocalDate})
      * @param connectionGroupIdentifier (optional)
      * @return A {@link List} of {@link PlanboardMessage} objects
      */
@@ -766,10 +766,10 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
     /**
      * Find planboard messages.
      *
-     * @param sequence sequence number
-     * @param documentType the documenttype ({@link DocumentType})
+     * @param sequence          sequence number
+     * @param documentType      the documenttype ({@link DocumentType})
      * @param participantDomain the domain name of the participant
-     * @param congestionPoint congestion point entity address
+     * @param congestionPoint   congestion point entity address
      * @param documentStatusses one or more document statusses ({@link DocumentStatus})
      * @return A {@link List} of {@link PlanboardMessage} objects
      */
@@ -823,6 +823,7 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
                 .getResultList();
 
     }
+
     /**
      * Delete all {@link PlanboardMessage}s created for a specific period.
      *
@@ -830,10 +831,8 @@ public class PlanboardMessageRepository extends BaseRepository<PlanboardMessage>
      * @return the number of {@link PlanboardMessage}s deleted.
      */
     public int cleanup(LocalDate period) {
-        // TODO: maybe (also) consider expirationDate and/or creationDateTime?
-        StringBuilder sql = new StringBuilder();
-        sql.append("DELETE FROM PlanboardMessage pm WHERE pm.period = :period");
+        String sql = "DELETE FROM PlanboardMessage pm WHERE pm.period = :period";
 
-        return entityManager.createQuery(sql.toString()).setParameter("period", period.toDateMidnight().toDate()).executeUpdate();
+        return entityManager.createQuery(sql).setParameter("period", period.toDateMidnight().toDate()).executeUpdate();
     }
 }

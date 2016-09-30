@@ -264,13 +264,13 @@ public class CommonReferenceUpdateBusinessServiceTest {
     }
 
     /**
-     * Tests CommonReferenceUpdateBusinessService.getAggregatorByDomain method.
+     * Tests CommonReferenceUpdateBusinessService.findByDomain method.
      */
     @Test
     public void getAggregatorByDomainTest() {
         Aggregator expectedAggregator = new Aggregator(AGR_DOMAIN);
 
-        when(aggregatorRepository.getAggregatorByDomain(AGR_DOMAIN)).thenReturn(
+        when(aggregatorRepository.findByDomain(AGR_DOMAIN)).thenReturn(
                 expectedAggregator);
 
         Aggregator actualAggregator = service.getAggregatorByDomain(AGR_DOMAIN);
@@ -278,7 +278,7 @@ public class CommonReferenceUpdateBusinessServiceTest {
         Assert.assertEquals(expectedAggregator, actualAggregator);
 
         Mockito.verify(aggregatorRepository, Mockito.times(1))
-                .getAggregatorByDomain(AGR_DOMAIN);
+                .findByDomain(AGR_DOMAIN);
     }
 
     /**
@@ -430,7 +430,7 @@ public class CommonReferenceUpdateBusinessServiceTest {
                 true);
         List<String> errors = new ArrayList<>();
         Aggregator expectedAggregator = new Aggregator(AGR_DOMAIN);
-        when(aggregatorRepository.getAggregatorByDomain(AGR_DOMAIN)).thenReturn(expectedAggregator);
+        when(aggregatorRepository.findByDomain(AGR_DOMAIN)).thenReturn(expectedAggregator);
         ArgumentCaptor<Connection> captorConnection = ArgumentCaptor.forClass(Connection.class);
 
         // do the business call
@@ -451,7 +451,7 @@ public class CommonReferenceUpdateBusinessServiceTest {
                 false);
         List<String> errors = new ArrayList<>();
         Aggregator expectedAggregator = new Aggregator(AGR_DOMAIN);
-        when(aggregatorRepository.getAggregatorByDomain(AGR_DOMAIN)).thenReturn(expectedAggregator);
+        when(aggregatorRepository.findByDomain(AGR_DOMAIN)).thenReturn(expectedAggregator);
 
         Connection connection = new Connection();
         connection.setEntityAddress(CONNECTION_ENTITY_ADDRESS);
@@ -477,7 +477,7 @@ public class CommonReferenceUpdateBusinessServiceTest {
                 true);
         List<String> errors = new ArrayList<>();
         Aggregator expectedAggregator = new Aggregator(AGR_DOMAIN);
-        when(aggregatorRepository.getAggregatorByDomain(AGR_DOMAIN)).thenReturn(expectedAggregator);
+        when(aggregatorRepository.findByDomain(AGR_DOMAIN)).thenReturn(expectedAggregator);
 
         Connection connection = new Connection();
         connection.setEntityAddress(CONNECTION_ENTITY_ADDRESS);
@@ -503,7 +503,7 @@ public class CommonReferenceUpdateBusinessServiceTest {
         List<String> errors = new ArrayList<>();
         Aggregator initialAggregator = new Aggregator("intial.aggregator");
         Aggregator expectedAggregator = new Aggregator(AGR_DOMAIN);
-        when(aggregatorRepository.getAggregatorByDomain(AGR_DOMAIN)).thenReturn(expectedAggregator);
+        when(aggregatorRepository.findByDomain(AGR_DOMAIN)).thenReturn(expectedAggregator);
 
         Connection connection = mock(Connection.class);
         connection.setEntityAddress(CONNECTION_ENTITY_ADDRESS);
@@ -526,7 +526,7 @@ public class CommonReferenceUpdateBusinessServiceTest {
                 false);
         List<String> errors = new ArrayList<>();
         Aggregator initialAggregator = new Aggregator(AGR_DOMAIN);
-        when(aggregatorRepository.getAggregatorByDomain(AGR_DOMAIN)).thenReturn(initialAggregator);
+        when(aggregatorRepository.findByDomain(AGR_DOMAIN)).thenReturn(initialAggregator);
 
         Connection connection = new Connection();
         connection.setEntityAddress(CONNECTION_ENTITY_ADDRESS);

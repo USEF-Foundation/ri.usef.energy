@@ -58,9 +58,14 @@ public class DsoSettlementMessageResponseCoordinatorTest {
     @Test
     public void testProcessPtuSettlements() {
         PowerMockito.when(
-                businessService.findPlanboardMessagesWithOriginSequence(Matchers.any(Long.class),
+                businessService.findPlanboardMessagesWithOriginSequence(Matchers.eq(1L),
                         Matchers.eq(DocumentType.FLEX_ORDER_SETTLEMENT), Matchers.eq(AGGREGATOR_DOMAIN))).thenReturn(
                 buildPlanboardMessageList());
+        PowerMockito.when(
+                businessService.findPlanboardMessagesWithOriginSequence(Matchers.eq(2L),
+                        Matchers.eq(DocumentType.FLEX_ORDER_SETTLEMENT), Matchers.eq(AGGREGATOR_DOMAIN))).thenReturn(
+                buildPlanboardMessageList());
+
         dsoSettlementMessageResponseCoordinator.processPtuSettlements(buildOrderReferences(), DispositionAcceptedDisputed.DISPUTED,
                 AGGREGATOR_DOMAIN);
         Mockito.verify(businessService, Mockito.times(2))
@@ -75,7 +80,9 @@ public class DsoSettlementMessageResponseCoordinatorTest {
     }
 
     private List<PlanboardMessage> buildPlanboardMessageList() {
-        return Collections.singletonList(new PlanboardMessage());
+        PlanboardMessage planboardMessage = new PlanboardMessage();
+        planboardMessage.setDocumentStatus(DocumentStatus.SENT);
+        return Collections.singletonList(planboardMessage);
     }
 
     private List<Long> buildOrderReferences() {

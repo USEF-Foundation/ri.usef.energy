@@ -43,11 +43,11 @@ public class PrognosisUpdateDeviation {
     @Column(name = "PROGNOSIS_SEQUENCE", nullable = false)
     private Long prognosisSequence;
 
-    @Column(name = "PTU_DATE")
+    @Column(name = "PTU_DATE", nullable = false)
     @Temporal(TemporalType.DATE)
     private Date ptuDate;
 
-    @Column(name = "PTU_INDEX")
+    @Column(name = "PTU_INDEX", nullable = false)
     private Integer ptuIndex;
 
     @Column(name = "AGGREGATOR_DOMAIN", nullable = false)

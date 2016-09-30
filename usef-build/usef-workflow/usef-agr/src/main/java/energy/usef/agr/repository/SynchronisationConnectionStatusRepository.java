@@ -16,6 +16,7 @@
 
 package energy.usef.agr.repository;
 
+import energy.usef.agr.model.CommonReferenceOperator;
 import energy.usef.agr.model.SynchronisationConnection;
 import energy.usef.agr.model.SynchronisationConnectionStatus;
 import energy.usef.agr.model.SynchronisationConnectionStatusType;
@@ -54,4 +55,48 @@ public class SynchronisationConnectionStatusRepository extends BaseRepository<Sy
         entityManager.createQuery("DELETE FROM SynchronisationConnectionStatus").executeUpdate();
     }
 
+
+    /**
+     * Deletes all the {@link SynchronisationConnectionStatus} entities for a given {@link CommonReferenceOperator}.
+     *
+     * @param commonReferenceOperator an existing {@link CommonReferenceOperator}
+     */
+    public void deleteAll(CommonReferenceOperator commonReferenceOperator) {
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("DELETE FROM SynchronisationConnectionStatus ");
+        queryBuilder.append("WHERE commonReferenceOperator = :commonReferenceOperator ");
+
+        Query query = entityManager.createQuery(queryBuilder.toString());
+        query.setParameter("commonReferenceOperator", commonReferenceOperator);
+
+        query.executeUpdate();
+    }
+
+    /**
+     * Deletes all the {@link SynchronisationConnectionStatus} object for a {@Link CommonReferenceOperator}.
+     *
+     * @param commonReferenceOperator
+     */
+    public void deleteFor (CommonReferenceOperator commonReferenceOperator) {
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("DELETE FROM SynchronisationConnectionStatus scs ");
+        queryBuilder.append("WHERE scs.commonReferenceOperator = :commonReferenceOperator");
+
+        Query query = entityManager.createQuery(queryBuilder.toString());
+        query.setParameter("commonReferenceOperator", commonReferenceOperator).executeUpdate();
+    }
+
+    /**
+     * Deletes all the {@link SynchronisationConnectionStatus} object for a {@Link SynchronisationConnection}.
+     *
+     * @param synchronisationConnection
+     */
+    public void deleteFor (SynchronisationConnection synchronisationConnection) {
+        StringBuilder queryBuilder = new StringBuilder();
+        queryBuilder.append("DELETE FROM SynchronisationConnectionStatus scs ");
+        queryBuilder.append("WHERE scs.synchronisationConnection = :synchronisationConnection");
+
+        Query query = entityManager.createQuery(queryBuilder.toString());
+        query.setParameter("synchronisationConnection", synchronisationConnection).executeUpdate();
+    }
 }

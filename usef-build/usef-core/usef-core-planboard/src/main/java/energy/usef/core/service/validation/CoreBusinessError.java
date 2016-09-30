@@ -28,6 +28,8 @@ public enum CoreBusinessError implements BusinessError {
     INVALID_TIMEZONE("The Time zone is not the agreed value."),
     INVALID_CURRENCY("The Currency is not the agreed value."),
     INVALID_DOMAIN("The domain {} does not equal the expected {}."),
+    INVALID_DOMAIN_NAME("{} is not a valid domain name."),
+    INVALID_ENTITY_ADDRESS("{} is not a valid domain name."),
 
     DOCUMENT_EXIRED("{} with sequence number {} expired at {}"),
     RELATED_MESSAGE_NOT_FOUND("The message with sequence {} does not exist. "),
@@ -38,6 +40,7 @@ public enum CoreBusinessError implements BusinessError {
 
     NO_FLEX_OFFER_RELATED("Impossible to find a flex offer with the sequence {} for participant {}."),
     NO_PLAN_BOARD_MESSAGE_RELATED("Impossible to find a plan board message with the sequence {}."),
+    FLEX_OFFER_ALREADY_ORDERED("Flex Offer has already been ordered, can not be revoked {}."),
     FLEX_OFFER_HAS_PTU_IN_OPERATE_OR_LATER_PHASE(
             "The flex offer {} for participant {} has PTU {} in operate (or later) phase already."),
 

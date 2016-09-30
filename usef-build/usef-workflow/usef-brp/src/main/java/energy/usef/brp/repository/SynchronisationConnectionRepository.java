@@ -62,6 +62,40 @@ public class SynchronisationConnectionRepository extends BaseRepository<Synchron
     }
 
     /**
+     * Gets Synchronisation Connection entity by its entity address.
+     *
+     * @param entityAddress SynchronisationConnection entity address
+     *
+     * @return SynchronisationConnection entity
+     */
+    @SuppressWarnings("unchecked")
+    public SynchronisationConnection findByEntityAddress(String entityAddress) {
+
+        List<SynchronisationConnection> result = entityManager
+                .createQuery(
+                        "SELECT sc FROM SynchronisationConnection sc WHERE sc.entityAddress = :entityAddress")
+                .setParameter("entityAddress", entityAddress).getResultList();
+        if (result == null || result.isEmpty()) {
+            return null;
+        }
+        return result.get(0);
+    }
+
+    /**
+     * Deletes {@Link SynchronisationConnection} entity by its entity address.
+     *
+     * @param domain commonReferenceOperator domain
+     */
+    @SuppressWarnings("unchecked")
+    public void deleteByEntityAddress(String domain) {
+        SynchronisationConnection synchronisationConnection = findByEntityAddress(domain);
+        if (synchronisationConnection != null) {
+            entityManager.remove(synchronisationConnection);
+        }
+    }
+
+
+    /**
      * Deletes all {@link SynchronisationConnection} entities.
      */
     public void deleteAll() {

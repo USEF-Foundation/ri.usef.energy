@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>energy.usef</groupId>
 		<artifactId>usef-workflow</artifactId>
-		<version>1.3.5</version>
+		<version>1.3.6</version>
 	</parent>
 	<artifactId>usef-dso</artifactId>
 	<packaging>jar</packaging>
@@ -12,12 +12,12 @@
 		<dependency>
 			<groupId>energy.usef</groupId>
 			<artifactId>usef-core-workflow</artifactId>
-			<version>1.3.5</version>
+			<version>1.3.6</version>
 		</dependency>
 		<dependency>
 			<groupId>energy.usef</groupId>
 			<artifactId>usef-core-planboard</artifactId>
-			<version>1.3.5</version>
+			<version>1.3.6</version>
 		</dependency>
 	</dependencies>
 </project>
