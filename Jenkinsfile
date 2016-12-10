@@ -1,9 +1,6 @@
-def buildClosure = {
-    sh "./mvn clean install -DBUILD_NUMBER=${env.BUILD_NUMBER} -DBUILD_TIMESTAMP=${env.BUILD_TIMESTAMP} -DBRANCH_NAME=${env.BRANCH_NAME}"
+node {
+        stage "build USEF-RI"
+    	env.PATH = "${tool 'Maven'}/bin:${env.PATH}"
+    	checkout scm
+    	sh 'mvn clean deploy'
 }
-
-def buildParameterMap = [:]
-buildParameterMap['appName'] = 'usef-ri'
-buildParameterMap['buildClosure'] = buildClosure
-
-buildAndDeployGeneric(buildParameterMap)
