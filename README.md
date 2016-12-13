@@ -63,8 +63,10 @@ Join us on social media:
  - [LinkedIn](https://www.linkedin.com/company/usef-foundation)
  - [info@usef.energy](mailto:info@usef.energy)
 
-Visit us at [usef.energy](https://usef.energy/Home.aspx).
+Visit us on [usef.energy](https://usef.energy/Home.aspx).
+
 ---
+
 ## <a name="license"></a>License
 
 The USEF Reference Implementation is licensed under the [Apache License, Version 2.0](http://www.apache.org/licenses/).
