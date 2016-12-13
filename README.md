@@ -45,10 +45,16 @@ Check our [Changelog](CHANGELOG.md) to see recent changes.
     * Asynchronous and decoupled operations using message queues
 
 ### <a name="prerequisites"></a> Prerequisites
-[TBW]
+
+* Git
+* Oracle Java SE Development Kit 8 or OpenJDK JDK 8
+* Apache Maven version 3.2.3 or later
+* JBoss Wildfly 10.0.0.Final
+* H2 – JBoss Wildfly 10.0.0 Final is shipped with the H2 Database Engine version 1.3.173. This version contains bugs that prevents the USEF Reference Implementation from working correctly. Beta version 1.4.190 does not contain these bugs.
 
 ### <a name="how_to_install"></a> How to install
-[TBW]
+
+To build and run the USEF Reference Implementation you please read the complete [installation manual](https://github.com/USEF-Foundation/ri.usef.energy/blob/master/usef-doc/USEF%20The%20Framework%20Implemented%20-%20Installation%20Manual.docx).
 
 ### <a name="community"></a> Community
 
