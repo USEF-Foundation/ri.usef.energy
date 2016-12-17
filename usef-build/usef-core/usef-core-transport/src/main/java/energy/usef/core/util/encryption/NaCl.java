@@ -47,7 +47,7 @@ public class NaCl {
     }
 
     private static final class SingletonHolder {
-        public static final Sodium SODIUM_INSTANCE = LibraryLoader.create(Sodium.class).load(LIBRARY_NAME);
+        public static final Sodium SODIUM_INSTANCE = LibraryLoader.create(Sodium.class).search("/usr/local/lib").load(LIBRARY_NAME);
         static { // added to make sure library inits
             SODIUM_INSTANCE.sodium_init();
         }
