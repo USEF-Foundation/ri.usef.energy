@@ -260,7 +260,7 @@ Improved triggering of the re-optimize portfolio process. When one or more event
 #### MCM Validate ####
 The default PBC implementation of the creation of flex requests by the DSO has been changed. If multiple flex requests are created, the power values are divided amongst them (40/60). Note that the PBC interface is unchanged, and this does not affect custom PBC implementations.
 
- #### MCM Settlement  ####
+#### MCM Settlement  ####
 In the settlement process, the calculation of the delivered flex amount for a given PTU is modified, in order to properly settle flex transactions. The formula now used is according to the latest revision of USEF 2014:I.III, and can be referenced in the specification document..
 
 #### Enhancements and bug fixes ####
