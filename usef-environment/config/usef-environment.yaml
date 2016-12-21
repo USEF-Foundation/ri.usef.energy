@@ -395,8 +395,8 @@ nodes:
     - node: "localhost"
       address: "127.0.0.1"
       processes:
-        - domain-name: "cro1.usef-example.com"
-          cro-role:
+        - domain-name: "tst-usef.liander.nl"
+          dso-role:
               # Example on how the parent configuration item can be overwritten.
               # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
               # bypass_dns_verification: true
@@ -419,92 +419,3 @@ nodes:
               # This public key is used to decrypt incoming xml messages.
               public-encryption-key: "oJsWvumLo1PHdE3ij/sPiLeoiqtMnOZMEmPoz45pIZI="
               
-#        - domain-name: "agr.usef-example.com"
-#          agr-role:
-              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
-              # bypass_dns_verification: true
-              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
-              # bypass_tls_verification: true
-
-#        - domain-name: "brp.usef-example.com"
-#          brp-role:
-              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
-              # bypass_dns_verification: true
-              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
-              # bypass_tls_verification: true
-
-#        - domain-name: "cro.usef-example.com"
-#          cro-role:
-              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
-              # bypass_dns_verification: true
-              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
-              # bypass_tls_verification: true
-
-#        - domain-name: "dso.usef-example.com"
-#          dso-role:
-              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
-              # bypass_dns_verification: true
-              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
-              # bypass_tls_verification: true
-
-#        - domain-name: "mdc.usef-example.com"
-#          mdc-role:
-              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
-              # bypass_dns_verification: true
-              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
-              # bypass_tls_verification: true
-
-        - domain-name: "agr1.usef-example.com"
-          agr-role:
-              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
-              # bypass_dns_verification: true
-              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
-              # bypass_tls_verification: true
-              # Boolean indicating if aggregator is non-udi aggregator or not
-              agr_is_non_udi_aggregator: false
- 
-        - domain-name: "agr2.usef-example.com"
-          agr-role:
-              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
-              # bypass_dns_verification: true
-              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
-              # bypass_tls_verification: true
-              # Boolean indicating if aggregator is non-udi aggregator or not
-              agr_is_non_udi_aggregator: true
- 
-        - domain-name: "agr3.usef-example.com"
-          agr-role:
-              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
-              # bypass_dns_verification: true
-              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
-              # bypass_tls_verification: true
-              # Boolean indicating if aggregator is non-udi aggregator or not
-              agr_is_non_udi_aggregator: false
- 
-        - domain-name: "brp1.usef-example.com"
-          brp-role:
-              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
-              # bypass_dns_verification: true
-              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
-              # bypass_tls_verification: true
-
-        - domain-name: "brp2.usef-example.com"
-          brp-role:
-              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
-              # bypass_dns_verification: true
-              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
-              # bypass_tls_verification: true
-
-        - domain-name: "dso1.usef-example.com"
-          dso-role:
-              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
-              # bypass_dns_verification: true
-              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
-              # bypass_tls_verification: true
-
-        - domain-name: "mdc1.usef-example.com"
-          mdc-role:
-              # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
-              # bypass_dns_verification: true
-              # If you don't have proper SSL certificates for this participant yet, uncomment the following line:
-              # bypass_tls_verification: true
