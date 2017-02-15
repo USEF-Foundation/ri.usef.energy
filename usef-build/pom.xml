@@ -333,7 +333,7 @@
         <repository>
             <id>central</id>
             <name>Alliander-releases</name>
-            <url>http://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-snapshot</url>
+            <url>http://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-release</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
