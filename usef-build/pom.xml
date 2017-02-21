@@ -241,7 +241,7 @@
             <plugin>
                 <groupId>org.jfrog.buildinfo</groupId>
                 <artifactId>artifactory-maven-plugin</artifactId>
-                <version>2.6.1</version>
+                <version>2.2.0</version>
                 <inherited>false</inherited>
                 <executions>
                     <execution>
@@ -329,11 +329,43 @@
             </plugin>
         </plugins>
     </reporting>
+	
+	<repositories>
+		<repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>remote-repos</name>
+		 <url>http://artifactory.usef-dynamo.nl/artifactory/remote-repos</url>
+		</repository>
+		<repository>
+		   <id>dynamo-snapshot</id>
+		   <name>dynamo-snapshot</name>
+		   <url>http://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-snapshot</url>
+        </repository>
+		<repository>
+		   <id>dynamo-release</id>
+		   <name>dynamo-release</name>
+		   <url>http://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-release</url>
+        </repository>
+	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+			<id>central</id>
+			<name>remote-repos-plugins</name>
+		 <url>http://artifactory.usef-dynamo.nl/artifactory/remote-repos</url>
+		</pluginRepository>
+	</pluginRepositories>
+
     <distributionManagement>
         <repository>
             <id>central</id>
             <name>Alliander-releases</name>
-            <url>http://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-snapshot</url>
+            <url>http://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-release</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
