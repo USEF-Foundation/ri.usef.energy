@@ -18,10 +18,17 @@ package energy.usef.core.util.encryption;
 
 import energy.usef.core.util.VersionUtil;
 import jnr.ffi.LibraryLoader;
+import jnr.ffi.Platform;
 import jnr.ffi.annotations.In;
 import jnr.ffi.annotations.Out;
 import jnr.ffi.byref.LongLongByReference;
 import jnr.ffi.types.u_int64_t;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /***
  * NaCl class to load sodium.
@@ -49,6 +56,20 @@ public class NaCl {
     private static final class SingletonHolder {
         public static final Sodium SODIUM_INSTANCE = LibraryLoader.create(Sodium.class).search("/usr/local/lib").load(LIBRARY_NAME);
         static { // added to make sure library inits
+            final Logger LOGGER = LoggerFactory.getLogger(NaCl.class);
+
+            final String filename = "/usr/local/lib/" + LIBRARY_NAME;
+            File f = new File(filename);
+            if(f.exists() && !f.isDirectory()) {
+                LOGGER.info("File exists: " + filename);
+            } else {
+                LOGGER.error("File does not exist: " + filename);
+            }
+
+            List<String> paths = new ArrayList<String>();
+            paths.add("/usr/local/lib");
+            LOGGER.info("Library found: " + Platform.getNativePlatform().locateLibrary(LIBRARY_NAME, paths));
+
             SODIUM_INSTANCE.sodium_init();
         }
     }
