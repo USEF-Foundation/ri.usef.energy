@@ -47,7 +47,7 @@ Our unified coding guidelines and the descriptions of the most important technic
     * Package: `info.usef.core.service.endpoint.<...>` 
     * Name: `<Logical Name>Endpoint Example: info.usef.core.service.endpoint.MessageEndpoint`
 * Message Driven Beans:
-    * Package: `info.usef.core.service.mdb.<…> `
+    * Package: `info.usef.core.service.mdb.<â€¦> `
     * Name: `<Logical Name>MDB` 
     * Example: `info.usef.core.service.endpoint.MessageEndpoint`
 * Business services (business logic implementation)
@@ -55,7 +55,7 @@ Our unified coding guidelines and the descriptions of the most important technic
     * Name: `<Logical Name>BusinessService` 
     * Example: `info.usef.core.service.business. MessageBusinessService`
 * Some technical or helper services:
-    * Package: `info.usef.core.service.helper.<…> `
+    * Package: `info.usef.core.service.helper.<â€¦> `
     * Name: `<Logical Name>HelperService`
     * Example: `info.usef.core.service.jms.JMSHelperService`
 
@@ -132,7 +132,7 @@ Before you submit your pull request consider the following guidelines:
 * Make your changes in a new git branch:
 
     ```shell
-    git checkout -b my-fix-branch master
+    git checkout -b my-fix-branch develop
     ```
 
 * Create your patch.
@@ -150,6 +150,6 @@ Before you submit your pull request consider the following guidelines:
     git push origin my-fix-branch
     ```
 
-In GitHub, send a pull request to `ri.usef.energy:master`.
+In GitHub, send a pull request to `ri.usef.energy:develop`.
 
 That's it! Thank you for your contribution!
