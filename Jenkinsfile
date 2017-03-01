@@ -9,4 +9,6 @@ def buildParameterMap = [:]
 buildParameterMap['appName'] = 'ri.usef-dynamo.nl'
 buildParameterMap['buildClosure'] = buildClosure
 
+sh 'docker --version'
+
 buildAndDeployGeneric(buildParameterMap)
