@@ -257,7 +257,7 @@
                             <publisher>
                                 <contextUrl>https://artifactory.usef-dynamo.nl/artifactory</contextUrl>
                                 <username>admin</username>
-                                <password>DberXxxgsNzkCc75QWNW</password>
+                                <password>AP756xHYRjU1umhgbDjgEMxeVrh1HsKapkCiK5</password>
                                 <repoKey>dynamo-libs-release</repoKey>
                                 <snapshotRepoKey>dynamo-libs-snapshot</snapshotRepoKey>
                             </publisher>
