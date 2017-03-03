@@ -258,8 +258,8 @@
 								<contextUrl>https://artifactory.usef-dynamo.nl/artifactory</contextUrl>
 								<username>${env.ARTIFACTORY_USERNAME}</username>
 								<password>${env.ARTIFACTORY_PASSWORD}</password>
-								<repoKey>alliander-libs-release</repoKey>
-								<snapshotRepoKey>alliander-libs-snapshot</snapshotRepoKey>
+								<repoKey>dynamo-libs-release</repoKey>
+								<snapshotRepoKey>dynamo-libs-snapshot</snapshotRepoKey>
 							</publisher>
 						</configuration>
 					</execution>
@@ -364,12 +364,12 @@
     <distributionManagement>
         <repository>
             <id>central</id>
-            <name>Alliander-releases</name>
+            <name>dynamo-release</name>
             <url>https://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-release</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
-            <name>Alliander-snapshots</name>
+            <name>dynamo-snapshot</name>
             <url>https://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-snapshot</url>
         </snapshotRepository>
     </distributionManagement>
