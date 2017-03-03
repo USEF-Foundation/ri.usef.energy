@@ -238,33 +238,33 @@
                     <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.jfrog.buildinfo</groupId>
-                <artifactId>artifactory-maven-plugin</artifactId>
-                <version>2.2.0</version>
-                <inherited>false</inherited>
-                <executions>
-                    <execution>
-                        <id>build-info</id>
-                        <goals>
-                            <goal>publish</goal>
-                        </goals>
-                        <configuration>
-                            <deployProperties>
-                                <gradle>awesome</gradle>
-                                <review.team>qa</review.team>
-                            </deployProperties>
-                            <publisher>
-                                <contextUrl>https://artifactory.usef-dynamo.nl/artifactory</contextUrl>
-                                <username>admin</username>
-                                <password>AP756xHYRjU1umhgbDjgEMxeVrh1HsKapkCiK5</password>
-                                <repoKey>dynamo-libs-release</repoKey>
-                                <snapshotRepoKey>dynamo-libs-snapshot</snapshotRepoKey>
-                            </publisher>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+			<plugin>
+				<groupId>org.jfrog.buildinfo</groupId>
+				<artifactId>artifactory-maven-plugin</artifactId>
+				<version>2.6.1</version>
+				<inherited>false</inherited>
+				<executions>
+					<execution>
+						<id>build-info</id>
+						<goals>
+							<goal>publish</goal>
+						</goals>
+						<configuration>
+							<deployProperties>
+								<gradle>awesome</gradle>
+								<review.team>qa</review.team>
+							</deployProperties>
+							<publisher>
+								<contextUrl>https://artifactory.usef-dynamo.nl/artifactory</contextUrl>
+								<username>${env.ARTIFACTORY_USERNAME}</username>
+								<password>${env.ARTIFACTORY_PASSWORD}</password>
+								<repoKey>alliander-libs-release</repoKey>
+								<snapshotRepoKey>alliander-libs-snapshot</snapshotRepoKey>
+							</publisher>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
         </plugins>
         <pluginManagement>
             <plugins>
