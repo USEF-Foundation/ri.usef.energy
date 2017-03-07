@@ -18,19 +18,23 @@ pipeline {
 
     stage ('Build') {
       steps {
-        env.PATH = "${tool 'Maven'}/bin:${env.PATH}" //TODO: change me into desciptive form
-        sh 'cd usef-build && mvn clean deploy && cd ..' //TODO: change me into desciptive form
+        script {
+          env.PATH = "${tool 'Maven'}/bin:${env.PATH}" //TODO: change me into desciptive form
+          sh 'cd usef-build && mvn clean deploy && cd ..' //TODO: change me into desciptive form
+        }
       }
     }
 
     stage ('Docker Build & Push') {
       steps {
-        def branchName = env.BRANCH_NAME?.replaceAll("origin/", "")?.replaceAll("/", "_") //TODO: change me into desciptive form
-        def artifactName = branchName == "master"? "" : branchName + "-" //TODO: change me into desciptive form
-        artifactName += env.BUILD_TIMESTAMP //TODO: change me into desciptive form
-        def dockerImage = "${myArtifact}:${artifactName}" //TODO: change me into desciptive form
-        def dockerImageUrl = "${registryServer}/${dockerImage}" //TODO: change me into desciptive form
-        def registryServer = env.REGISTRY_SERVER //TODO: change me into desciptive form
+        script {
+          def branchName = env.BRANCH_NAME?.replaceAll("origin/", "")?.replaceAll("/", "_") //TODO: change me into desciptive form
+          def artifactName = branchName == "master"? "" : branchName + "-" //TODO: change me into desciptive form
+          artifactName += env.BUILD_TIMESTAMP //TODO: change me into desciptive form
+          def dockerImage = "${myArtifact}:${artifactName}" //TODO: change me into desciptive form
+          def dockerImageUrl = "${registryServer}/${dockerImage}" //TODO: change me into desciptive form
+          def registryServer = env.REGISTRY_SERVER //TODO: change me into desciptive form
+        }
 
         docker.withRegistry("https://${registryServer}") {
           def pcImg = docker.build("${dockerImage}")
@@ -41,16 +45,20 @@ pipeline {
 
     stage ("Deploy to dynamo-int") {
       steps {
-        def namespaceInt = env.NAMESPACE_INT //change me into desciptive form
-        def appName = 'ri.usef-dynamo.nl' //TODO: change me into desciptive form
+        script {
+          def namespaceInt = env.NAMESPACE_INT //change me into desciptive form
+          def appName = 'ri.usef-dynamo.nl' //TODO: change me into desciptive form
+        }
         //deploy(workingDir, appName, namespaceInt, dockerImageUrl)
       }
     }
 
     stage ("Deploy to dynamo-acc") {
       steps {
-        def namespaceAcc = env.NAMESPACE_ACC //TODO: change me into desciptive form
-        def appName = 'ri.usef-dynamo.nl' //TODO: change me into desciptive form
+        script {
+          def namespaceAcc = env.NAMESPACE_ACC //TODO: change me into desciptive form
+          def appName = 'ri.usef-dynamo.nl' //TODO: change me into desciptive form
+        }
         //deploy(workingDir, appName, namespaceAcc, dockerImageUrl)
       }
     }
