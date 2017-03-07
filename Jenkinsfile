@@ -23,7 +23,7 @@ pipeline {
       steps {
         script {
           //env.PATH = "${tool 'Maven'}/bin:${env.PATH}" //TODO: change me into descriptive form
-          sh env
+          sh 'env'
           sh 'cd usef-build && mvn clean deploy && cd ..' //TODO: change me into descriptive form
         }
       }
