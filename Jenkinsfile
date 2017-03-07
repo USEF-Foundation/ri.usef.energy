@@ -12,7 +12,7 @@ pipeline {
     stage ('Start') {
       steps {
         // send build started notifications
-        //sendNotifications 'STARTED'
+        sendNotifications 'STARTED'
       }
     }
 
@@ -34,6 +34,8 @@ pipeline {
           def dockerImage = "${myArtifact}:${artifactName}" //TODO: change me into desciptive form
           def dockerImageUrl = "${registryServer}/${dockerImage}" //TODO: change me into desciptive form
           def registryServer = env.REGISTRY_SERVER //TODO: change me into desciptive form
+          echo "registryServer: " + registryServer
+          echo "dockerImage: " + dockerImage
         }
 
         docker.withRegistry("https://${registryServer}") {
@@ -73,15 +75,17 @@ pipeline {
 
     stage ("Deploy to dynamo-prd") {
       steps {
-        def namespacePrd = env.NAMESPACE_PRD //change me into desciptive form //TODO: change me into desciptive form
-        def appName = 'ri.usef-dynamo.nl' //TODO: change me into desciptive form
+        script {
+          def namespacePrd = env.NAMESPACE_PRD //change me into desciptive form //TODO: change me into desciptive form
+          def appName = 'ri.usef-dynamo.nl' //TODO: change me into desciptive form
+        }
         //deploy(workingDir, appName, namespacePrd, dockerImageUrl)
       }
     }
   }
   post {
     always {
-      //sendNotifications currentBuild.result
+      sendNotifications currentBuild.result
     }
   }
 }
