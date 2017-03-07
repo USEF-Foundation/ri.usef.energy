@@ -25,7 +25,7 @@ pipeline {
       }
     }
 
-    stage ('Docker Build & Push') {
+    stage ('Docker Build & Push') { //TODO: remove me
       steps {
         script {
           def branchName = env.BRANCH_NAME?.replaceAll("origin/", "")?.replaceAll("/", "_") //TODO: change me into desciptive form
@@ -38,10 +38,10 @@ pipeline {
           echo "dockerImage: " + dockerImage
         }
 
-        docker.withRegistry("https://${registryServer}") {
-          def pcImg = docker.build("${dockerImage}")
-          pcImg.push();
-        }
+        //docker.withRegistry("https://${registryServer}") {
+        //  def pcImg = docker.build("usefdynamo/ri.usef-dynamo.nl") //TODO: make variable
+        //  pcImg.push();
+        //}
       }
     }
 
