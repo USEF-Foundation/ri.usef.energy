@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>energy.usef</groupId>
     <artifactId>usef-root-pom</artifactId>
-    <version>1.3.7-SNAPSHOT</version>
+    <version>1.3.8-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -238,33 +238,33 @@
                     <additionalparam>-Xdoclint:none</additionalparam>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.jfrog.buildinfo</groupId>
-                <artifactId>artifactory-maven-plugin</artifactId>
-                <version>2.2.0</version>
-                <inherited>false</inherited>
-                <executions>
-                    <execution>
-                        <id>build-info</id>
-                        <goals>
-                            <goal>publish</goal>
-                        </goals>
-                        <configuration>
-                            <deployProperties>
-                                <gradle>awesome</gradle>
-                                <review.team>qa</review.team>
-                            </deployProperties>
-                            <publisher>
-                                <contextUrl>http://artifactory.usef-dynamo.nl/artifactory</contextUrl>
-                                <username>${env.ARTIFACTORY_USERNAME}</username>
-                                <password>${env.ARTIFACTORY_PASSWORD}</password>
-                                <repoKey>dynamo-libs-release</repoKey>
-                                <snapshotRepoKey>dynamo-libs-snapshot</snapshotRepoKey>
-                            </publisher>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+			<plugin>
+				<groupId>org.jfrog.buildinfo</groupId>
+				<artifactId>artifactory-maven-plugin</artifactId>
+				<version>2.6.1</version>
+				<inherited>false</inherited>
+				<executions>
+					<execution>
+						<id>build-info</id>
+						<goals>
+							<goal>publish</goal>
+						</goals>
+						<configuration>
+							<deployProperties>
+								<gradle>awesome</gradle>
+								<review.team>qa</review.team>
+							</deployProperties>
+							<publisher>
+								<contextUrl>https://artifactory.usef-dynamo.nl/artifactory</contextUrl>
+								<username>${env.ARTIFACTORY_USERNAME}</username>
+								<password>${env.ARTIFACTORY_PASSWORD}</password>
+								<repoKey>dynamo-libs-release</repoKey>
+								<snapshotRepoKey>dynamo-libs-snapshot</snapshotRepoKey>
+							</publisher>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
         </plugins>
         <pluginManagement>
             <plugins>
@@ -337,17 +337,17 @@
 			</snapshots>
 			<id>central</id>
 			<name>remote-repos</name>
-		 <url>http://artifactory.usef-dynamo.nl/artifactory/remote-repos</url>
+		 <url>https://artifactory.usef-dynamo.nl/artifactory/remote-repos</url>
 		</repository>
 		<repository>
 		   <id>dynamo-snapshot</id>
 		   <name>dynamo-snapshot</name>
-		   <url>http://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-snapshot</url>
+		   <url>https://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-snapshot</url>
         </repository>
 		<repository>
 		   <id>dynamo-release</id>
 		   <name>dynamo-release</name>
-		   <url>http://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-release</url>
+		   <url>https://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-release</url>
         </repository>
 	</repositories>
 	<pluginRepositories>
@@ -357,20 +357,20 @@
 			</snapshots>
 			<id>central</id>
 			<name>remote-repos-plugins</name>
-		 <url>http://artifactory.usef-dynamo.nl/artifactory/remote-repos</url>
+		 <url>https://artifactory.usef-dynamo.nl/artifactory/remote-repos</url>
 		</pluginRepository>
 	</pluginRepositories>
 
     <distributionManagement>
         <repository>
             <id>central</id>
-            <name>Alliander-releases</name>
-            <url>http://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-release</url>
+            <name>dynamo-release</name>
+            <url>https://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-release</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
-            <name>Alliander-snapshots</name>
-            <url>http://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-snapshot</url>
+            <name>dynamo-snapshot</name>
+            <url>https://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-snapshot</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
