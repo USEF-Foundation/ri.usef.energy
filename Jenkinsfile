@@ -51,12 +51,14 @@ pipeline {
 
     stage ("Deploy to dynamo-int") {
       steps {
+        echo "..."
         //deploy(workingDir, 'ri.usef-dynamo.nl', env.NAMESPACE_INT, dockerImageUrl)
       }
     }
 
     stage ("Deploy to dynamo-acc") {
       steps {
+        echo "..."
         //deploy(workingDir, 'ri.usef-dynamo.nl', env.NAMESPACE_ACC, dockerImageUrl)
       }
     }
@@ -71,6 +73,7 @@ pipeline {
 
     stage ("Deploy to dynamo-prd") {
       steps {
+        echo "..."
         //deploy(workingDir, 'ri.usef-dynamo.nl', env.NAMESPACE_PRD, dockerImageUrl)
       }
     }
