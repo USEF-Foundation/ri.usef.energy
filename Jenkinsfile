@@ -1,5 +1,5 @@
 #!groovy
-@Library('dynamo-workflow-libs') _
+//@Library('dynamo-workflow-libs') _
 
 pipeline {
   agent any
