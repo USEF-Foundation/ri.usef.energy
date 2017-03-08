@@ -5,7 +5,7 @@ pipeline {
   agent any
   tools {
     maven 'Maven'
-    jdk 'OpenJDK 1.8u92'
+    //jdk 'OpenJDK 1.8u92'
   }
   environment {
     MAVEN_OPTS='-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true'
@@ -20,6 +20,7 @@ pipeline {
       steps {
         sendNotifications 'STARTED'
         sh 'env'
+        sh 'ls /usr/lib/jvm/'
       }
     }
 
