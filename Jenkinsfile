@@ -7,8 +7,7 @@ pipeline {
     maven 'Maven'
   }
   environment {
-    //MAVEN_OPTS='-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true'
-    MAVEN_OPTS='-Djavax.net.ssl.trustStore=$JENKINS_HOME/.keystore/cacerts -Djavax.net.ssl.keyStorePassword=changeit'
+    MAVEN_OPTS='-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true'
   }
   options {
     // Only keep the 10 most recent builds
@@ -20,7 +19,6 @@ pipeline {
       steps {
         sendNotifications 'STARTED'
         sh 'env'
-        sh 'ls /usr/lib/jvm/'
         //sh '''
         //  $JAVA_HOME/bin/keytool -import -v -trustcacerts \
         //  -alias server-alias -file server.cer \
