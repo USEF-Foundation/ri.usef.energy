@@ -24,9 +24,7 @@ pipeline {
 
     stage ('Build') {
       steps {
-        withMaven (maven: 'Maven',
-            mavenOpts="-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true") {
-
+        withMaven {
           sh 'cd usef-build && mvn clean deploy -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true && cd ..'
         }
       }
