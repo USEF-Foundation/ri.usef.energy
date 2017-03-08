@@ -21,6 +21,12 @@ pipeline {
         sendNotifications 'STARTED'
         sh 'env'
         sh 'ls /usr/lib/jvm/'
+        sh '''
+          $JAVA_HOME/bin/keytool -import -v -trustcacerts \
+          -alias server-alias -file server.cer \
+          -keystore $JAVA_HOME/lib/security/cacerts -keypass changeit \
+          -storepass changeit
+          '''
       }
     }
 
