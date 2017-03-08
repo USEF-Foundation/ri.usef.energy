@@ -7,7 +7,8 @@ pipeline {
     maven 'Maven'
   }
   environment {
-    MAVEN_OPTS='-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true'
+    //MAVEN_OPTS='-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true'
+    MAVEN_OPTS='-Djavax.net.ssl.trustStore=$JENKINS_HOME/.keystore/cacerts -Djavax.net.ssl.keyStorePassword=changeit'
   }
   options {
     // Only keep the 10 most recent builds
@@ -32,8 +33,7 @@ pipeline {
     stage ('Build') {
       steps {
         script {
-          sh 'export MAVEN_OPTS="-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true"'
-          sh 'cd usef-build && mvn clean deploy -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true && cd ..'
+          sh 'cd usef-build && mvn clean deploy && cd ..'
         }
       }
     }
