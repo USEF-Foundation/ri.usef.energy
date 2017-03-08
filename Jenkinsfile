@@ -8,6 +8,8 @@ pipeline {
   }
   environment {
     MAVEN_OPTS='-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true'
+    maven.wagon.http.ssl.insecure=true
+    maven.wagon.http.ssl.allowall=true
   }
   options {
     // Only keep the 10 most recent builds
@@ -20,12 +22,12 @@ pipeline {
         sendNotifications 'STARTED'
         sh 'env'
         sh 'ls /usr/lib/jvm/'
-        sh '''
-          $JAVA_HOME/bin/keytool -import -v -trustcacerts \
-          -alias server-alias -file server.cer \
-          -keystore $JAVA_HOME/lib/security/cacerts -keypass changeit \
-          -storepass changeit
-          '''
+        //sh '''
+        //  $JAVA_HOME/bin/keytool -import -v -trustcacerts \
+        //  -alias server-alias -file server.cer \
+        //  -keystore $JAVA_HOME/lib/security/cacerts -keypass changeit \
+        //  -storepass changeit
+        //  '''
       }
     }
 
