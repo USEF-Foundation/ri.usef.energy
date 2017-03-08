@@ -5,10 +5,10 @@ pipeline {
   agent any
   tools {
     maven 'Maven'
+    jdk 'OpenJDK 1.8u92'
   }
   environment {
     MAVEN_OPTS='-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true'
-    MAVEN_HOME='/root/tools/hudson.tasks.Maven_MavenInstallation/Maven'
   }
   options {
     // Only keep the 10 most recent builds
@@ -25,7 +25,7 @@ pipeline {
 
     stage ('Build') {
       steps {
-        withMaven {
+        script {
           sh 'cd usef-build && mvn clean deploy -Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true && cd ..'
         }
       }
