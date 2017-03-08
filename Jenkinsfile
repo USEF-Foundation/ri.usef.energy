@@ -8,6 +8,7 @@ pipeline {
   }
   environment {
     MAVEN_OPTS='-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true'
+    MAVEN_HOME='/root/tools/hudson.tasks.Maven_MavenInstallation/Maven'
   }
   options {
     // Only keep the 10 most recent builds
