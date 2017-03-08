@@ -255,7 +255,7 @@
 								<review.team>qa</review.team>
 							</deployProperties>
 							<publisher>
-								<contextUrl>https://artifactory.usef-dynamo.nl/artifactory</contextUrl>
+								<contextUrl>http://artifactory.usef-dynamo.nl/artifactory</contextUrl>
 								<username>${env.ARTIFACTORY_USERNAME}</username>
 								<password>${env.ARTIFACTORY_PASSWORD}</password>
 								<repoKey>dynamo-libs-release</repoKey>
@@ -337,17 +337,17 @@
 			</snapshots>
 			<id>central</id>
 			<name>remote-repos</name>
-		 <url>https://artifactory.usef-dynamo.nl/artifactory/remote-repos</url>
+		 <url>http://artifactory.usef-dynamo.nl/artifactory/remote-repos</url>
 		</repository>
 		<repository>
 		   <id>dynamo-snapshot</id>
 		   <name>dynamo-snapshot</name>
-		   <url>https://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-snapshot</url>
+		   <url>http://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-snapshot</url>
         </repository>
 		<repository>
 		   <id>dynamo-release</id>
 		   <name>dynamo-release</name>
-		   <url>https://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-release</url>
+		   <url>http://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-release</url>
         </repository>
 	</repositories>
 	<pluginRepositories>
@@ -357,7 +357,7 @@
 			</snapshots>
 			<id>central</id>
 			<name>remote-repos-plugins</name>
-		 <url>https://artifactory.usef-dynamo.nl/artifactory/remote-repos</url>
+		 <url>http://artifactory.usef-dynamo.nl/artifactory/remote-repos</url>
 		</pluginRepository>
 	</pluginRepositories>
 
@@ -365,12 +365,12 @@
         <repository>
             <id>central</id>
             <name>dynamo-release</name>
-            <url>https://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-release</url>
+            <url>http://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-release</url>
         </repository>
         <snapshotRepository>
             <id>snapshots</id>
             <name>dynamo-snapshot</name>
-            <url>https://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-snapshot</url>
+            <url>http://artifactory.usef-dynamo.nl/artifactory/dynamo-libs-snapshot</url>
         </snapshotRepository>
     </distributionManagement>
 </project>
