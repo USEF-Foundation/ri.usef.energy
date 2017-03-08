@@ -2,7 +2,7 @@
 @Library('dynamo-workflow-libs') _
 
 pipeline {
-  agent any
+  agent none
   tools {
     maven 'Maven'
   }
@@ -16,19 +16,15 @@ pipeline {
   stages {
 
     stage ('Start') {
+      agent any
       steps {
         sendNotifications 'STARTED'
         sh 'env'
-        //sh '''
-        //  $JAVA_HOME/bin/keytool -import -v -trustcacerts \
-        //  -alias server-alias -file server.cer \
-        //  -keystore $JAVA_HOME/lib/security/cacerts -keypass changeit \
-        //  -storepass changeit
-        //  '''
       }
     }
 
     stage ('Build') {
+      agent any
       steps {
         script {
           sh 'cd usef-build && mvn clean deploy && cd ..'
