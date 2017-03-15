@@ -18,7 +18,6 @@ pipeline {
     stage ('Start') {
       agent any
       steps {
-        sendNotifications 'STARTED'
         sh 'env'
       }
     }
@@ -32,10 +31,21 @@ pipeline {
       }
     }
 
+    stage('SonarQube analysis') {
+      agent none
+      withSonarQubeEnv('My SonarQube Server') {
+        sh 'cd usef-build && mvn sonar:sonar && cd ..'
+      }
+      //TODO: add waitForQualityGate to hold the pipeline until sonarqube finished scanning
+    }
+
   }
   post {
-    always {
-      sendNotifications currentBuild.result
+    failure {
+      sendNotifications 'FAILURE'
+    }
+    unstable {
+      sendNotifications 'UNSTABLE'
     }
   }
 }
