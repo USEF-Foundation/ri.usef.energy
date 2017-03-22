@@ -25,22 +25,18 @@ pipeline {
         maven 'Maven'
       }
       steps {
-        script {
-          sh 'cd usef-build && mvn clean deploy && cd ..'
+        withSonarQubeEnv('My SonarQube Server') {
+          sh 'cd usef-build && mvn clean verify sonar:sonar deploy -Dsonar.host.url=$SONARQUBE_URL && cd ..'
         }
       }
     }
 
-    stage('SonarQube analysis') {
-      agent any
-      tools {
-        maven 'Maven'
-      }
-      steps {
-        withSonarQubeEnv('My SonarQube Server') {
-          sh 'cd usef-build && mvn clean verify sonar:sonar -Dsonar.host.url=$SONARQUBE_URL && cd ..'
+    stage("Quality Gate"){
+      timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+        def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
+        if (qg.status != 'OK') {
+          error "Pipeline aborted due to quality gate failure: ${qg.status}"
         }
-        //TODO: add waitForQualityGate to hold the pipeline until sonarqube finished scanning
       }
     }
 
