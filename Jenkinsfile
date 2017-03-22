@@ -32,7 +32,7 @@ pipeline {
     }
 
     stage('SonarQube analysis') {
-      agent none
+      agent any
       tools {
         maven 'Maven'
       }
