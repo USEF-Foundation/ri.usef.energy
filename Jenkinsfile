@@ -3,9 +3,6 @@
 
 pipeline {
   agent none
-  tools {
-    maven 'Maven'
-  }
   environment {
     MAVEN_OPTS='-Dmaven.wagon.http.ssl.insecure=true -Dmaven.wagon.http.ssl.allowall=true -Dmaven.wagon.http.ssl.ignore.validity.dates=true'
   }
@@ -24,6 +21,9 @@ pipeline {
 
     stage ('Build') {
       agent any
+      tools {
+        maven 'Maven'
+      }
       steps {
         script {
           sh 'cd usef-build && mvn clean deploy && cd ..'
@@ -33,6 +33,9 @@ pipeline {
 
 //    stage('SonarQube analysis') {
 //      agent none
+//      tools {
+//        maven 'Maven'
+//      }
 //      withSonarQubeEnv('My SonarQube Server') {
 //        sh 'cd usef-build && mvn sonar:sonar && cd ..'
 //      }
