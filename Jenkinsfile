@@ -38,7 +38,7 @@ pipeline {
       }
       steps {
         withSonarQubeEnv('My SonarQube Server') {
-          sh 'cd usef-build && mvn clean verify sonar:sonar && cd ..'
+          sh 'cd usef-build && mvn clean verify sonar:sonar -Dsonar.host.url=$SONARQUBE_URL && cd ..'
         }
         //TODO: add waitForQualityGate to hold the pipeline until sonarqube finished scanning
       }
