@@ -26,16 +26,16 @@ pipeline {
       }
       steps {
         withSonarQubeEnv('My SonarQube Server') {
-          sh 'cd usef-build && mvn clean verify sonar:sonar deploy -Dsonar.host.url=$SONARQUBE_URL && cd ..'
+          sh 'cd usef-build && mvn clean verify sonar:sonar deploy -Dsonar.host.url=$SONARQUBE_URL -Dsonar.scm.provider=git && cd ..'
         }
       }
     }
 
     stage("Quality Gate"){
-      agent none
+      agent any
       steps {
-        script {
-          timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+        timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
+          script {
             def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
             if (qg.status != 'OK') {
               error "Pipeline aborted due to quality gate failure: ${qg.status}"
