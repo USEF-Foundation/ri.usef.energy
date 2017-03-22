@@ -37,12 +37,10 @@ pipeline {
         maven 'Maven'
       }
       steps {
-        script {
-          withSonarQubeEnv('My SonarQube Server') {
-            sh 'cd usef-build && mvn clean verify sonar:sonar && cd ..'
-          }
-          //TODO: add waitForQualityGate to hold the pipeline until sonarqube finished scanning
+        withSonarQubeEnv('My SonarQube Server') {
+          sh 'cd usef-build && mvn clean verify sonar:sonar && cd ..'
         }
+        //TODO: add waitForQualityGate to hold the pipeline until sonarqube finished scanning
       }
     }
 
