@@ -31,16 +31,16 @@ pipeline {
       }
     }
 
-//    stage('SonarQube analysis') {
-//      agent none
-//      tools {
-//        maven 'Maven'
-//      }
-//      withSonarQubeEnv('My SonarQube Server') {
-//        sh 'cd usef-build && mvn sonar:sonar && cd ..'
-//      }
-//      //TODO: add waitForQualityGate to hold the pipeline until sonarqube finished scanning
-//    }
+    stage('SonarQube analysis') {
+      agent none
+      tools {
+        maven 'Maven'
+      }
+      withSonarQubeEnv('My SonarQube Server') {
+        sh 'cd usef-build && mvn clean verify sonar:sonar && cd ..'
+      }
+      //TODO: add waitForQualityGate to hold the pipeline until sonarqube finished scanning
+    }
 
   }
   post {
