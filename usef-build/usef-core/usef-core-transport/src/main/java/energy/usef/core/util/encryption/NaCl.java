@@ -63,7 +63,7 @@ public class NaCl {
             if(f.exists() && !f.isDirectory()) {
                 LOGGER.info("File exists: " + filename);
             } else {
-                LOGGER.error("File does not exist: " + filename);
+                LOGGER.debug("File does not exist: " + filename);
             }
 
             List<String> paths = new ArrayList<String>();
