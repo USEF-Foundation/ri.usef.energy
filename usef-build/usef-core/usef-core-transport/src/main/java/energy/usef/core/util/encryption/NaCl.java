@@ -40,7 +40,7 @@ public class NaCl {
     /**
      * Creates a sodium instance.
      *
-     * @return a sodium instance as singleton.
+     * @return a sodium instancle as singleton.
      */
     public static Sodium sodium() {
         Sodium sodium = SingletonHolder.SODIUM_INSTANCE;
