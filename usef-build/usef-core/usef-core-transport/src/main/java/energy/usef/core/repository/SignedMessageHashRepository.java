@@ -47,7 +47,7 @@ public class SignedMessageHashRepository extends BaseRepository<SignedMessageHas
     public boolean isSignedMessageHashAlreadyPresent(byte[] hashedContent) {
         Long signedMessageHashes = (Long) entityManager
                 .createQuery("SELECT COUNT(smh) FROM SignedMessageHash smh WHERE smh.hashedContent = :hashedContent")
-                .setParameter("hashedContent", hashedContent)
+                .setParameterList("hashedContent", hashedContent)
                 .getSingleResult();
         return signedMessageHashes != null && signedMessageHashes == 1;
 
