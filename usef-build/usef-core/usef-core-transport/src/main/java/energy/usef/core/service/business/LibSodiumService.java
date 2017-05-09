@@ -23,8 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.PostConstruct;
+import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.ejb.Timer;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
@@ -37,12 +39,16 @@ public class LibSodiumService {
     private static final Logger LOGGER = LoggerFactory.getLogger(LibSodiumService.class);
 
     /**
-     * Initialize a bean after the instance has been constructed.
+     * Initialize NaCl Sodium library. Sometimes this one is timed out and the deployment is
+     * canceled.
+     * @param timer of the event which is fired at once.
      */
-    @PostConstruct
-    public void initBean() {
-        LOGGER.info("Check if the libsodium can be loaded during startup.");
+    @Schedule(hour = "*", minute = "*", persistent = false)
+    protected void init(Timer timer) {
+        LOGGER.info("Check if the Libsodium can be loaded during startup.");
         NaCl.sodium();
-    }
 
+        // Timer is canceled to prevent it is thrown again.
+        timer.cancel();
+    }
 }

@@ -71,6 +71,7 @@ public class NaCl {
             LOGGER.info("Library found: " + Platform.getNativePlatform().locateLibrary(LIBRARY_NAME, paths));
 
             SODIUM_INSTANCE.sodium_init();
+            LOGGER.info("Finished initializing Sodium.");
         }
     }
 
