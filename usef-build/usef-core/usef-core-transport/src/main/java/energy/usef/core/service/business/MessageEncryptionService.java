@@ -68,7 +68,9 @@ public class MessageEncryptionService {
         if (!Base64.isBase64(sealedMessage)) {
             throw new BusinessException(MessageEncryptionError.EXPECTED_BASE64_SEALED_MESSAGE);
         }
-        requireNonNull(b64PublicKey);
+        if (b64PublicKey == null) {
+            throw new NullPointerException("Base 64 Public Key is null (b64PublicKey).");
+        }
         if (!Base64.isBase64(b64PublicKey)) {
             throw new BusinessException(MessageEncryptionError.EXPECTED_BASE64_PUBLIC_KEY);
         }
