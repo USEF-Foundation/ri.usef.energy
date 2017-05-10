@@ -101,6 +101,8 @@ public class SenderService {
         LOGGER.debug("Started sending message");
         LOGGER_CONFIDENTIAL.debug("Trying to send message {} ", xmlString);
 
+        LOGGER.info("Sending message {}", xmlString);
+
         Message dtoMessage = (Message) XMLUtil
                 .xmlToMessage(xmlString, config.getBooleanProperty(ConfigParam.VALIDATE_OUTGOING_XML).booleanValue());
         energy.usef.core.model.Message storedMessage = messageService.storeMessage(xmlString, dtoMessage, MessageDirection.OUTBOUND);

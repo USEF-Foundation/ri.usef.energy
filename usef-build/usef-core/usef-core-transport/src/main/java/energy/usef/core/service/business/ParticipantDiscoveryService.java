@@ -121,6 +121,9 @@ public class ParticipantDiscoveryService {
         String senderDomain = incomingMessage.getSenderDomain();
         USEFRole senderRole = incomingMessage.getSenderRole();
 
+        LOGGER.info("Signed message received from {} for role {}: {}", senderDomain, senderRole,
+                incomingMessage.getBody());
+
         if (byPassDNSCheck()) {
             checkSenderDomainAndRoleAvailable(incomingMessage);
             value = findLocalParticipantUnsigningPublicKey(senderDomain, senderRole);
