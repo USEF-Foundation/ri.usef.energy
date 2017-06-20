@@ -27,6 +27,8 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.ejb.Lock;
+import javax.ejb.LockType;
 import javax.ejb.Startup;
 import javax.ejb.Singleton;
 
@@ -38,6 +40,8 @@ import org.slf4j.LoggerFactory;
  *
  */
 @Startup
+@Singleton
+@Lock(LockType.READ)
 public class Config extends AbstractConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
