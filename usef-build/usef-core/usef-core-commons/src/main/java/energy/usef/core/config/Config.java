@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
  *
  */
 @Startup
-@Singleton
 public class Config extends AbstractConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Config.class);
