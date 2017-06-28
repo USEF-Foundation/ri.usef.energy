@@ -58,11 +58,11 @@ keystore_private_key_password: usef1234
 
 # If this participant sends an xml message, it will be send to the RECIPIENT_ENDPOINT. The URL contains of a host, port
 # (defined in the participants_dns_info.yaml file) and a path, which is defined by the RECIPIENT_ENDPOINT.
-# e.g. localhost:8080/dso/USEF/2015/ReceiverService/receiveMessage
-# where /USEF/2015/ReceiverService/receiveMessage is the configured RECIPIENT_ENDPOINT.
+# e.g. localhost:8080/dso/USEF/2015/SignedMessage
+# where /USEF/2015/SignedMessage is the configured RECIPIENT_ENDPOINT.
 # If this value is missing, the USEF-compliant URL will be used. In that case a proxy server is required.
 # See "USEF Reference Implementation Installation Manual".
-recipient_endpoint: '/USEF/2015/ReceiverService/receiveMessage'
+recipient_endpoint: '/USEF/2015/SignedMessage'
 
 # Comma-separated http error codes for which a send request should be retried. When a message is send to a participant and
 # an HTTP error code is received, the message will be send again.

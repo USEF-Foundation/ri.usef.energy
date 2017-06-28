@@ -74,7 +74,7 @@ import energy.usef.core.service.business.error.ParticipantDiscoveryError;
 @PrepareForTest({ ReceiverEndpoint.class, IncomingMessageVerificationService.class, KeystoreHelperService.class })
 public class ReceiverEndpointTest extends BaseResourceTest {
 
-    private static final String URL = "/ReceiverService/receiveMessage";
+    private static final String URL = "/SignedMessage";
     private static final String BAD_URL = "/hsqsfqhgsfqgs";
     private static final String TEST_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><TestMessage><MessageMetadata SenderDomain=\"agr.usef-example.com\" SenderRole=\"AGR\" RecipientDomain=\"cro.usef-example.com\" RecipientRole=\"CRO\" TimeStamp=\"2015-02-05T14:08:33.687\" MessageID=\"12345678-1234-1234-1234-1234567890ab\" ConversationID=\"12345678-1234-1234-1234-1234567890ab\" Precedence=\"Routine\" ValidUntil=\"2015-02-05T14:08:33.687\"/></TestMessage>";
 
