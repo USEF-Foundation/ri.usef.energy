@@ -67,11 +67,11 @@ public class PowerMatcher {
     private static final int RETRY_DELAY_MS = 1000;
     private static final String POWER_MATCHER_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
-    private static final String ENDPOINT_BALANCE_RESPONSIBLE_PARTY = "/rest/clustermanagement/brp";
-    private static final String ENDPOINT_CONGESTION_POINT = "/rest/clustermanagement/congestionpoint";
-    private static final String ENDPOINT_CONNECTION = "/rest/clustermanagement/connection";
-    private static final String ENDPOINT_OBJECTIVE_AGENT = "/rest/objectiveagent";
-    private static final String ENDPOINT_CONGESTION_MANAGEMENT = "/rest/congestionmanagement";
+    private static final String ENDPOINT_BALANCE_RESPONSIBLE_PARTY = "/USEF/2015/clustermanagement/brp";
+    private static final String ENDPOINT_CONGESTION_POINT = "/USEF/2015/clustermanagement/congestionpoint";
+    private static final String ENDPOINT_CONNECTION = "/USEF/2015/clustermanagement/connection";
+    private static final String ENDPOINT_OBJECTIVE_AGENT = "/USEF/2015/objectiveagent";
+    private static final String ENDPOINT_CONGESTION_MANAGEMENT = "/USEF/2015/congestionmanagement";
 
     private static ObjectMapper objectMapper;
     private static Client client;

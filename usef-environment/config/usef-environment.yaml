@@ -56,13 +56,13 @@ keystore_private_key_password: usef1234
 # Settings for sending / receiving messages.
 ##########################################################################################################################
 
-# If this participant sends an xml message, it will be send to the RECIPIENT_ENDPOINT. The URL contains of a host, port 
+# If this participant sends an xml message, it will be send to the RECIPIENT_ENDPOINT. The URL contains of a host, port
 # (defined in the participants_dns_info.yaml file) and a path, which is defined by the RECIPIENT_ENDPOINT.
-# e.g. localhost:8080/dso/rest/ReceiverService/receiveMessage
-# where /rest/ReceiverService/receiveMessage is the configured RECIPIENT_ENDPOINT.
+# e.g. localhost:8080/dso/USEF/2015/ReceiverService/receiveMessage
+# where /USEF/2015/ReceiverService/receiveMessage is the configured RECIPIENT_ENDPOINT.
 # If this value is missing, the USEF-compliant URL will be used. In that case a proxy server is required.
 # See "USEF Reference Implementation Installation Manual".
-recipient_endpoint: '/rest/ReceiverService/receiveMessage'
+recipient_endpoint: '/USEF/2015/ReceiverService/receiveMessage'
 
 # Comma-separated http error codes for which a send request should be retried. When a message is send to a participant and
 # an HTTP error code is received, the message will be send again.
@@ -75,7 +75,7 @@ max_error_message_length: 255
 ##########################################################################################################################
 # Configuration file locations
 ##########################################################################################################################
-# Name of the file of the participants and their DNS which is located in the configuration folder. When the participant 
+# Name of the file of the participants and their DNS which is located in the configuration folder. When the participant
 # is not in the file, the messages from/to the participant are not accepted.
 participant_dns_info_filename: participants_dns_info.yaml
 
@@ -88,7 +88,7 @@ sender_allow_list_forced: false
 # The file is ignored if sender_allow_list_forced is set to 'false'.
 sender_allow_list_filename: transport-allowlist.yaml
 
-# Name of file containing the list of participants whose messages will be rejected. 
+# Name of file containing the list of participants whose messages will be rejected.
 # Messages from participants that are on both the allow list and the deny list will not be accepted.
 sender_deny_list_filename: transport-denylist.yaml
 
@@ -227,7 +227,7 @@ dso_initiate_collect_orange_regime_data_time: '12:00'
 ##########################################################################################################################
 # CRO Properties
 ##########################################################################################################################
-# Common reference mode which can be set on OPEN or CLOSED. In closed mode, participants will need to be pre-configured 
+# Common reference mode which can be set on OPEN or CLOSED. In closed mode, participants will need to be pre-configured
 # in the CRO's database in order for updates to be accepted.
 common_reference_mode: OPEN
 
@@ -356,7 +356,7 @@ validate_incoming_xml: true
 # If you want to run the PBC Feeder in the USEF environment, the following endpoint is used.
 # All reference participants need the PBC feeder for feeding the stub PBCs.
 # So, when this is commented out, the stub PBCs won't work correctly.
-pbc_feeder_endpoint: http://localhost:8080/usef-pbcfeeder/rest/PBCFeeder  
+pbc_feeder_endpoint: http://localhost:8080/usef-pbcfeeder/USEF/2015/PBCFeeder
 
 # Generate a database per participant or one for all participants.
 per_participant_database : true
@@ -384,7 +384,7 @@ service_node: "localhost"
 # If configuration items are not listed in this file, the participant will fallback to its default. During startup of
 # the application server, the configuration items (properties) are displayed.
 
-# Participants can be added to the environment by copying sections. Make sure that each section has a unique domain-name. 
+# Participants can be added to the environment by copying sections. Make sure that each section has a unique domain-name.
 # For example, an additional aggregator role can be added by adding:
 # - domain-name: "agr02.usef-example.com"
 #      agr-role:
@@ -404,7 +404,7 @@ nodes:
               # bypass_tls_verification: true
 
               # This private key is used to sign the xml message which is send to another participant. Never give
-              # this private key to anybody. 
+              # this private key to anybody.
               private-signing-key: "QRRb5Q+mq7HI7CaoAd7sWmXoo6uxNiwpyWGJa/TEGsqmOh3cfshlw3UdW9Hz+xPg+1Sq0jCBLBeAQaY8Zddhcw=="
 
               # This public key is used to verify incoming xml messages to verify if the xml messages comes from the
@@ -418,4 +418,3 @@ nodes:
 
               # This public key is used to decrypt incoming xml messages.
               public-encryption-key: "oJsWvumLo1PHdE3ij/sPiLeoiqtMnOZMEmPoz45pIZI="
-              
