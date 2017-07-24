@@ -85,6 +85,7 @@ public class PbcFeederClient {
         String pbcEndpoint = config.getProperty(ConfigPbcFeederParam.PBC_FEEDER_ENDPOINT) + "/powerLimit/" + congestionPointId;
         LOGGER.info("Trying to connect to {}", pbcEndpoint);
 
+
         String value = get(pbcEndpoint);
         ObjectMapper mapper = new ObjectMapper();
         try {
