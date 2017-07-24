@@ -26,7 +26,8 @@ pipeline {
       }
       steps {
         withSonarQubeEnv('My SonarQube Server') {
-          sh 'cd usef-build && mvn clean verify sonar:sonar deploy -Dsonar.host.url=$SONARQUBE_URL && cd ..'
+//          sh 'cd usef-build && mvn clean verify sonar:sonar deploy -Dsonar.host.url=$SONARQUBE_URL && cd ..'
+          sh 'cd usef-build && mvn clean deploy && cd ..'
         }
       }
     }
