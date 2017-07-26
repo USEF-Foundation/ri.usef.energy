@@ -59,6 +59,7 @@ public class PbcFeederClient {
     public List<PbcStubDataDto> getPbcStubDataList(LocalDate date, int ptuIndex, int amount) {
         String pbcEndpoint =
                 config.getProperty(ConfigPbcFeederParam.PBC_FEEDER_ENDPOINT) + "/ptu/" + date.toString() + "/" + ptuIndex + "/" + amount;
+        LOGGER.info("Retrieve PBC Stub Data list on url {}", pbcEndpoint);
 
         String value = get(pbcEndpoint);
         ObjectMapper mapper = new ObjectMapper();
@@ -82,6 +83,7 @@ public class PbcFeederClient {
      */
     public List<BigDecimal> getCongestionPointPowerLimits(Integer congestionPointId) {
         String pbcEndpoint = config.getProperty(ConfigPbcFeederParam.PBC_FEEDER_ENDPOINT) + "/powerLimit/" + congestionPointId;
+        LOGGER.info("Retrieve congestionpoint power limits on url {}", pbcEndpoint);
         String value = get(pbcEndpoint);
         ObjectMapper mapper = new ObjectMapper();
         try {

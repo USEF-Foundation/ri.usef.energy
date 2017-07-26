@@ -94,6 +94,7 @@ public class WorkflowStepLoader {
                 if (StringUtils.isEmpty((String)entry.getValue())) {
                     LOGGER.error("Invalid configuration for WorkflowStep {}, class name can not be empty.", entry.getKey());
                 }
+                LOGGER.info("Loading class: {}", entry.getKey());
                 Class<WorkflowStep> clazz = (Class<WorkflowStep>) Class.forName((String) entry.getValue());
 
                 if (!hasWorkflowStepInterface(clazz)) {
