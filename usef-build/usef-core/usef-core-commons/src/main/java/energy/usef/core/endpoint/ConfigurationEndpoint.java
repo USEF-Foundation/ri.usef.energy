@@ -1,7 +1,7 @@
 package energy.usef.core.endpoint;
 
-import energy.usef.core.config.AbstractConfig;
 import energy.usef.core.config.ConfigParam;
+import energy.usef.core.config.DefaultConfig;
 import energy.usef.core.util.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,7 @@ public class ConfigurationEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationEndpoint.class);
 
     @Inject
-    protected AbstractConfig config;
+    protected DefaultConfig config;
 
     /**
      * Endpoint to get a {@Link Properties} object containing the default configuration.
