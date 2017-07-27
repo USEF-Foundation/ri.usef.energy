@@ -23,6 +23,7 @@ import static energy.usef.core.data.xml.bean.message.MessagePrecedence.TRANSACTI
 import java.util.Comparator;
 import java.util.List;
 
+import java.util.Optional;
 import javax.ejb.Asynchronous;
 import javax.ejb.Lock;
 import javax.ejb.LockType;
@@ -103,7 +104,8 @@ public class DsoCreateFlexRequestCoordinator {
      */
     @Asynchronous
     @Lock(LockType.WRITE)
-    public void createFlexRequests(@Observes(during = TransactionPhase.AFTER_COMPLETION) CreateFlexRequestEvent event) throws BusinessValidationException {
+    public void createFlexRequests(@Observes(during = TransactionPhase.AFTER_COMPLETION) CreateFlexRequestEvent event)
+            throws BusinessValidationException {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
         eventValidationService.validateEventPeriodTodayOrInFuture(event);
 
@@ -142,7 +144,8 @@ public class DsoCreateFlexRequestCoordinator {
                 flexRequestMessage.getMessageMetadata().setConversationID(MessageMetadataBuilder.uuid());
                 flexRequestMessage.getMessageMetadata().setMessageID(MessageMetadataBuilder.uuid());
 
-                Long prognosisSequence = findRelatedPrognosisSequenceForFlexRequest(gridSafetyAnalysis, aggregator.getDomain());
+                Long prognosisSequence = findRelatedPrognosisSequenceForFlexRequest(gridSafetyAnalysis,
+                        aggregator.getDomain());
                 if (prognosisSequence == null) {
                     LOGGER.warn("No prognosis has been found for the aggregator {}. The flex request will not be sent.",
                             aggregator.getDomain());
@@ -152,8 +155,9 @@ public class DsoCreateFlexRequestCoordinator {
                 flexRequestMessage.setPrognosisOrigin(aggregator.getDomain());
                 flexRequestMessage.setPrognosisSequence(prognosisSequence);
 
-                corePlanboardBusinessService.storeFlexRequest(flexRequestMessage.getCongestionPoint(), flexRequestMessage,
-                        DocumentStatus.SENT, aggregator.getDomain());
+                corePlanboardBusinessService
+                        .storeFlexRequest(flexRequestMessage.getCongestionPoint(), flexRequestMessage,
+                                DocumentStatus.SENT, aggregator.getDomain());
 
                 // 2.3.1 Send the flex request message
                 jmsHelperService.sendMessageToOutQueue(XMLUtil.messageObjectToXml(flexRequestMessage));
@@ -176,7 +180,8 @@ public class DsoCreateFlexRequestCoordinator {
         GridSafetyAnalysisDto gridSafetyAnalysisDto = GridSafetyAnalysisDtoTransformer.transform(gridSafetyAnalysis);
         contextIn.setValue(CreateFlexRequestStepParameter.IN.GRID_SAFETY_ANALYSIS_DTO.name(), gridSafetyAnalysisDto);
 
-        WorkflowContext contextOut = workflowStubLoader.invoke(DsoWorkflowStep.DSO_CREATE_FLEX_REQUEST.name(), contextIn);
+        WorkflowContext contextOut = workflowStubLoader
+                .invoke(DsoWorkflowStep.DSO_CREATE_FLEX_REQUEST.name(), contextIn);
 
         WorkflowUtil.validateContext(DsoWorkflowStep.DSO_CREATE_FLEX_REQUEST.name(), contextOut,
                 CreateFlexRequestStepParameter.OUT.values());
@@ -213,7 +218,8 @@ public class DsoCreateFlexRequestCoordinator {
         flexRequestMessage.setPTUDuration(Period.minutes(config.getIntegerProperty(ConfigParam.PTU_DURATION)));
         flexRequestMessage.setPeriod(event.getPeriod());
         flexRequestMessage.setTimeZone(config.getProperty(ConfigParam.TIME_ZONE));
-        flexRequestMessage.setSequence(sequenceGeneratorService.next());
+        flexRequestMessage.setSequence(Optional.ofNullable(flexRequestDto.getSequenceNumber()).orElse(sequenceGeneratorService.next()));
+
         return flexRequestMessage;
     }
 }
