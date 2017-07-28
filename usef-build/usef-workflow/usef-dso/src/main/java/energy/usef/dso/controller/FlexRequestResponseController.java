@@ -17,18 +17,20 @@
 package energy.usef.dso.controller;
 
 import energy.usef.core.controller.BaseIncomingResponseMessageController;
+import energy.usef.core.data.xml.bean.message.DispositionAcceptedRejected;
 import energy.usef.core.data.xml.bean.message.FlexRequestResponse;
 import energy.usef.core.exception.BusinessException;
+import energy.usef.core.model.AcknowledgementStatus;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
 import energy.usef.core.model.Message;
 import energy.usef.core.model.PlanboardMessage;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
 import energy.usef.core.util.DocumentStatusUtil;
-
+import energy.usef.dso.workflow.validate.acknowledgement.flexrequest.FlexRequestAcknowledgementEvent;
 import javax.ejb.Stateless;
+import javax.enterprise.event.Event;
 import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,9 @@ public class FlexRequestResponseController extends BaseIncomingResponseMessageCo
 
     @Inject
     private CorePlanboardBusinessService corePlanboardBusinessService;
+
+    @Inject
+    private Event<FlexRequestAcknowledgementEvent> eventManager;
 
     /**
      * {@inheritDoc}
@@ -70,5 +75,10 @@ public class FlexRequestResponseController extends BaseIncomingResponseMessageCo
             LOGGER.warn("Flex request from {} with sequence {} rejected.", message.getMessageMetadata().getSenderDomain()
                     , message.getSequence());
         }
+        FlexRequestAcknowledgementEvent event = new FlexRequestAcknowledgementEvent(
+            message.getSequence(),
+            message.getResult() == DispositionAcceptedRejected.REJECTED ? AcknowledgementStatus.REJECTED : AcknowledgementStatus.ACCEPTED,
+            message.getMessageMetadata().getSenderDomain());
+        eventManager.fire(event);
     }
 }

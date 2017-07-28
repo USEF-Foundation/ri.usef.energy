@@ -72,7 +72,7 @@ public class DsoFlexOrderAcknowledgementCoordinatorTest {
 
         ReflectionUtil.setFinalStatic(DsoFlexOrderAcknowledgementCoordinator.class.getDeclaredField("LOGGER"), LOGGER);
         Whitebox.setInternalState(dsoFlexRequestAcknowledgementCoordinator, dsoPlanboardBusinessService);
-        Whitebox.setInternalState(dsoFlexRequestAcknowledgementCoordinator, eventManager);
+          Whitebox.setInternalState(dsoFlexRequestAcknowledgementCoordinator, eventManager);
     }
 
     /**
