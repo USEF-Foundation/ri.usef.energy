@@ -22,15 +22,21 @@ import java.io.IOException;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.ejb.Lock;
+import javax.ejb.Singleton;
 import javax.enterprise.context.ApplicationScoped;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static javax.ejb.LockType.READ;
+
 /**
  * Property config class.
  */
 @ApplicationScoped
+@Singleton
+@Lock(READ)
 public class ConfigMdc extends AbstractConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigMdc.class);
 
