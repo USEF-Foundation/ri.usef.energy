@@ -3,6 +3,7 @@ package energy.usef.core.endpoint;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.config.DefaultConfig;
 import energy.usef.core.util.JsonUtil;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,8 +21,12 @@ public class ConfigurationEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationEndpoint.class);
 
+    private DefaultConfig config;
+
     @Inject
-    protected DefaultConfig config;
+    public ConfigurationEndpoint(DefaultConfig config) {
+        this.config = config;
+    }
 
     /**
      * Endpoint to get a {@Link Properties} object containing the default configuration.
@@ -33,7 +38,8 @@ public class ConfigurationEndpoint {
     public Response getAllCommonReferenceOperators() {
         LOGGER.info("Received request to get Configuration");
         try {
-            return Response.ok(JsonUtil.createJsonText(getWhitelistedProperties()), MediaType.APPLICATION_JSON_TYPE).build();
+            return Response.ok(JsonUtil.createJsonText(getWhitelistedProperties()), MediaType.APPLICATION_JSON_TYPE)
+                    .build();
         } catch (IOException e) {
             LOGGER.error("{}", e);
             return Response.serverError().entity(JsonUtil.exceptionBody(e)).build();
@@ -44,10 +50,14 @@ public class ConfigurationEndpoint {
 
     private Properties getWhitelistedProperties() {
         Properties properties = config.getProperties();
-        String[] whitelistedPropertyKeys = properties.getProperty(ConfigParam.CONFIGURATION_ENDPOINT_PROPERTIES_WHITELIST.name()).split(",");
+        String[] whitelistedPropertyKeys = properties
+                .getProperty(ConfigParam.CONFIGURATION_ENDPOINT_PROPERTIES_WHITELIST.name(), "").split(",");
         Properties allowedProperties = new Properties();
         for (String whitelistedProperty : whitelistedPropertyKeys) {
-            allowedProperties.setProperty(whitelistedProperty, properties.getProperty(whitelistedProperty));
+            String property = properties.getProperty(whitelistedProperty);
+            if (!StringUtils.isEmpty(property)) {
+                allowedProperties.setProperty(whitelistedProperty, property);
+            }
         }
         return allowedProperties;
     }
