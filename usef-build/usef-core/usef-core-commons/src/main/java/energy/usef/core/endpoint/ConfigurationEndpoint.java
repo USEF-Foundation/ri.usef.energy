@@ -21,9 +21,14 @@ public class ConfigurationEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConfigurationEndpoint.class);
 
+    @Inject
     private DefaultConfig config;
 
-    @Inject
+    /**
+     * Empty constructor.
+     */
+    public ConfigurationEndpoint() { }
+
     public ConfigurationEndpoint(DefaultConfig config) {
         this.config = config;
     }
