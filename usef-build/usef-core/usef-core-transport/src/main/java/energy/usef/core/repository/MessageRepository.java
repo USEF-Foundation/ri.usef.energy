@@ -141,18 +141,29 @@ public class MessageRepository extends BaseRepository<Message> {
                 .setParameter("day", period.toLocalDate().getDayOfMonth())
                 .getResultList();
 
+        if (messages.isEmpty()) {
+            return false;
+        }
+
         // because Postgres can not handle XML fields, filter the xml with Java.
-        List<Message> filtered = new ArrayList<>();
+        List<Message> filteredQuery = new ArrayList<>();
         for (Message message : messages) {
             String xml = message.getXml();
-            if (xml != null &&
-                    (xml.contains(COMMON_REFERENCE_QUERY) ||
-                     xml.contains(COMMON_REFERENCE_QUERY_RESPONSE))) {
-                filtered.add(message);
+            if (xml != null && xml.contains(COMMON_REFERENCE_QUERY)) {
+                filteredQuery.add(message);
             }
         }
 
-        return filtered.isEmpty();
+        List<Message> filteredResponse = new ArrayList<>();
+        for (Message message : messages) {
+            String xml = message.getXml();
+            if (xml != null && xml.contains(COMMON_REFERENCE_QUERY_RESPONSE)) {
+                filteredResponse.add(message);
+            }
+        }
+
+        // This assumes
+        return !filteredQuery.isEmpty() && filteredQuery.size() == filteredResponse.size();
     }
 
     /**
