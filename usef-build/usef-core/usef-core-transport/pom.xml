@@ -15,7 +15,20 @@
 			<artifactId>usef-core-commons</artifactId>
 			<version>1.3.8-SNAPSHOT</version>
 		</dependency>
-		
+
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.4.1212</version>
+        </dependency>
+
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+
 		<!-- Kalium -->
 		<dependency>
 			<groupId>org.abstractj.kalium</groupId>

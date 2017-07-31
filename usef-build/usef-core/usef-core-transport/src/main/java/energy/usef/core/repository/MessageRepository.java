@@ -19,6 +19,7 @@ package energy.usef.core.repository;
 import static javax.persistence.TemporalType.TIMESTAMP;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -127,12 +128,10 @@ public class MessageRepository extends BaseRepository<Message> {
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT queries FROM Message queries WHERE queries.conversationId NOT IN (");
         sql.append("  SELECT responses.conversationId FROM Message responses ");
-        sql.append("  WHERE responses.xml LIKE :responseType ");
-        sql.append("    AND YEAR(responses.creationTime) = :year ");
+        sql.append("    WHERE YEAR(responses.creationTime) = :year ");
         sql.append("    AND MONTH(responses.creationTime) = :month ");
         sql.append("    AND DAY(responses.creationTime) = :day ");
         sql.append("  )");
-        sql.append("  AND queries.xml LIKE :queryType ");
         sql.append("  AND YEAR(queries.creationTime) = :year ");
         sql.append("  AND MONTH(queries.creationTime) = :month ");
         sql.append("  AND DAY(queries.creationTime) = :day ");
@@ -140,10 +139,20 @@ public class MessageRepository extends BaseRepository<Message> {
                 .setParameter("year", period.toLocalDate().getYear())
                 .setParameter("month", period.toLocalDate().getMonthOfYear())
                 .setParameter("day", period.toLocalDate().getDayOfMonth())
-                .setParameter("queryType", "%" + COMMON_REFERENCE_QUERY + "%")
-                .setParameter("responseType", "%" + COMMON_REFERENCE_QUERY_RESPONSE + "%")
                 .getResultList();
-        return messages.isEmpty();
+
+        // because Postgres can not handle XML fields, filter the xml with Java.
+        List<Message> filtered = new ArrayList<>();
+        for (Message message : messages) {
+            String xml = message.getXml();
+            if (xml != null &&
+                    (xml.contains(COMMON_REFERENCE_QUERY) ||
+                     xml.contains(COMMON_REFERENCE_QUERY_RESPONSE))) {
+                filtered.add(message);
+            }
+        }
+
+        return filtered.isEmpty();
     }
 
     /**

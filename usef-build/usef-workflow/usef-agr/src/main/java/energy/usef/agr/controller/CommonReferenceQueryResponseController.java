@@ -65,7 +65,7 @@ public class CommonReferenceQueryResponseController extends BaseIncomingResponse
         LOGGER.debug("CommonReferenceQueryResponse received");
         if (DispositionSuccessFailure.SUCCESS.equals(message.getResult())) {
             LOGGER.info("Store CommonReferenceQueryResponse");
-            // we now that the common reference query is not null
+            // we know that the common reference query is not null
             Message commonReferenceQuery = findFirstMessageOfConversation(message);
             CommonReferenceEntityType type = fetchEntityTypeFromOriginalQuery(commonReferenceQuery);
 
@@ -80,6 +80,8 @@ public class CommonReferenceQueryResponseController extends BaseIncomingResponse
                 LOGGER.debug("Every CommonReferenceQuery has a related Response for period [{}].", initializationDate);
                 // Update the element data store
                 agrUpdateElementDataStoreEventManager.fire(new AgrUpdateElementDataStoreEvent(initializationDate));
+            } else {
+
             }
         }
         LOGGER.debug("CommonReferenceQueryResponse finished");
