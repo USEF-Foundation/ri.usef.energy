@@ -19,8 +19,7 @@ package energy.usef.core.repository;
 import static javax.persistence.TemporalType.TIMESTAMP;
 
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import javax.ejb.Stateless;
 
@@ -126,15 +125,10 @@ public class MessageRepository extends BaseRepository<Message> {
      */
     public boolean hasEveryCommonReferenceQuerySentAResponseReceived(LocalDateTime period) {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT queries FROM Message queries WHERE queries.conversationId NOT IN (");
-        sql.append("  SELECT responses.conversationId FROM Message responses ");
-        sql.append("    WHERE YEAR(responses.creationTime) = :year ");
-        sql.append("    AND MONTH(responses.creationTime) = :month ");
-        sql.append("    AND DAY(responses.creationTime) = :day ");
-        sql.append("  )");
-        sql.append("  AND YEAR(queries.creationTime) = :year ");
-        sql.append("  AND MONTH(queries.creationTime) = :month ");
-        sql.append("  AND DAY(queries.creationTime) = :day ");
+        sql.append("SELECT queries FROM Message queries ");
+        sql.append("    WHERE YEAR(queries.creationTime) = :year ");
+        sql.append("    AND MONTH(queries.creationTime) = :month ");
+        sql.append("    AND DAY(queries.creationTime) = :day ");
         List<Message> messages = getEntityManager().createQuery(sql.toString(), Message.class)
                 .setParameter("year", period.toLocalDate().getYear())
                 .setParameter("month", period.toLocalDate().getMonthOfYear())
@@ -146,24 +140,34 @@ public class MessageRepository extends BaseRepository<Message> {
         }
 
         // because Postgres can not handle XML fields, filter the xml with Java.
-        List<Message> filteredQuery = new ArrayList<>();
+        // First find all queries in messages of today.
+        Map<String, Boolean> requestResponses = new HashMap<>();
         for (Message message : messages) {
             String xml = message.getXml();
             if (xml != null && xml.contains(COMMON_REFERENCE_QUERY)) {
-                filteredQuery.add(message);
+                requestResponses.put(message.getConversationId(), false);
             }
         }
-
-        List<Message> filteredResponse = new ArrayList<>();
+        // Match corresponding responses.
         for (Message message : messages) {
             String xml = message.getXml();
             if (xml != null && xml.contains(COMMON_REFERENCE_QUERY_RESPONSE)) {
-                filteredResponse.add(message);
+                Boolean value = requestResponses.get(message.getConversationId());
+                if (value != null) {
+                    requestResponses.put(message.getConversationId(), true);
+                }
             }
         }
 
-        // This assumes
-        return !filteredQuery.isEmpty() && filteredQuery.size() == filteredResponse.size();
+        // Check if all queries have responses.
+        for (Map.Entry<String, Boolean> entry : requestResponses.entrySet()) {
+            if (entry.getValue() == false) {
+                // response message not yet received.
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
