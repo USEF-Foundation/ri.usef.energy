@@ -639,6 +639,15 @@ public class DsoPlanboardBusinessService {
         List<AggregatorOnConnectionGroupState> endingAtDate = aggregatorOnConnectionGroupStateRepository
                 .findEndingAggregatorOnConnectionGroupStates(congestionPoint.getUsefIdentifier(), initializationDate);
 
+        StringBuilder sb = new StringBuilder();
+        for (AggregatorOnConnectionGroupState groupState : endingAtDate) {
+            sb.append("Aggregator: " + groupState.getAggregator().getDomain() + ", connection group: " +
+                            groupState.getCongestionPointConnectionGroup().getUsefIdentifier() +
+                            " valid until: " +
+                            groupState.getValidUntil() + "\n");
+        }
+        LOGGER.info("Aggregators on connection group state:\n{}", sb.toString());
+
         // for each ending aggregator/connection group state for which nothing is updated, extend the valid until date.
         endingAtDate.stream()
                 .filter(aocgs -> xmlCongestionPoint.getAggregator()
@@ -648,7 +657,12 @@ public class DsoPlanboardBusinessService {
                                 && aocgs.getCongestionPointConnectionGroup()
                                 .getUsefIdentifier()
                                 .equals(xmlCongestionPoint.getEntityAddress())))
-                .forEach(aocgs -> aocgs.setValidUntil(aocgs.getValidUntil().plusDays(initializationDuration)));
+                .forEach(aocgs -> {
+                    LOGGER.info("Update aggregator {} for congestion group {} and valid until {} to {}.",
+                            aocgs.getAggregator().getDomain(), aocgs.getCongestionPointConnectionGroup()
+                            .getUsefIdentifier(), aocgs.getValidUntil(), initializationDuration);
+                    aocgs.setValidUntil(aocgs.getValidUntil().plusDays(initializationDuration));
+                });
 
         // create new records if anything changed
         xmlCongestionPoint
@@ -664,6 +678,9 @@ public class DsoPlanboardBusinessService {
                                         .equals(xmlCongestionPoint.getEntityAddress())))
                 .filter(xmlAggregator -> StringUtils.isNotEmpty(xmlAggregator.getDomain()))
                 .forEach(xmlAggregator -> {
+                    LOGGER.info("Create aggregator {} for congestion group {} and valid until {}.",
+                            xmlAggregator.getDomain(), congestionPoint, initializationDuration);
+
                     Aggregator dbAggregator = aggregatorRepository.findOrCreate(xmlAggregator.getDomain());
                     AggregatorOnConnectionGroupState newState = new AggregatorOnConnectionGroupState();
                     newState.setAggregator(dbAggregator);
