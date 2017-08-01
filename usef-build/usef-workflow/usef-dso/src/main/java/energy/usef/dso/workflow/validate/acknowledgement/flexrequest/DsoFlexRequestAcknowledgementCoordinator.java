@@ -37,9 +37,12 @@ import org.slf4j.LoggerFactory;
 public class DsoFlexRequestAcknowledgementCoordinator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DsoFlexRequestAcknowledgementCoordinator.class);
-    private final ConfigDso config;
-
     @Inject
+    private ConfigDso config;
+
+    public DsoFlexRequestAcknowledgementCoordinator() {
+    }
+
     public DsoFlexRequestAcknowledgementCoordinator(ConfigDso config) {
         this.config = config;
     }
