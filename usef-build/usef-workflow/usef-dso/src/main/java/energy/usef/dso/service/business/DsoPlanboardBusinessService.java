@@ -630,9 +630,12 @@ public class DsoPlanboardBusinessService {
     public void updateAggregatorsOnCongestionPointConnectionGroup(CongestionPoint xmlCongestionPoint, LocalDate initializationDate,
             Integer initializationDuration) {
 
+        LOGGER.info("Update aggregators on congestionpoint {} and host {}.", xmlCongestionPoint.getEntityAddress(),
+                config.getProperty(ConfigParam.HOST_DOMAIN));
         CongestionPointConnectionGroup congestionPoint = congestionPointConnectionGroupRepository.findOrCreate(
                 xmlCongestionPoint.getEntityAddress(), config.getProperty(ConfigParam.HOST_DOMAIN));
 
+        LOGGER.info("Update congestionpoint {} for date {}.", congestionPoint.getUsefIdentifier(), initializationDate);
         List<AggregatorOnConnectionGroupState> endingAtDate = aggregatorOnConnectionGroupStateRepository
                 .findEndingAggregatorOnConnectionGroupStates(congestionPoint.getUsefIdentifier(), initializationDate);
 
