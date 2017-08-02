@@ -395,7 +395,7 @@ nodes:
     - node: "localhost"
       address: "127.0.0.1"
       processes:
-        - domain-name: "tst-usef.liander.nl"
+        - domain-name: "dynamo.alliander.com"
           dso-role:
               # Example on how the parent configuration item can be overwritten.
               # If you don't have DNSSEC configured for this participant yet, uncomment the following line:
