@@ -296,7 +296,7 @@ public class CorePlanboardBusinessService {
             boolean isSubstitute) {
         LocalDate period = prognosisMessage.getPeriod();
         List<PTU> ptus = PtuListConverter.normalize(prognosisMessage.getPTU());
-
+        LOGGER.info("Storing Prognosis for period {}", period);
         PlanboardMessage planboardMessage = new PlanboardMessage(prognosisType, prognosisMessage.getSequence(), initialStatus,
                 participantDomain, period, null, connectionGroup, null);
         planboardMessage.setMessage(message);
@@ -304,20 +304,29 @@ public class CorePlanboardBusinessService {
 
         List<PtuPrognosis> storedPrognosis = new ArrayList<>();
         Map<Integer, PtuContainer> ptuContainers = ptuContainerRepository.findPtuContainersMap(period);
+
+        if (ptuContainers.isEmpty()) {
+            LOGGER.warn("No PTU containers found for period {}.", period);
+        }
+
         for (PTU ptu : ptus) {
             PtuContainer ptuContainer = ptuContainers.get(ptu.getStart().intValue());
-            PtuPrognosis prognosis = new PtuPrognosis();
-            prognosis.setPtuContainer(ptuContainer);
-            prognosis.setSequence(prognosisMessage.getSequence());
-            prognosis.setType(PrognosisType.valueOf(prognosisMessage.getType().name()));
-            prognosis.setPower(ptu.getPower());
-            prognosis.setParticipantDomain(participantDomain);
-            prognosis.setConnectionGroup(connectionGroup);
-            prognosis.setSubstitute(isSubstitute);
+            if (ptuContainer == null) {
+                LOGGER.warn("PTU container can not be found for PTU {}", ptu.getStart().intValue());
+            } else {
+                PtuPrognosis prognosis = new PtuPrognosis();
+                prognosis.setPtuContainer(ptuContainer);
+                prognosis.setSequence(prognosisMessage.getSequence());
+                prognosis.setType(PrognosisType.valueOf(prognosisMessage.getType().name()));
+                prognosis.setPower(ptu.getPower());
+                prognosis.setParticipantDomain(participantDomain);
+                prognosis.setConnectionGroup(connectionGroup);
+                prognosis.setSubstitute(isSubstitute);
 
-            ptuPrognosisRepository.persist(prognosis);
-            storedPrognosis.add(prognosis);
-            ptuStateRepository.findOrCreatePtuState(ptuContainer, connectionGroup);
+                ptuPrognosisRepository.persist(prognosis);
+                storedPrognosis.add(prognosis);
+                ptuStateRepository.findOrCreatePtuState(ptuContainer, connectionGroup);
+            }
         }
         return storedPrognosis;
     }
