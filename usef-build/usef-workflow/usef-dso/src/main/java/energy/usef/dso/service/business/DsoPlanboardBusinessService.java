@@ -23,9 +23,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
@@ -627,6 +630,7 @@ public class DsoPlanboardBusinessService {
      * @param initializationDate {@link LocalDate} date of the initializtion of the aggregator count.
      * @param initializationDuration {@link Integer} duration of the initalization.
      */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void updateAggregatorsOnCongestionPointConnectionGroup(CongestionPoint xmlCongestionPoint, LocalDate initializationDate,
             Integer initializationDuration) {
 
