@@ -81,7 +81,7 @@ public class CommonReferenceQueryResponseController extends BaseIncomingResponse
                 // Update the element data store
                 agrUpdateElementDataStoreEventManager.fire(new AgrUpdateElementDataStoreEvent(initializationDate));
             } else {
-
+                LOGGER.debug("Not every CommonReferenceQuery has a related Response for period [{}].", initializationDate);
             }
         }
         LOGGER.debug("CommonReferenceQueryResponse finished");
