@@ -136,14 +136,14 @@ public class AgrPortfolioBusinessService {
     public void createConnectionProfiles(final LocalDate period, List<ConnectionPortfolioDto> connectionPortfolioDTOs) {
         Map<String, Connection> connectionMap = corePlanboardBusinessService.findActiveConnections(period, Optional.empty())
                 .stream().collect(Collectors.toMap(Connection::getEntityAddress, Function.identity()));
-        LOGGER.debug("Found {} active connections", connectionMap.size());
+        LOGGER.info("Found {} active connections", connectionMap.size());
 
 
         for (ConnectionPortfolioDto connectionPortfolioDTO : connectionPortfolioDTOs) {
-            LOGGER.debug("Connection portfolio {}", connectionPortfolioDTO.toString());
+            LOGGER.info("Connection portfolio {}", connectionPortfolioDTO.toString());
             final Connection connection = connectionMap.get(connectionPortfolioDTO.getConnectionEntityAddress());
             connectionPortfolioDTO.getConnectionPowerPerPTU().forEach((ptuIndex, powerContainerDto) -> {
-                LOGGER.debug("Power container {}", powerContainerDto.toString());
+                LOGGER.info("Power container {}", powerContainerDto.toString());
                 PowerContainer powerContainer = new ConnectionPowerContainer(connection, period, ptuIndex);
                 powerContainer.setProfile(new PowerData());
                 powerContainer.getProfile().setUncontrolledLoad(powerContainerDto.getProfile().getUncontrolledLoad());
