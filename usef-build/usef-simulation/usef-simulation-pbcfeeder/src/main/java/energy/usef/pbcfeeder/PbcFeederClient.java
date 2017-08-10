@@ -62,6 +62,7 @@ public class PbcFeederClient {
         LOGGER.info("Retrieve PBC Stub Data list on url {}", pbcEndpoint);
 
         String value = get(pbcEndpoint);
+        LOGGER.info("PBC-Stub-Data returned {}", value);
         ObjectMapper mapper = new ObjectMapper();
 
         List<PbcStubDataDto> pbcStubDataDtoList = new ArrayList<>();
