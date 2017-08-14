@@ -21,6 +21,7 @@ import static org.junit.Assert.fail;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.FlexOffer;
+import energy.usef.core.data.xml.bean.message.FlexOfferRevocation;
 import energy.usef.core.exception.BusinessException;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
@@ -32,13 +33,18 @@ import energy.usef.core.service.helper.MessageMetadataBuilder;
 import energy.usef.core.service.validation.CorePlanboardValidatorService;
 import energy.usef.dso.workflow.coloring.ColoringProcessEvent;
 
+import energy.usef.dso.workflow.validate.create.flexoffer.DsoFlexOfferCoordinator;
+import energy.usef.dso.workflow.validate.create.flexoffer.FlexOfferReceivedEvent;
+import energy.usef.dso.workflow.validate.revoke.flexoffer.FlexOfferRevocationEvent;
 import javax.enterprise.event.Event;
 
 import org.joda.time.LocalDateTime;
 import org.joda.time.Period;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -53,86 +59,30 @@ import org.powermock.reflect.Whitebox;
 public class
 FlexOfferControllerTest {
 
-    private static final String CONGESTION_POINT = "ea.32147890740214670";
-
-    @Mock
-    private MessageService messageService;
-
-    @Mock
-    private JMSHelperService jmsService;
-
-    @Mock
-    private CorePlanboardBusinessService corePlanboardBusinessService;
-
-    @Mock
-    private CorePlanboardValidatorService corePlanboardValidatorService;
-
-    @Mock
-    private Event<ColoringProcessEvent> coloringEventManager;
-
-    @Mock
-    private Config config;
-
     private FlexOfferController controller;
+
+    @Mock
+    private Event<FlexOfferReceivedEvent> eventManager;
 
     @Before
     public void init() {
         controller = new FlexOfferController();
-        Whitebox.setInternalState(controller, messageService);
-        Whitebox.setInternalState(controller, jmsService);
-        Whitebox.setInternalState(controller, corePlanboardBusinessService);
-        Whitebox.setInternalState(controller, corePlanboardValidatorService);
-        Whitebox.setInternalState(controller, coloringEventManager);
-        Whitebox.setInternalState(controller, config);
-
-        PowerMockito.when(config.getProperty(Matchers.eq(ConfigParam.HOST_DOMAIN))).thenReturn("usef-example.com");
+        Whitebox.setInternalState(controller, eventManager);
     }
 
     @Test
-    public void testFlexOffer() {
-        try {
-            Mockito.when(corePlanboardValidatorService
-                    .validatePlanboardMessageExpirationDate(0L, DocumentType.FLEX_REQUEST, "something.com")).thenReturn(buildFlexRequest());
+    public void testActionSucceeds() throws BusinessException {
+        controller.action(buildMessage(), null);
+        ArgumentCaptor<FlexOfferReceivedEvent> eventCaptor = ArgumentCaptor.forClass(FlexOfferReceivedEvent.class);
+        Mockito.verify(eventManager, Mockito.times(1)).fire(eventCaptor.capture());
 
-            // empty flex offer
-            FlexOffer flexOffer = buildFlexOffer();
-            controller.action(flexOffer, null);
-
-            Mockito.verify(corePlanboardValidatorService, Mockito.times(1)).validateTimezone(Matchers.eq(flexOffer.getTimeZone()));
-            Mockito.verify(corePlanboardValidatorService, Mockito.times(1)).validateCurrency(Matchers.eq(flexOffer.getCurrency()));
-            Mockito.verify(corePlanboardValidatorService, Mockito.times(1)).validatePTUDuration(
-                    Matchers.eq(flexOffer.getPTUDuration()));
-
-            Mockito.verify(corePlanboardBusinessService, Mockito.times(1)).storeFlexOffer(Mockito.anyString(),
-                    Matchers.eq(flexOffer),
-                    Matchers.eq(DocumentStatus.ACCEPTED), Matchers.eq(flexOffer.getMessageMetadata().getSenderDomain()));
-
-            Mockito.verify(jmsService, Mockito.times(1)).sendMessageToOutQueue(Matchers.contains("Accepted"));
-
-            Mockito.verify(coloringEventManager, Mockito.times(1)).fire(Matchers.any(ColoringProcessEvent.class));
-
-        } catch (BusinessException e) {
-            fail(e.getMessage());
-        }
+        FlexOfferReceivedEvent capturedEvent = eventCaptor.getValue();
+        Assert.assertNotNull("Did not expect a null event fired.", capturedEvent);
+        Assert.assertNotNull("Did not expect a null reference to the FlexOffer message.",
+                capturedEvent.getFlexOffer());
     }
 
-    private FlexOffer buildFlexOffer() {
-        FlexOffer request = new FlexOffer();
-        request.setTimeZone("Europe/Amsterdam");
-        request.setPTUDuration(Period.minutes(15));
-        request.setCurrency("EUR");
-        request.setMessageMetadata(MessageMetadataBuilder.buildDefault());
-        request.getMessageMetadata().setSenderDomain("something.com");
-        request.setCongestionPoint(CONGESTION_POINT);
-
-        return request;
+    private FlexOffer buildMessage() {
+        return new FlexOffer();
     }
-
-    private PlanboardMessage buildFlexRequest() {
-        PlanboardMessage flexRequest = new PlanboardMessage();
-        flexRequest.setExpirationDate(new LocalDateTime().plusDays(1));
-
-        return flexRequest;
-    }
-
 }

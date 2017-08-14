@@ -16,6 +16,7 @@
 
 package energy.usef.core.service.business;
 
+import com.google.common.collect.Lists;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.CommonReferenceEntityType;
@@ -171,7 +172,7 @@ public class CorePlanboardBusinessService {
      * @param initialStatus The status of the flex offer which is stored.
      * @param participantDomain - The domain of the party which is being communicated with
      */
-    public void storeFlexOffer(String usefIdentifier, FlexOffer flexOfferRequest, DocumentStatus initialStatus,
+    public List<PtuFlexOffer> storeFlexOffer(String usefIdentifier, FlexOffer flexOfferRequest, DocumentStatus initialStatus,
             String participantDomain) {
         if (flexOfferRequest.getPTU().isEmpty()) {
             // Empty flex offer
@@ -187,6 +188,7 @@ public class CorePlanboardBusinessService {
                 flexOfferRequest.getExpirationDateTime());
         planboardMessageRepository.persist(planboardMessage);
 
+        List<PtuFlexOffer> offers = Lists.newArrayList();
         Map<Integer, PtuContainer> ptuContainers = ptuContainerRepository.findPtuContainersMap(period);
         for (PTU ptu : ptus) {
             PtuContainer ptuContainer = ptuContainers.get(ptu.getStart().intValue());
@@ -201,7 +203,9 @@ public class CorePlanboardBusinessService {
             flexOffer.setPrice(ptu.getPrice());
 
             ptuFlexOfferRepository.persist(flexOffer);
+            offers.add(flexOffer);
         }
+        return offers;
     }
 
     /**

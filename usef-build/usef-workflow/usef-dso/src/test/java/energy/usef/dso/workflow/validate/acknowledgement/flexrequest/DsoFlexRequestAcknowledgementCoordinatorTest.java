@@ -24,13 +24,13 @@ public class DsoFlexRequestAcknowledgementCoordinatorTest {
     private DsoFlexRequestAcknowledgementCoordinator coordinator;
 
     @Rule
-    public WireMockRule wireMockRule = new WireMockRule();
+    public WireMockRule wireMockRule = new WireMockRule(9999);
 
     @Before
     public void init() {
         wireMockRule.stubFor(WireMock.post(urlEqualTo("/api/flexrequests/1/response")).willReturn(ok()));
         Properties properties = new Properties();
-        properties.put("FLEX_REQUEST_ENDPOINT", "http://localhost:8080/");
+        properties.put("FLEX_REQUEST_ENDPOINT", "http://localhost:9999/");
         Mockito.when(config.getProperties()).thenReturn(properties);
         coordinator = new DsoFlexRequestAcknowledgementCoordinator(config);
     }
