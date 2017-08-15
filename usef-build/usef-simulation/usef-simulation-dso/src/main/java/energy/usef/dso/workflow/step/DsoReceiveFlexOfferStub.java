@@ -18,9 +18,10 @@ package energy.usef.dso.workflow.step;
 
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.WorkflowStep;
+import energy.usef.core.workflow.dto.FlexOfferDto;
+import energy.usef.dso.workflow.validate.create.flexoffer.PlaceFlexOfferStepParameter.IN;
+import energy.usef.dso.workflow.validate.create.flexoffer.PlaceFlexOfferStepParameter.OUT;
 import org.joda.time.LocalDate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Workflow step implementation for the Workflow 'Receive Flexibility Offers'. This implementation expects to find the following
@@ -33,13 +34,10 @@ import org.slf4j.LoggerFactory;
  */
 public class DsoReceiveFlexOfferStub implements WorkflowStep {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DsoReceiveFlexOfferStub.class);
-
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public WorkflowContext invoke(WorkflowContext context) {
+        FlexOfferDto flexOfferDto = (FlexOfferDto) context.getValue(IN.FLEX_OFFER_DTO.name());
+        context.setValue(OUT.ACCEPTED_FLEX_OFFER_DTO.name(), flexOfferDto);
         return context;
     }
 }

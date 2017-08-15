@@ -32,4 +32,12 @@ public class PlaceFlexOfferStepParameter {
         FLEX_OFFER_DTO, CONGESTION_POINT_ENTITY_ADDRESS, PTU_DURATION, PERIOD
     }
 
+    /**
+     * The out going parameters for this step, at the moment the RI does not do anything with the returned flex
+     * offer (future implementations can if necessary)
+     */
+    public enum OUT {
+        ACCEPTED_FLEX_OFFER_DTO
+    }
+
 }
