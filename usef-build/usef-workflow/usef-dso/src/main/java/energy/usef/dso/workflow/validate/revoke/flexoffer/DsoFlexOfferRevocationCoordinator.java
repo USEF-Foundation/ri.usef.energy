@@ -19,7 +19,13 @@ package energy.usef.dso.workflow.validate.revoke.flexoffer;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 import static energy.usef.core.data.xml.bean.message.MessagePrecedence.ROUTINE;
+import static energy.usef.dso.workflow.DsoWorkflowStep.DSO_FLEX_OFFER_REVOCATION;
 
+import energy.usef.core.workflow.DefaultWorkflowContext;
+import energy.usef.core.workflow.WorkflowContext;
+import energy.usef.core.workflow.dto.FlexOfferDto;
+import energy.usef.core.workflow.step.WorkflowStepExecuter;
+import energy.usef.core.workflow.transformer.FlexOfferTransformer;
 import java.util.List;
 import java.util.Map;
 
@@ -69,6 +75,9 @@ public class DsoFlexOfferRevocationCoordinator {
     @Inject
     private Config config;
 
+    @Inject
+    private WorkflowStepExecuter workflowLoader;
+
     /**
      * {@inheritDoc}
      */
@@ -103,6 +112,7 @@ public class DsoFlexOfferRevocationCoordinator {
             // Checking that no flex offer has a PTU in the operate or later phase.
             // Making sure that all PTUs are not in the operate or later phase we make sure that all PTUs are in the future
             planboardValidatorService.checkPtuPhase(flexOfferRevocation, flexOffers);
+            invokePbc(flexOffers, senderDomain);
         } catch (BusinessValidationException e) {
             LOGGER.warn("Validation error for a flex offer: " + e.getMessage(), e);
             responseResult = DispositionAcceptedRejected.REJECTED;
@@ -120,6 +130,15 @@ public class DsoFlexOfferRevocationCoordinator {
         response.setMessage(responseResultMessage);
         jmsHelperService.sendMessageToOutQueue(XMLUtil.messageObjectToXml(response));
         LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
+    }
+
+    private void invokePbc(Map<Integer, PtuFlexOffer> flexOffers, String sender) {
+        FlexOfferDto flexOffersDto = FlexOfferTransformer.transformPtuFlexOffers(flexOffers.values());
+        WorkflowContext inContext = new DefaultWorkflowContext();
+        inContext.setValue(RevokeFlexOfferStepParameter.IN.FLEX_OFFER_DTO.name(), flexOffersDto);
+        inContext.setValue(RevokeFlexOfferStepParameter.IN.AGGREGATOR.name(), sender);
+
+        workflowLoader.invoke(DSO_FLEX_OFFER_REVOCATION.name(), inContext);
     }
 
     private void validateIfOrdered(long flexOfferSequence, String senderDomain) throws BusinessValidationException {

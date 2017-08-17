@@ -23,6 +23,7 @@ import energy.usef.core.workflow.dto.FlexOfferDto;
 import energy.usef.core.workflow.dto.PtuFlexOfferDto;
 
 import java.math.BigInteger;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -78,11 +79,11 @@ public class FlexOfferTransformer {
      * @param ptuFlexOffers a {@link java.util.List} of {@link PtuFlexOffer}.
      * @return a {@link FlexOfferDto}.
      */
-    public static FlexOfferDto transformPtuFlexOffers(List<PtuFlexOffer> ptuFlexOffers) {
+    public static FlexOfferDto transformPtuFlexOffers(Collection<PtuFlexOffer> ptuFlexOffers) {
         if (ptuFlexOffers == null || ptuFlexOffers.isEmpty()) {
             return null;
         }
-        PtuFlexOffer firstPtuFlexOffer = ptuFlexOffers.get(0);
+        PtuFlexOffer firstPtuFlexOffer = ptuFlexOffers.iterator().next();
         FlexOfferDto flexOfferDto = new FlexOfferDto();
         flexOfferDto.setParticipantDomain(firstPtuFlexOffer.getParticipantDomain());
         flexOfferDto.setConnectionGroupEntityAddress(firstPtuFlexOffer.getConnectionGroup().getUsefIdentifier());
