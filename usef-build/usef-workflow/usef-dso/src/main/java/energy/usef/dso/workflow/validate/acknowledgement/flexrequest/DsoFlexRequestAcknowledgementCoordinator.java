@@ -18,15 +18,18 @@ package energy.usef.dso.workflow.validate.acknowledgement.flexrequest;
 
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
+import static energy.usef.dso.workflow.DsoWorkflowStep.DSO_FLEX_REQUEST_ACKNOWLEDGEMENT;
 
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import energy.usef.dso.config.ConfigDso;
+import energy.usef.core.workflow.DefaultWorkflowContext;
+import energy.usef.core.workflow.WorkflowContext;
+import energy.usef.core.workflow.dto.AcknowledgementStatusDto;
+import energy.usef.core.workflow.step.WorkflowStepExecuter;
+import energy.usef.dso.workflow.DsoWorkflowStep;
+import energy.usef.dso.workflow.validate.acknowledgement.flexrequest.FlexRequestAcknowledgementStepParameter.IN;
 import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,14 +41,7 @@ public class DsoFlexRequestAcknowledgementCoordinator {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DsoFlexRequestAcknowledgementCoordinator.class);
     @Inject
-    private ConfigDso config;
-
-    public DsoFlexRequestAcknowledgementCoordinator() {
-    }
-
-    public DsoFlexRequestAcknowledgementCoordinator(ConfigDso config) {
-        this.config = config;
-    }
+    private WorkflowStepExecuter workflow;
 
     /**
      * {@inheritDoc}
@@ -54,25 +50,14 @@ public class DsoFlexRequestAcknowledgementCoordinator {
     public void handleEvent(@Observes FlexRequestAcknowledgementEvent event) {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
 
-        String endpoint = config.getProperties().getProperty("FLEX_REQUEST_ENDPOINT");
-        if (StringUtils.isEmpty(endpoint)) {
-            LOGGER.error("Configuration for flex request endpoint ('FLEX_REQUEST_ENDPOINT' is missing");
-        } else {
-            sendAcknowledgement(event, endpoint);
-        }
+        AcknowledgementStatusDto status = AcknowledgementStatusDto.valueOf(event.getAcknowledgementStatus().name());
+        WorkflowContext inContext = new DefaultWorkflowContext();
+        inContext.setValue(IN.ACKNOWLEDGEMENT_STATUS_DTO.name(), status);
+        inContext.setValue(IN.SEQUENCE_NUMBER.name(), event.getSequence());
+        inContext.setValue(IN.AGGREGATOR.name(), event.getAggregatorDomain());
+
+        workflow.invoke(DSO_FLEX_REQUEST_ACKNOWLEDGEMENT.name(), inContext);
 
         LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }
-
-    private void sendAcknowledgement(FlexRequestAcknowledgementEvent event, String endpoint) {
-        try {
-            Unirest.post(endpoint + "/api/flexrequests/{id}/response")
-                    .routeParam("id", String.valueOf(event.getSequence()))
-                    .field("aggregatorName", event.getAggregatorDomain())
-                    .field("status", event.getAcknowledgementStatus().toString()).asJson();
-        } catch (UnirestException e) {
-            LOGGER.warn("Unable to send acknowledgement to the flex-service: {}", endpoint);
-        }
-    }
-
 }

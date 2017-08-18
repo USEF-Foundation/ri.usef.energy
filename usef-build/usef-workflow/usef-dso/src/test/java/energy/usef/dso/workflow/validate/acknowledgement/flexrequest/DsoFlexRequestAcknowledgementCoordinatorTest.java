@@ -1,45 +1,50 @@
 package energy.usef.dso.workflow.validate.acknowledgement.flexrequest;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.ok;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static energy.usef.dso.workflow.validate.acknowledgement.flexrequest.FlexRequestAcknowledgementStepParameter.IN.ACKNOWLEDGEMENT_STATUS_DTO;
+import static energy.usef.dso.workflow.validate.acknowledgement.flexrequest.FlexRequestAcknowledgementStepParameter.IN.SEQUENCE_NUMBER;
 
-import com.github.tomakehurst.wiremock.client.WireMock;
-import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import energy.usef.core.model.AcknowledgementStatus;
-import energy.usef.dso.config.ConfigDso;
-import java.util.Properties;
+import energy.usef.core.workflow.WorkflowContext;
+import energy.usef.core.workflow.step.WorkflowStepExecuter;
+import energy.usef.dso.workflow.DsoWorkflowStep;
+import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 @RunWith(PowerMockRunner.class)
 public class DsoFlexRequestAcknowledgementCoordinatorTest {
 
     @Mock
-    private ConfigDso config;
-    private DsoFlexRequestAcknowledgementCoordinator coordinator;
+    private WorkflowStepExecuter workflowStepExecuter;
 
-    @Rule
-    public WireMockRule wireMockRule = new WireMockRule(9999);
+    private DsoFlexRequestAcknowledgementCoordinator coordinator;
 
     @Before
     public void init() {
-        wireMockRule.stubFor(WireMock.post(urlEqualTo("/api/flexrequests/1/response")).willReturn(ok()));
-        Properties properties = new Properties();
-        properties.put("FLEX_REQUEST_ENDPOINT", "http://localhost:9999/");
-        Mockito.when(config.getProperties()).thenReturn(properties);
-        coordinator = new DsoFlexRequestAcknowledgementCoordinator(config);
+        coordinator = new DsoFlexRequestAcknowledgementCoordinator();
+        Whitebox.setInternalState(coordinator, workflowStepExecuter);
     }
 
     @Test
     public void handleEvent() {
+        ArgumentCaptor<WorkflowContext> contextCapturer = ArgumentCaptor.forClass(WorkflowContext.class);
         FlexRequestAcknowledgementEvent event = new FlexRequestAcknowledgementEvent(1L, AcknowledgementStatus.ACCEPTED,
                 "aggr1.com");
         coordinator.handleEvent(event);
+
+        Mockito.verify(workflowStepExecuter, Mockito.timeout(1000).times(1)).invoke(Mockito.eq(DsoWorkflowStep.DSO_FLEX_REQUEST_ACKNOWLEDGEMENT.name()),
+                contextCapturer.capture());
+
+        Assert.assertNotNull(contextCapturer.getValue().getValue(
+                ACKNOWLEDGEMENT_STATUS_DTO.name()));
+        Assert.assertNotNull(contextCapturer.getValue().getValue(
+                SEQUENCE_NUMBER.name()));
     }
 
 }
