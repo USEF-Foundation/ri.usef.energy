@@ -17,14 +17,20 @@
 package energy.usef.dso.workflow.validate.create.flexoffer;
 
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 
+import com.google.common.collect.Lists;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.FlexOffer;
+import energy.usef.core.data.xml.bean.message.PTU;
 import energy.usef.core.exception.BusinessException;
+import energy.usef.core.model.CongestionPointConnectionGroup;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
 import energy.usef.core.model.PlanboardMessage;
+import energy.usef.core.model.PtuContainer;
+import energy.usef.core.model.PtuFlexOffer;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
 import energy.usef.core.service.business.MessageService;
 import energy.usef.core.service.helper.JMSHelperService;
@@ -35,6 +41,7 @@ import energy.usef.dso.controller.FlexOfferController;
 import energy.usef.dso.controller.FlexRequestResponseController;
 import energy.usef.dso.workflow.coloring.ColoringProcessEvent;
 import javax.enterprise.event.Event;
+import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.Period;
 import org.junit.Before;
@@ -94,6 +101,14 @@ DsoFlexOfferCoordinatorTest {
         try {
             Mockito.when(corePlanboardValidatorService
                     .validatePlanboardMessageExpirationDate(0L, DocumentType.FLEX_REQUEST, "something.com")).thenReturn(buildFlexRequest());
+            PtuFlexOffer ptuFlexOffer = new PtuFlexOffer();
+            ptuFlexOffer.setConnectionGroup(new CongestionPointConnectionGroup("test"));
+            PtuContainer ptuContainer = new PtuContainer();
+            ptuContainer.setPtuDate(new LocalDate());
+            ptuContainer.setPtuIndex(1);
+            ptuFlexOffer.setPtuContainer(ptuContainer);
+            Mockito.when(corePlanboardBusinessService
+                    .storeFlexOffer(any(), any(), any(), any())).thenReturn(Lists.newArrayList(ptuFlexOffer));
 
             // empty flex offer
             FlexOffer flexOffer = buildFlexOffer();
@@ -110,7 +125,7 @@ DsoFlexOfferCoordinatorTest {
 
             Mockito.verify(jmsService, Mockito.times(1)).sendMessageToOutQueue(Matchers.contains("Accepted"));
 
-            Mockito.verify(coloringEventManager, Mockito.times(1)).fire(Matchers.any(ColoringProcessEvent.class));
+            Mockito.verify(coloringEventManager, Mockito.times(1)).fire(any(ColoringProcessEvent.class));
 
         } catch (BusinessException e) {
             fail(e.getMessage());

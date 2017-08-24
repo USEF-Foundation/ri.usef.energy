@@ -37,6 +37,7 @@ import energy.usef.core.service.business.CorePlanboardBusinessService;
 import energy.usef.core.service.helper.JMSHelperService;
 import energy.usef.core.service.helper.MessageMetadataBuilder;
 import energy.usef.core.service.validation.CorePlanboardValidatorService;
+import energy.usef.core.util.DateTimeUtil;
 import energy.usef.core.util.XMLUtil;
 import energy.usef.core.workflow.DefaultWorkflowContext;
 import energy.usef.core.workflow.WorkflowContext;
@@ -57,6 +58,7 @@ import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import org.joda.time.LocalDate;
+import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,7 +121,7 @@ public class DsoFlexOfferCoordinator {
             List<PtuFlexOffer> ptuFlexOffers = corePlanboardBusinessService.storeFlexOffer(usefIdentifier, flexOffer, DocumentStatus.ACCEPTED,
                     flexOffer.getMessageMetadata().getSenderDomain());
 
-            invokePlaceFlexOffersPBC(FlexOfferTransformer.transformPtuFlexOffers(ptuFlexOffers), usefIdentifier, flexOffer.getPeriod());
+            invokePlaceFlexOffersPBC(flexRequestMessage.getExpirationDate(), FlexOfferTransformer.transformPtuFlexOffers(ptuFlexOffers), usefIdentifier, flexOffer.getPeriod());
 
             // update status (RECEIVED_OFFER or RECEIVED_EMPTY_OFFER) of the flex requests
             updateFlexRequestsStatus(flexOffer, flexRequestMessage);
@@ -204,8 +206,10 @@ public class DsoFlexOfferCoordinator {
                 response.getMessageMetadata().getConversationID());
     }
 
-    @SuppressWarnings("unchecked") private void invokePlaceFlexOffersPBC(FlexOfferDto flexOfferDto, String congestionPoint, LocalDate period) {
+    @SuppressWarnings("unchecked") private void invokePlaceFlexOffersPBC(LocalDateTime expirationDate,
+            FlexOfferDto flexOfferDto, String congestionPoint, LocalDate period) {
         WorkflowContext inContext = new DefaultWorkflowContext();
+        flexOfferDto.setExpirationDateTime(expirationDate);
         inContext.setValue(PlaceFlexOfferStepParameter.IN.FLEX_OFFER_DTO.name(), flexOfferDto);
         inContext.setValue(PlaceFlexOrdersStepParameter.IN.CONGESTION_POINT_ENTITY_ADDRESS.name(), congestionPoint);
         inContext.setValue(PlaceFlexOrdersStepParameter.IN.PTU_DURATION.name(), config.getIntegerProperty(ConfigParam.PTU_DURATION));
