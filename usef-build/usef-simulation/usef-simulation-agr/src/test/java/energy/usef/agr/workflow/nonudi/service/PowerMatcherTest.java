@@ -60,11 +60,11 @@ import org.powermock.reflect.Whitebox;
 public class PowerMatcherTest {
 
     private static final String ENDPOINT_URI = "http://localhost:8081";
-    private static final String ENDPOINT_BALANCE_RESPONSE_PARTY = "/USEF/2015/clustermanagement/brp";
-    private static final String ENDPOINT_CONGESTION_POINT = "/USEF/2015/clustermanagement/congestionpoint";
-    private static final String ENDPOINT_CONNECTION = "/USEF/2015/clustermanagement/connection";
-    private static final String ENDPOINT_OBJECTIVE_AGENT = "/USEF/2015/objectiveagent";
-    private static final String ENDPOINT_CONGESTION_MANAGEMENT = "/USEF/2015/congestionmanagement";
+    private static final String ENDPOINT_BALANCE_RESPONSE_PARTY = "/rest/clustermanagement/brp";
+    private static final String ENDPOINT_CONGESTION_POINT = "/rest/clustermanagement/congestionpoint";
+    private static final String ENDPOINT_CONNECTION = "/rest/clustermanagement/connection";
+    private static final String ENDPOINT_OBJECTIVE_AGENT = "/rest/objectiveagent";
+    private static final String ENDPOINT_CONGESTION_MANAGEMENT = "/rest/congestionmanagement";
     private static final String TIMEZONE_BERLIN = "Europe/Berlin";
     private static ObjectMapper objectMapper;
     private static DateTimeZone jodaTimeZone;
