@@ -9,7 +9,7 @@ import energy.usef.core.workflow.WorkflowStep;
  * <ul>
  * <li>AGGREGATOR Aggregator which send the acknowledgement</li>
  * <li>ACKNOWLEDGEMENT_STATUS_DTO ({@link energy.usef.core.workflow.dto.AcknowledgementStatusDto}): the status</li>
- * <li>FLEX_OFFER_SEQUENCE_NUMBER ({@link Long}): the flex request </li>
+ * <li>FLEX_OFFER_SEQUENCE_NUMBER ({@link Long}): the flex offer to which this acknowledgement belongs</li>
  * * </ul>
  *
  * No output as this is only an informational message
