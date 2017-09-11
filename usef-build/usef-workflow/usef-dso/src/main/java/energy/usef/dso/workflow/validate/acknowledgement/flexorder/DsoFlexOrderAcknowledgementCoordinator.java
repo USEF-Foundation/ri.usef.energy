@@ -82,7 +82,7 @@ public class DsoFlexOrderAcknowledgementCoordinator {
                             .toArray(Integer[]::new));
             eventManager.fire(createFlexRequestEvent);
         } else {
-            invokePBC(event, flexOrderDto.getFlexOfferSequenceNumber());
+            invokePBC(event, flexOrderDto.getSequenceNumber());
         }
         LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }

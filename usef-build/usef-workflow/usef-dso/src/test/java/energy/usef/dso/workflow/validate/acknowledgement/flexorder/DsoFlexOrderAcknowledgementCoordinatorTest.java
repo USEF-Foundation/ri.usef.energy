@@ -90,8 +90,7 @@ public class DsoFlexOrderAcknowledgementCoordinatorTest {
     @Test
     public void testInvokeWorkflow() {
         ArgumentCaptor<WorkflowContext> contextCapturer = ArgumentCaptor.forClass(WorkflowContext.class);
-        ArgumentCaptor<CreateFlexRequestEvent> eventCaptor = ArgumentCaptor
-                .forClass(CreateFlexRequestEvent.class);
+        ArgumentCaptor<CreateFlexRequestEvent> eventCaptor = ArgumentCaptor.forClass(CreateFlexRequestEvent.class);
 
         FlexOrderDto dto = createFlexRequestDto();
         Mockito.when(
@@ -161,7 +160,7 @@ public class DsoFlexOrderAcknowledgementCoordinatorTest {
     private FlexOrderDto createFlexRequestDto() {
         FlexOrderDto dto = new FlexOrderDto();
 
-        dto.setFlexOfferSequenceNumber(1234L);
+        dto.setSequenceNumber(1234L);
         dto.setConnectionGroupEntityAddress("abc.com");
         dto.setPeriod(new LocalDate());
         IntStream.range(1, 4).mapToObj(BigInteger::valueOf).forEach(i -> {
