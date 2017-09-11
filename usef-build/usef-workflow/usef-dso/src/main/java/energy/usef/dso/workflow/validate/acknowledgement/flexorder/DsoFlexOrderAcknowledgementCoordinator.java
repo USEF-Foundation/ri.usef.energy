@@ -71,7 +71,7 @@ public class DsoFlexOrderAcknowledgementCoordinator {
         if (flexOrderDto == null) {
             LOGGER.warn("No flex order to update was found");
         } else if (AcknowledgementStatus.ACCEPTED != event.getAcknowledgementStatus()) {
-            invokePBC(event, flexOrderDto.getFlexOfferSequenceNumber());
+            invokePBC(event, flexOrderDto.getSequenceNumber());
             // Flexibility request is rejected or no response received, creating a new request
             CreateFlexRequestEvent createFlexRequestEvent = new CreateFlexRequestEvent(flexOrderDto.getConnectionGroupEntityAddress(),
                     flexOrderDto.getPeriod(),
@@ -87,11 +87,11 @@ public class DsoFlexOrderAcknowledgementCoordinator {
         LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }
 
-    private void invokePBC(FlexOrderAcknowledgementEvent event, Long flexOfferSequenceNumber) {
+    private void invokePBC(FlexOrderAcknowledgementEvent event, Long flexOrderSequenceNumber) {
         AcknowledgementStatusDto status = AcknowledgementStatusDto.valueOf(event.getAcknowledgementStatus().name());
         WorkflowContext inContext = new DefaultWorkflowContext();
         inContext.setValue(IN.ACKNOWLEDGEMENT_STATUS_DTO.name(), status);
-        inContext.setValue(IN.FLEX_OFFER_SEQUENCE_NUMBER.name(), flexOfferSequenceNumber);
+        inContext.setValue(IN.FLEX_ORDER_SEQUENCE_NUMBER.name(), flexOrderSequenceNumber);
         inContext.setValue(IN.AGGREGATOR.name(), event.getAggregatorDomain());
 
         workflow.invoke(DSO_FLEX_REQUEST_ACKNOWLEDGEMENT.name(), inContext);

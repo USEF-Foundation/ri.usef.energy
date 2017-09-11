@@ -29,6 +29,6 @@ public class FlexOrderAcknowledgementStepParameter {
      * The in going parameters for this step.
      */
     public enum IN {
-        AGGREGATOR, ACKNOWLEDGEMENT_STATUS_DTO, FLEX_OFFER_SEQUENCE_NUMBER
+        AGGREGATOR, ACKNOWLEDGEMENT_STATUS_DTO, FLEX_ORDER_SEQUENCE_NUMBER
     }
 }
