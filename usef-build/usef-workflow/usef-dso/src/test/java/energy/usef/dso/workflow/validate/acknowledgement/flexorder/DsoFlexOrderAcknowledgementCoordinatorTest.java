@@ -18,11 +18,12 @@ package energy.usef.dso.workflow.validate.acknowledgement.flexorder;
 
 import static energy.usef.core.model.AcknowledgementStatus.ACCEPTED;
 import static energy.usef.dso.workflow.validate.acknowledgement.flexorder.FlexOrderAcknowledgementStepParameter.IN.ACKNOWLEDGEMENT_STATUS_DTO;
-import static energy.usef.dso.workflow.validate.acknowledgement.flexorder.FlexOrderAcknowledgementStepParameter.IN.FLEX_OFFER_SEQUENCE_NUMBER;
+import static energy.usef.dso.workflow.validate.acknowledgement.flexorder.FlexOrderAcknowledgementStepParameter.IN.FLEX_ORDER_SEQUENCE_NUMBER;
 import static org.hamcrest.core.Is.is;
 import static org.mockito.Matchers.contains;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
 import energy.usef.core.model.AcknowledgementStatus;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.dto.FlexOrderDto;
@@ -32,12 +33,9 @@ import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 import energy.usef.dso.util.ReflectionUtil;
 import energy.usef.dso.workflow.DsoWorkflowStep;
 import energy.usef.dso.workflow.validate.create.flexrequest.CreateFlexRequestEvent;
-
 import java.math.BigInteger;
 import java.util.stream.IntStream;
-
 import javax.enterprise.event.Event;
-
 import org.joda.time.LocalDate;
 import org.junit.Assert;
 import org.junit.Before;
@@ -111,7 +109,7 @@ public class DsoFlexOrderAcknowledgementCoordinatorTest {
                 contextCapturer.capture());
 
         Assert.assertNotNull(contextCapturer.getValue().getValue(ACKNOWLEDGEMENT_STATUS_DTO.name()));
-        Assert.assertThat(contextCapturer.getValue().getValue(FLEX_OFFER_SEQUENCE_NUMBER.name()), is(1234L));
+        Assert.assertThat(contextCapturer.getValue().getValue(FLEX_ORDER_SEQUENCE_NUMBER.name()), is(1234L));
     }
 
     /**
@@ -137,7 +135,7 @@ public class DsoFlexOrderAcknowledgementCoordinatorTest {
                 contextCapturer.capture());
 
         Assert.assertNotNull(contextCapturer.getValue().getValue(ACKNOWLEDGEMENT_STATUS_DTO.name()));
-        Assert.assertThat(contextCapturer.getValue().getValue(FLEX_OFFER_SEQUENCE_NUMBER.name()), is(1234L));
+        Assert.assertThat(contextCapturer.getValue().getValue(FLEX_ORDER_SEQUENCE_NUMBER.name()), is(1234L));
     }
 
     /**
