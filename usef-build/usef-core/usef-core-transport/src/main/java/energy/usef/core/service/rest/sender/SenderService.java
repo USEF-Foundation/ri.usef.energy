@@ -214,7 +214,7 @@ public class SenderService {
         String propName = dtoMessage.getMessageMetadata().getRecipientDomain().replace(".","_").toUpperCase() + AUTH_HEADER;
         String base64DsoAuthorization = config.getProperties().getProperty(propName);
 
-        if (base64DsoAuthorization != null && !"".equals(base64DsoAuthorization) {
+        if (base64DsoAuthorization != null && !"".equals(base64DsoAuthorization)) {
             if (base64DsoAuthorization.length() < 10 ) {
                 LOGGER.warn("The configuration parameter " + propName + " in the config-local.properties is too short");                
             } else {
