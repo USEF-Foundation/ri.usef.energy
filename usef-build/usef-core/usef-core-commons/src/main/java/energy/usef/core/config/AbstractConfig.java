@@ -230,7 +230,7 @@ public abstract class AbstractConfig {
                 .collect(Collectors.toList());
         Collections.sort(propertiesList);
 
-        LOGGER.info("\nProperties:\n" + StringUtils.join(propertiesList.toArray(), "\n"));
+        LOGGER.trace("\nProperties:\n" + StringUtils.join(propertiesList.toArray(), "\n"));
     }
 
     /***
