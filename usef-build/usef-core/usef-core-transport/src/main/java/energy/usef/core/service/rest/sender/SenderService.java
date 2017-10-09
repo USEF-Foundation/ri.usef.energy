@@ -212,7 +212,11 @@ public class SenderService {
         HttpRequest request = requestFactory.buildPostRequest(targetURL, content);
 
         String propName = dtoMessage.getMessageMetadata().getRecipientDomain().replace(".","_").toUpperCase() + AUTH_HEADER;
-        String base64DsoAuthorization = config.getProperties().getProperty(propName);
+        String base64DsoAuthorization = System.getenv(propName.replace("-","_"));
+
+        if (base64DsoAuthorization == null || "".equals(base64DsoAuthorization)) {
+        	base64DsoAuthorization = config.getProperties().getProperty(propName);
+        }
 
         if (base64DsoAuthorization != null && !"".equals(base64DsoAuthorization)) {
             if (base64DsoAuthorization.length() < 10 ) {
