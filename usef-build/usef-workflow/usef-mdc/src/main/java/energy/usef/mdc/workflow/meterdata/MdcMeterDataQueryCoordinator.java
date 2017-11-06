@@ -129,10 +129,6 @@ public class MdcMeterDataQueryCoordinator {
         // Copy 'any' elements from MeterDataQuery to MeterDataQueryResponse
         meterDataQueryResponse.getAny().addAll(event.getMeterDataQuery().getAny());
 
-        if (event.getMeterDataQuery().getDateRangeStart().equals(event.getMeterDataQuery().getDateRangeStart())) {
-            meterDataQueryResponse.getAny().add(new JAXBElement<String>(new QName("http://usef.dynamo","extension", "dynamo"), String.class, "daily"));
-        }
-
         // send response
         jmsHelperService.sendMessageToOutQueue(XMLUtil.messageObjectToXml(meterDataQueryResponse));
 
