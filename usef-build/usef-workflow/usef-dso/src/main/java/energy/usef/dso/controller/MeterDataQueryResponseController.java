@@ -16,6 +16,7 @@
 
 package energy.usef.dso.controller;
 
+import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
 import energy.usef.core.controller.BaseIncomingResponseMessageController;
 import energy.usef.core.data.xml.bean.message.DispositionSuccessFailure;
 import energy.usef.core.data.xml.bean.message.MeterDataQueryResponse;
@@ -27,6 +28,7 @@ import energy.usef.core.model.DocumentType;
 import energy.usef.core.model.Message;
 import energy.usef.core.model.PlanboardMessage;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
+import energy.usef.dso.workflow.settlement.SendMeterdataEvent;
 import energy.usef.dso.workflow.settlement.collect.FinalizeCollectOrangeRegimeDataEvent;
 import energy.usef.dso.workflow.settlement.initiate.FinalizeInitiateSettlementEvent;
 
@@ -54,12 +56,21 @@ public class MeterDataQueryResponseController extends BaseIncomingResponseMessag
     @Inject
     private Event<FinalizeCollectOrangeRegimeDataEvent> finalizeCollectOrangeRegimeDataEventManager;
 
+    @Inject
+    private Event<SendMeterdataEvent> sendMeterdataEventManager;
+
     @Override
     public void action(MeterDataQueryResponse message, Message savedMessage) throws BusinessException {
         LOGGER.debug("MeterDataQueryResponse received");
 
         DocumentType documentType = (message.getQueryType() == MeterDataQueryType.EVENTS) ? DocumentType.METER_DATA_QUERY_EVENTS
                 : DocumentType.METER_DATA_QUERY_USAGE;
+
+       // Dynamo addition
+       if (documentType == DocumentType.METER_DATA_QUERY_USAGE && isCustomInteraction(message)) {
+           sendMeterdataEventManager.fire(new SendMeterdataEvent(message));
+           return;
+       }
 
         // find sent Meter Data Query
         PlanboardMessage planboardMessage = corePlanboardBusinessService
@@ -93,5 +104,9 @@ public class MeterDataQueryResponseController extends BaseIncomingResponseMessag
         }
 
         planboardMessage.setDocumentStatus(DocumentStatus.PROCESSED);
+    }
+
+    private boolean isCustomInteraction(MeterDataQueryResponse message) {
+        return (message.getAny().stream().filter(e -> ((ElementNSImpl)e).getTextContent().equalsIgnoreCase("DynamoMeterDataService")).count() == 1L);
     }
 }
