@@ -16,7 +16,6 @@
 
 package energy.usef.dso.controller;
 
-import com.sun.org.apache.xerces.internal.dom.ElementNSImpl;
 import energy.usef.core.controller.BaseIncomingResponseMessageController;
 import energy.usef.core.data.xml.bean.message.DispositionSuccessFailure;
 import energy.usef.core.data.xml.bean.message.MeterDataQueryResponse;
@@ -41,6 +40,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 /**
  * Controller class handling the reception of a {@link MeterDataQueryResponse} message.
@@ -107,6 +107,6 @@ public class MeterDataQueryResponseController extends BaseIncomingResponseMessag
     }
 
     private boolean isCustomInteraction(MeterDataQueryResponse message) {
-        return (message.getAny().stream().filter(e -> ((ElementNSImpl)e).getTextContent().equalsIgnoreCase("DynamoMeterDataService")).count() == 1L);
+        return (message.getAny().stream().filter(e -> ((Element) e ).getFirstChild().getNodeValue().equalsIgnoreCase("DynamoMeterDataService")).count() == 1L);
     }
 }
