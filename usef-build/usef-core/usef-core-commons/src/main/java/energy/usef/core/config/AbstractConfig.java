@@ -230,7 +230,14 @@ public abstract class AbstractConfig {
         properties.putAll(environmentVariableProperties);
 
         List<String> propertiesList = properties.entrySet().stream()
-                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .map(entry -> {
+                    String key = entry.getKey().toString();
+                    if (key.toLowerCase().contains("password")) {
+                        return key + "=***";
+                    } else {
+                        return key + "=" + entry.getValue();
+                    }
+                })
                 .collect(Collectors.toList());
         Collections.sort(propertiesList);
 
