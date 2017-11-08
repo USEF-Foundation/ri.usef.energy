@@ -108,7 +108,7 @@ public class SenderServiceTest {
     private static final String TLS_VERIFICATION_DISABLED_MESSAGE = "TLS/SSL verification is disabled. Certificates of the destination of the message will not be checked.";
 
     @Rule
-    public WireMockRule usefEndpoint = new WireMockRule(666);
+    public WireMockRule usefEndpoint = new WireMockRule(6667);
 
     @Mock
     private MessageService messageService;
@@ -345,7 +345,7 @@ public class SenderServiceTest {
         participant.setSpecVersion("2015");
 
         ParticipantRole role = new ParticipantRole(USEFRole.DSO);
-        role.setUrl("http://localhost:666");
+        role.setUrl("http://localhost:6667");
         role.setPublicKeys(Arrays.asList("unsigningKey", "KEY2"));
 
         participant.setRoles(Collections.singletonList(role));
