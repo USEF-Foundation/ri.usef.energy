@@ -17,6 +17,7 @@
 package energy.usef.mdc.workflow.meterdata;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import energy.usef.core.config.Config;
@@ -54,6 +55,9 @@ import org.mockito.Mockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
+
 @RunWith(PowerMockRunner.class)
 public class MdcMeterDataQueryCoordinatorTest {
 
@@ -88,7 +92,7 @@ public class MdcMeterDataQueryCoordinatorTest {
         final LocalDate dateRangeStart = new LocalDate("2014-01-01");
         final LocalDate dateRangeEnd = new LocalDate("2014-01-02");
 
-        MeterDataQueryEvent queryEvent = buildMeterDataQueryEvent(dsoDomain, dateRangeStart, dateRangeEnd);
+        MeterDataQueryEvent queryEvent = buildMeterDataQueryEvent(dsoDomain, dateRangeStart, dateRangeEnd, false);
 
         Mockito.when(mdcCoreBusinessService.findDistributionSystemOperator(dsoDomain))
                 .thenReturn(new DistributionSystemOperator(dsoDomain));
@@ -120,12 +124,16 @@ public class MdcMeterDataQueryCoordinatorTest {
         assertTrue(captor.getValue().contains("Result=\"Success\""));
         assertTrue(captor.getValue().contains("Power=\"40\""));
         assertTrue(captor.getValue().contains("EntityCount=\"4\""));
-    }
+        assertFalse(captor.getValue().contains("ExtendedMessage"));
+   }
 
-    private MeterDataQueryEvent buildMeterDataQueryEvent(String dsoDomain, LocalDate dateRangeStart, LocalDate dateRangeEnd) {
+    private MeterDataQueryEvent buildMeterDataQueryEvent(String dsoDomain, LocalDate dateRangeStart, LocalDate dateRangeEnd, boolean addAny) {
         MeterDataQuery query = new MeterDataQuery();
         query.setDateRangeStart(dateRangeStart);
         query.setDateRangeEnd(dateRangeEnd);
+        if (addAny) {
+            query.getAny().add(new JAXBElement<String>(new QName("http://extension.usef.energy","extension", "extension"), String.class, "ExtendedMessage"));
+        }
 
         Connections connectionGroup = new Connections();
         connectionGroup.setParent("ean.111111111111");
@@ -147,7 +155,7 @@ public class MdcMeterDataQueryCoordinatorTest {
         LocalDate dateRangeEnd = new LocalDate("2014-01-02");
         String dsoDomain = "dso.usef-example.com";
 
-        MeterDataQueryEvent queryEvent = buildMeterDataQueryEvent(dsoDomain, dateRangeStart, dateRangeEnd);
+        MeterDataQueryEvent queryEvent = buildMeterDataQueryEvent(dsoDomain, dateRangeStart, dateRangeEnd, false);
         // not configured
         Mockito.when(mdcCoreBusinessService.findDistributionSystemOperator(dsoDomain))
                 .thenReturn(new DistributionSystemOperator(dsoDomain));
@@ -175,7 +183,7 @@ public class MdcMeterDataQueryCoordinatorTest {
         LocalDate dateRangeStart = new LocalDate("2014-01-01");
         LocalDate dateRangeEnd = new LocalDate("2014-01-02");
         String dsoDomain = "dso.usef-example.com";
-        MeterDataQueryEvent queryEvent = buildMeterDataQueryEvent(dsoDomain, dateRangeStart, dateRangeEnd);
+        MeterDataQueryEvent queryEvent = buildMeterDataQueryEvent(dsoDomain, dateRangeStart, dateRangeEnd, false);
         // not configured
         Mockito.when(mdcCoreBusinessService.findDistributionSystemOperator(dsoDomain)).thenReturn(null);
 
@@ -212,4 +220,47 @@ public class MdcMeterDataQueryCoordinatorTest {
         workflowContext.setValue(MeterDataQueryStepParameter.OUT.METER_DATA.name(), meterDataDtos);
         return workflowContext;
     }
+
+    @Test
+    public void testHandleExtendedEvent() throws Exception {
+        final String dsoDomain = "dso.usef-example.com";
+        final LocalDate dateRangeStart = new LocalDate("2014-01-01");
+        final LocalDate dateRangeEnd = new LocalDate("2014-01-02");
+
+        MeterDataQueryEvent queryEvent = buildMeterDataQueryEvent(dsoDomain, dateRangeStart, dateRangeEnd, true);
+
+        Mockito.when(mdcCoreBusinessService.findDistributionSystemOperator(dsoDomain))
+                .thenReturn(new DistributionSystemOperator(dsoDomain));
+
+        Mockito.when(mdcCoreBusinessService.findConnectionState(Mockito.any(LocalDate.class),
+                Mockito.anyListOf(String.class))).thenReturn(IntStream.rangeClosed(0, 3)
+                .mapToObj(i -> "ean." + i)
+                .collect(Collectors.toMap(Function.identity(), i -> "agr.usef-example.com")));
+
+        Mockito.when(workflowStepExecuter.invoke(Mockito.eq(MdcWorkflowStep.MDC_METER_DATA_QUERY.name()),
+                Mockito.any(WorkflowContext.class))).thenReturn(buildMeterDataContext(dateRangeStart));
+
+        // test
+        coordinator.handleEvent(queryEvent);
+
+        ArgumentCaptor<WorkflowContext> contextIn = ArgumentCaptor.forClass(WorkflowContext.class);
+        Mockito.verify(workflowStepExecuter, Mockito.times(1)).invoke(Mockito.eq(MdcWorkflowStep.MDC_METER_DATA_QUERY.name()),
+                contextIn.capture());
+
+        assertEquals(15, contextIn.getValue().getValue(MeterDataQueryStepParameter.IN.PTU_DURATION.name()));
+        assertEquals(dateRangeStart, contextIn.getValue().getValue(MeterDataQueryStepParameter.IN.DATE_RANGE_START.name()));
+        assertEquals(dateRangeEnd, contextIn.getValue().getValue(MeterDataQueryStepParameter.IN.DATE_RANGE_END.name()));
+        assertEquals(queryEvent.getMeterDataQuery().getConnections().get(0).getConnection(),
+                contextIn.getValue().getValue(MeterDataQueryStepParameter.IN.CONNECTIONS.name()));
+
+        // check if power is combined into 1 aggregator (4*10)
+        ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+        Mockito.verify(jmsHelperService, Mockito.times(1)).sendMessageToOutQueue(captor.capture());
+        assertTrue(captor.getValue().contains("Result=\"Success\""));
+        assertTrue(captor.getValue().contains("Power=\"40\""));
+        assertTrue(captor.getValue().contains("EntityCount=\"4\""));
+        assertTrue(captor.getValue().contains("<extension:extension xmlns:extension=\"http://extension.usef.energy\">ExtendedMessage</extension:extension>"));
+    }
+
+
 }
