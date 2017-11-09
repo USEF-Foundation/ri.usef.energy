@@ -42,7 +42,7 @@ public class AllowedEndpointFilterTest {
         when(context.getUriInfo()).thenReturn(uriInfo);
         new AllowedEndpointFilter(config).filter(context);
 
-        verify(context).abortWith(any());
+        verify(context).abortWith(responseArgumentCaptor.capture());
         assertThat(responseArgumentCaptor.getValue().getStatus(), CoreMatchers.is(403));
     }
 
