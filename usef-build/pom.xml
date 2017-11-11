@@ -19,7 +19,6 @@
     <module>usef-simulation</module>
     <module>usef-endpoints</module>
     <module>usef-test</module>
-    <module>usef-deployments</module>
   </modules>
 
   <dependencies>
