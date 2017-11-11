@@ -16,7 +16,7 @@
 				<dependency>
 					<groupId>energy.usef</groupId>
 					<artifactId>usef-endpoint-cro</artifactId>
-					<version>1.3.8-SNAPSHOT</version>
+					<version>${project.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
