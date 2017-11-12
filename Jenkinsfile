@@ -41,7 +41,7 @@ pipeline {
                             sh 'git tag -a $version -m "New release"'
                             sh 'git push https://${GITUSER_USR}:${GITUSER_PSW}@github.com/Alliander/ri.usef.energy.git $version'
                         } else {
-                            sh 'mvn -f usef-build/pom.xml clean deploy -DskipTests'
+                            sh 'mvn -f usef-build/pom.xml clean deploy'
                         }
                     }
                 }
