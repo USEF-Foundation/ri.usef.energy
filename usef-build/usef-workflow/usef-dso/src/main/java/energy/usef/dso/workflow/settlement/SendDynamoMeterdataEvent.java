@@ -2,11 +2,11 @@ package energy.usef.dso.workflow.settlement;
 
 import energy.usef.core.data.xml.bean.message.MeterDataQueryResponse;
 
-public class SendMeterdataEvent {
+public class SendDynamoMeterdataEvent {
 
     private MeterDataQueryResponse message;
 
-    public SendMeterdataEvent(MeterDataQueryResponse message) {
+    public SendDynamoMeterdataEvent(MeterDataQueryResponse message) {
         this.message = message;
     }
 
@@ -19,7 +19,7 @@ public class SendMeterdataEvent {
     }
 
     @Override public String toString() {
-        return "SendMeterdataEvent[" +
+        return "SendDynamoMeterdataEvent[" +
                 "message=" + message +
                 ']';
     }

@@ -27,7 +27,7 @@ import energy.usef.core.model.DocumentType;
 import energy.usef.core.model.Message;
 import energy.usef.core.model.PlanboardMessage;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
-import energy.usef.dso.workflow.settlement.SendMeterdataEvent;
+import energy.usef.dso.workflow.settlement.SendDynamoMeterdataEvent;
 import energy.usef.dso.workflow.settlement.collect.FinalizeCollectOrangeRegimeDataEvent;
 import energy.usef.dso.workflow.settlement.initiate.FinalizeInitiateSettlementEvent;
 
@@ -57,7 +57,7 @@ public class MeterDataQueryResponseController extends BaseIncomingResponseMessag
     private Event<FinalizeCollectOrangeRegimeDataEvent> finalizeCollectOrangeRegimeDataEventManager;
 
     @Inject
-    private Event<SendMeterdataEvent> sendMeterdataEventManager;
+    private Event<SendDynamoMeterdataEvent> sendMeterdataEventManager;
 
     @Override
     public void action(MeterDataQueryResponse message, Message savedMessage) throws BusinessException {
@@ -67,8 +67,8 @@ public class MeterDataQueryResponseController extends BaseIncomingResponseMessag
                 : DocumentType.METER_DATA_QUERY_USAGE;
 
        // Dynamo addition
-       if (documentType == DocumentType.METER_DATA_QUERY_USAGE && isCustomInteraction(message)) {
-           sendMeterdataEventManager.fire(new SendMeterdataEvent(message));
+       if (documentType == DocumentType.METER_DATA_QUERY_USAGE && isDynamoMeterDataQueryResponse(message)) {
+           sendMeterdataEventManager.fire(new SendDynamoMeterdataEvent(message));
            return;
        }
 
@@ -106,7 +106,7 @@ public class MeterDataQueryResponseController extends BaseIncomingResponseMessag
         planboardMessage.setDocumentStatus(DocumentStatus.PROCESSED);
     }
 
-    private boolean isCustomInteraction(MeterDataQueryResponse message) {
+    private boolean isDynamoMeterDataQueryResponse(MeterDataQueryResponse message) {
         return (message.getAny().stream().filter(e -> ((Element) e ).getFirstChild().getNodeValue().equalsIgnoreCase("DynamoMeterDataService")).count() == 1L);
     }
 }
