@@ -104,6 +104,8 @@ public class SenderService {
         LOGGER.debug("Started sending message");
         LOGGER_CONFIDENTIAL.debug("Trying to send message {} ", xmlString);
 
+        LOGGER.info("Sending message {}", xmlString);
+
         Message dtoMessage = (Message) XMLUtil
                 .xmlToMessage(xmlString, config.getBooleanProperty(ConfigParam.VALIDATE_OUTGOING_XML).booleanValue());
         energy.usef.core.model.Message storedMessage = messageService.storeMessage(xmlString, dtoMessage, MessageDirection.OUTBOUND);
@@ -210,9 +212,13 @@ public class SenderService {
         HttpRequest request = requestFactory.buildPostRequest(targetURL, content);
 
         String propName = dtoMessage.getMessageMetadata().getRecipientDomain().replace(".","_").toUpperCase() + AUTH_HEADER;
-        String base64DsoAuthorization = config.getProperties().getProperty(propName);
+        String base64DsoAuthorization = System.getenv(propName.replace("-","_"));
 
-        if (base64DsoAuthorization != null && !"".equals(base64DsoAuthorization) {
+        if (base64DsoAuthorization == null || "".equals(base64DsoAuthorization)) {
+        	base64DsoAuthorization = config.getProperties().getProperty(propName);
+        }
+
+        if (base64DsoAuthorization != null && !"".equals(base64DsoAuthorization)) {
             if (base64DsoAuthorization.length() < 10 ) {
                 LOGGER.warn("The configuration parameter " + propName + " in the config-local.properties is too short");                
             } else {

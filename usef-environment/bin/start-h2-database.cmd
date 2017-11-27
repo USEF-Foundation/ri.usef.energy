@@ -30,7 +30,7 @@ if "%OS%" == "Windows_NT" (
   set DIRNAME=.\
 )
 
-set H2_DATABASE_JAR=%JBOSS_HOME%\modules\system\layers\base\com\h2database\h2\main\h2-1.4.190.jar
+set H2_DATABASE_JAR=%JBOSS_HOME%\modules\system\layers\base\com\h2database\h2\main\h2-1.4.193.jar
 set H2DB_PID=
 
 rem if JBoss Wildfly does not exist, show an error on the screen.
@@ -73,7 +73,8 @@ echo.
 echo H2_DATABASE_JAR  = %H2_DATABASE_JAR%
 echo.
 
-start java -server -Xmx1024m -Xms256m -classpath %H2_DATABASE_JAR% org.h2.tools.Server -tcp -tcpPort 9092 -tcpAllowOthers -web -webAllowOthers -webPort 8082
+rem start java -server -Xmx1024m -Xms256m -classpath %H2_DATABASE_JAR% org.h2.tools.Server -tcp -tcpPort 9092 -tcpAllowOthers -web -webAllowOthers -webPort 8082
+java -server -Xmx1024m -Xms256m -classpath %H2_DATABASE_JAR% org.h2.tools.Server -tcp -tcpPort 9092 -tcpAllowOthers -web -webAllowOthers -webPort 8082
 
 echo.
 echo ====================================================================================================

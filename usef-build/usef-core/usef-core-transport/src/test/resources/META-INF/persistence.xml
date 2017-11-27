@@ -8,6 +8,27 @@
 		<class>energy.usef.core.model.MessageError</class>
 		<class>energy.usef.core.model.SignedMessageHash</class>
 
+        <!--
+		<exclude-unlisted-classes>true</exclude-unlisted-classes>
+		<properties>
+			<property name="javax.persistence.schema-generation.database.action" value="none"/>
+
+			<property name="hibernate.order_updates" value="true"/>
+			<property name="hibernate.order_inserts" value="true"/>
+			<property name="hibernate.jdbc.batch_size" value="20"/>
+
+			<property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL9Dialect"/>
+			<property name="hibernate.show_sql" value="true"/>
+
+            <property name="hibernate.connection.url" value="jdbc:postgresql://localhost:5432/AGR" />
+            <property name="hibernate.connection.username" value="usef" />
+            <property name="hibernate.connection.password" value="usef" />
+
+			<property name="hibernate.default_schema" value="agr"/>
+			// <property name="wildfly.jpa.twophasebootstrap" value="false"/>
+		</properties>
+        -->
+
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="javax.persistence.schema-generation.database.action"

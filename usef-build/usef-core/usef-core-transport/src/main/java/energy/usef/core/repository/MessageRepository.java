@@ -19,7 +19,7 @@ package energy.usef.core.repository;
 import static javax.persistence.TemporalType.TIMESTAMP;
 
 import java.sql.Date;
-import java.util.List;
+import java.util.*;
 
 import javax.ejb.Stateless;
 
@@ -125,25 +125,49 @@ public class MessageRepository extends BaseRepository<Message> {
      */
     public boolean hasEveryCommonReferenceQuerySentAResponseReceived(LocalDateTime period) {
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT queries FROM Message queries WHERE queries.conversationId NOT IN (");
-        sql.append("  SELECT responses.conversationId FROM Message responses ");
-        sql.append("  WHERE responses.xml LIKE :responseType ");
-        sql.append("    AND YEAR(responses.creationTime) = :year ");
-        sql.append("    AND MONTH(responses.creationTime) = :month ");
-        sql.append("    AND DAY(responses.creationTime) = :day ");
-        sql.append("  )");
-        sql.append("  AND queries.xml LIKE :queryType ");
-        sql.append("  AND YEAR(queries.creationTime) = :year ");
-        sql.append("  AND MONTH(queries.creationTime) = :month ");
-        sql.append("  AND DAY(queries.creationTime) = :day ");
+        sql.append("SELECT queries FROM Message queries ");
+        sql.append("    WHERE YEAR(queries.creationTime) = :year ");
+        sql.append("    AND MONTH(queries.creationTime) = :month ");
+        sql.append("    AND DAY(queries.creationTime) = :day ");
         List<Message> messages = getEntityManager().createQuery(sql.toString(), Message.class)
                 .setParameter("year", period.toLocalDate().getYear())
                 .setParameter("month", period.toLocalDate().getMonthOfYear())
                 .setParameter("day", period.toLocalDate().getDayOfMonth())
-                .setParameter("queryType", "%" + COMMON_REFERENCE_QUERY + "%")
-                .setParameter("responseType", "%" + COMMON_REFERENCE_QUERY_RESPONSE + "%")
                 .getResultList();
-        return messages.isEmpty();
+
+        if (messages.isEmpty()) {
+            return false;
+        }
+
+        // because Postgres can not handle XML fields, filter the xml with Java.
+        // First find all queries in messages of today.
+        Map<String, Boolean> requestResponses = new HashMap<>();
+        for (Message message : messages) {
+            String xml = message.getXml();
+            if (xml != null && xml.contains(COMMON_REFERENCE_QUERY)) {
+                requestResponses.put(message.getConversationId(), false);
+            }
+        }
+        // Match corresponding responses.
+        for (Message message : messages) {
+            String xml = message.getXml();
+            if (xml != null && xml.contains(COMMON_REFERENCE_QUERY_RESPONSE)) {
+                Boolean value = requestResponses.get(message.getConversationId());
+                if (value != null) {
+                    requestResponses.put(message.getConversationId(), true);
+                }
+            }
+        }
+
+        // Check if all queries have responses.
+        for (Map.Entry<String, Boolean> entry : requestResponses.entrySet()) {
+            if (entry.getValue() == false) {
+                // response message not yet received.
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

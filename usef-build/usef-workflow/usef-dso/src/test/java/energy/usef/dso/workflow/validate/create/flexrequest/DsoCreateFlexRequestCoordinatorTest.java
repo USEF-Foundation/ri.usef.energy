@@ -141,6 +141,27 @@ public class DsoCreateFlexRequestCoordinatorTest {
     }
 
     @Test
+    public void flexRequestWithSequenceShouldMatchSequenceInMessage() throws BusinessValidationException {
+        PowerMockito.when(workflowStubLoader.invoke(Mockito.eq(DSO_CREATE_FLEX_REQUEST.name()),
+                Mockito.any(WorkflowContext.class)))
+                .then(call -> {
+                    WorkflowContext context = (WorkflowContext) call.getArguments()[1];
+                    List<FlexRequestDto> flexRequestDtos = buildFlexRequestDto();
+                    flexRequestDtos.get(0).setSequenceNumber(11111L);
+                    context.setValue(OUT.FLEX_REQUESTS_DTO_LIST.name(), flexRequestDtos);
+                    return context;
+                });
+        ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
+        coordinator.createFlexRequests(new CreateFlexRequestEvent(CONGESTION_POINT_ENTITY_ADDRESS, PTU_DATE, new Integer[] {}));
+        Mockito.verify(jmsHelperService, Mockito.times(2)).sendMessageToOutQueue(messageCaptor.capture());
+
+        List<String> messages = messageCaptor.getAllValues();
+        Assert.assertTrue(messages.get(0).contains("agr1.usef-example.com"));
+        Assert.assertTrue(messages.get(1).contains("agr2.usef-example.com"));
+        Assert.assertTrue(messages.get(0).contains("11111"));
+    }
+
+    @Test
     public void testInvokeWorkflowExpired() throws BusinessValidationException {
         coordinator.createFlexRequests(new CreateFlexRequestEvent(CONGESTION_POINT_ENTITY_ADDRESS, EXPIRED_PTU_DATE, new Integer[] {}));
         Mockito.verify(eventValidationService, Mockito.times(1));

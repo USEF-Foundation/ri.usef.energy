@@ -23,9 +23,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
@@ -627,14 +630,28 @@ public class DsoPlanboardBusinessService {
      * @param initializationDate {@link LocalDate} date of the initializtion of the aggregator count.
      * @param initializationDuration {@link Integer} duration of the initalization.
      */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void updateAggregatorsOnCongestionPointConnectionGroup(CongestionPoint xmlCongestionPoint, LocalDate initializationDate,
             Integer initializationDuration) {
 
+        LOGGER.info("Update aggregators on congestionpoint {} and host {}.", xmlCongestionPoint.getEntityAddress(),
+                config.getProperty(ConfigParam.HOST_DOMAIN));
         CongestionPointConnectionGroup congestionPoint = congestionPointConnectionGroupRepository.findOrCreate(
                 xmlCongestionPoint.getEntityAddress(), config.getProperty(ConfigParam.HOST_DOMAIN));
 
+        LOGGER.debug("Finding aggregators on connection group state for congestionpoint {} for date {}.",
+                congestionPoint.getUsefIdentifier(), initializationDate);
         List<AggregatorOnConnectionGroupState> endingAtDate = aggregatorOnConnectionGroupStateRepository
                 .findEndingAggregatorOnConnectionGroupStates(congestionPoint.getUsefIdentifier(), initializationDate);
+
+        StringBuilder sb = new StringBuilder();
+        for (AggregatorOnConnectionGroupState groupState : endingAtDate) {
+            sb.append("Aggregator: " + groupState.getAggregator().getDomain() + ", connection group: " +
+                            groupState.getCongestionPointConnectionGroup().getUsefIdentifier() +
+                            " valid until: " +
+                            groupState.getValidUntil() + "\n");
+        }
+        LOGGER.debug("Aggregators on connection group state:\n{}", sb.toString());
 
         // for each ending aggregator/connection group state for which nothing is updated, extend the valid until date.
         endingAtDate.stream()
@@ -645,7 +662,13 @@ public class DsoPlanboardBusinessService {
                                 && aocgs.getCongestionPointConnectionGroup()
                                 .getUsefIdentifier()
                                 .equals(xmlCongestionPoint.getEntityAddress())))
-                .forEach(aocgs -> aocgs.setValidUntil(aocgs.getValidUntil().plusDays(initializationDuration)));
+                .forEach(aocgs -> {
+                    LocalDate period = aocgs.getValidUntil().plusDays(initializationDuration);
+                    LOGGER.info("Update aggregator {} for congestion group {} and valid until {} to {}.",
+                            aocgs.getAggregator().getDomain(), aocgs.getCongestionPointConnectionGroup()
+                            .getUsefIdentifier(), aocgs.getValidUntil(), period);
+                    aocgs.setValidUntil(period);
+                });
 
         // create new records if anything changed
         xmlCongestionPoint
@@ -661,6 +684,10 @@ public class DsoPlanboardBusinessService {
                                         .equals(xmlCongestionPoint.getEntityAddress())))
                 .filter(xmlAggregator -> StringUtils.isNotEmpty(xmlAggregator.getDomain()))
                 .forEach(xmlAggregator -> {
+                    LocalDate period = initializationDate.plusDays(initializationDuration);
+                    LOGGER.info("Create aggregator {} for congestion group {} and valid until {}.",
+                            xmlAggregator.getDomain(), congestionPoint.getUsefIdentifier(), period);
+
                     Aggregator dbAggregator = aggregatorRepository.findOrCreate(xmlAggregator.getDomain());
                     AggregatorOnConnectionGroupState newState = new AggregatorOnConnectionGroupState();
                     newState.setAggregator(dbAggregator);
@@ -669,7 +696,7 @@ public class DsoPlanboardBusinessService {
                                     BigInteger.ZERO :
                                     xmlAggregator.getConnectionCount());
                     newState.setValidFrom(initializationDate);
-                    newState.setValidUntil(initializationDate.plusDays(initializationDuration));
+                    newState.setValidUntil(period);
                     newState.setCongestionPointConnectionGroup(congestionPoint);
                     aggregatorOnConnectionGroupStateRepository.persist(newState);
                 });

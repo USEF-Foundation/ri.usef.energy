@@ -60,6 +60,8 @@ import javax.ejb.Stateless;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,7 +92,7 @@ public class MdcMeterDataQueryCoordinator {
      *
      * @param event The actual event.
      */
-    public void handleEvent(@Observes MeterDataQueryEvent event) {
+       public void handleEvent(@Observes MeterDataQueryEvent event) {
         LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
 
         // build response
@@ -122,7 +124,10 @@ public class MdcMeterDataQueryCoordinator {
             }
         } else {
             meterDataQueryResponse.setMessage("Sender is not a configured customer.");
-        }
+         }
+
+        // Copy 'any' elements from MeterDataQuery to MeterDataQueryResponse
+        meterDataQueryResponse.getAny().addAll(event.getMeterDataQuery().getAny());
 
         // send response
         jmsHelperService.sendMessageToOutQueue(XMLUtil.messageObjectToXml(meterDataQueryResponse));

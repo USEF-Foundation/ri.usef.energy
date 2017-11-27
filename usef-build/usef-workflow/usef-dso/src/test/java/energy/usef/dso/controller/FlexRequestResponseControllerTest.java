@@ -20,6 +20,7 @@ import energy.usef.core.data.xml.bean.message.DispositionAcceptedRejected;
 import energy.usef.core.data.xml.bean.message.FlexRequestResponse;
 import energy.usef.core.data.xml.bean.message.USEFRole;
 import energy.usef.core.exception.BusinessException;
+import energy.usef.core.model.AcknowledgementStatus;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
 import energy.usef.core.model.Message;
@@ -28,12 +29,16 @@ import energy.usef.core.service.business.CorePlanboardBusinessService;
 import energy.usef.core.service.business.MessageService;
 import energy.usef.core.service.helper.MessageMetadataBuilder;
 
+import energy.usef.dso.workflow.validate.acknowledgement.flexrequest.FlexRequestAcknowledgementEvent;
+import javax.enterprise.event.Event;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
@@ -47,6 +52,8 @@ public class FlexRequestResponseControllerTest {
     private MessageService messageService;
     @Mock
     private CorePlanboardBusinessService corePlanboardBusinessService;
+    @Mock
+    private Event<FlexRequestAcknowledgementEvent> eventManager;
 
     private FlexRequestResponseController controller;
 
@@ -55,6 +62,7 @@ public class FlexRequestResponseControllerTest {
         controller = new FlexRequestResponseController();
         Whitebox.setInternalState(controller, messageService);
         Whitebox.setInternalState(controller, corePlanboardBusinessService);
+        Whitebox.setInternalState(controller, eventManager);
 
         PowerMockito.when(messageService.getInitialMessageOfConversation(Matchers.any(String.class))).thenReturn(new Message());
     }
@@ -66,6 +74,12 @@ public class FlexRequestResponseControllerTest {
         PowerMockito.when(corePlanboardBusinessService.findSinglePlanboardMessage(Matchers.any(Long.class), Matchers.eq(
                 DocumentType.FLEX_REQUEST), Matchers.eq("agr-usef-example.com"))).thenReturn(controlPlanboardMessage);
         controller.action(buildFlexRequestResponse(DispositionAcceptedRejected.ACCEPTED), null);
+
+        ArgumentCaptor<FlexRequestAcknowledgementEvent> eventCaptor = ArgumentCaptor
+                .forClass(FlexRequestAcknowledgementEvent.class);
+        Mockito.verify(eventManager, Mockito.times(1)).fire(eventCaptor.capture());
+
+        Assert.assertEquals(AcknowledgementStatus.ACCEPTED, eventCaptor.getValue().getAcknowledgementStatus());
         Assert.assertEquals(DocumentStatus.ACCEPTED, controlPlanboardMessage.getDocumentStatus());
     }
 

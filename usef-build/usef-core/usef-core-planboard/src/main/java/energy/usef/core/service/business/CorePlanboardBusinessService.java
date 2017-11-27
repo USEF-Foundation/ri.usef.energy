@@ -16,6 +16,7 @@
 
 package energy.usef.core.service.business;
 
+import com.google.common.collect.Lists;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.CommonReferenceEntityType;
@@ -171,7 +172,7 @@ public class CorePlanboardBusinessService {
      * @param initialStatus The status of the flex offer which is stored.
      * @param participantDomain - The domain of the party which is being communicated with
      */
-    public void storeFlexOffer(String usefIdentifier, FlexOffer flexOfferRequest, DocumentStatus initialStatus,
+    public List<PtuFlexOffer> storeFlexOffer(String usefIdentifier, FlexOffer flexOfferRequest, DocumentStatus initialStatus,
             String participantDomain) {
         if (flexOfferRequest.getPTU().isEmpty()) {
             // Empty flex offer
@@ -187,6 +188,7 @@ public class CorePlanboardBusinessService {
                 flexOfferRequest.getExpirationDateTime());
         planboardMessageRepository.persist(planboardMessage);
 
+        List<PtuFlexOffer> offers = Lists.newArrayList();
         Map<Integer, PtuContainer> ptuContainers = ptuContainerRepository.findPtuContainersMap(period);
         for (PTU ptu : ptus) {
             PtuContainer ptuContainer = ptuContainers.get(ptu.getStart().intValue());
@@ -201,7 +203,9 @@ public class CorePlanboardBusinessService {
             flexOffer.setPrice(ptu.getPrice());
 
             ptuFlexOfferRepository.persist(flexOffer);
+            offers.add(flexOffer);
         }
+        return offers;
     }
 
     /**
@@ -296,7 +300,7 @@ public class CorePlanboardBusinessService {
             boolean isSubstitute) {
         LocalDate period = prognosisMessage.getPeriod();
         List<PTU> ptus = PtuListConverter.normalize(prognosisMessage.getPTU());
-
+        LOGGER.info("Storing Prognosis for period {}", period);
         PlanboardMessage planboardMessage = new PlanboardMessage(prognosisType, prognosisMessage.getSequence(), initialStatus,
                 participantDomain, period, null, connectionGroup, null);
         planboardMessage.setMessage(message);
@@ -304,20 +308,29 @@ public class CorePlanboardBusinessService {
 
         List<PtuPrognosis> storedPrognosis = new ArrayList<>();
         Map<Integer, PtuContainer> ptuContainers = ptuContainerRepository.findPtuContainersMap(period);
+
+        if (ptuContainers.isEmpty()) {
+            LOGGER.warn("No PTU containers found for period {}.", period);
+        }
+
         for (PTU ptu : ptus) {
             PtuContainer ptuContainer = ptuContainers.get(ptu.getStart().intValue());
-            PtuPrognosis prognosis = new PtuPrognosis();
-            prognosis.setPtuContainer(ptuContainer);
-            prognosis.setSequence(prognosisMessage.getSequence());
-            prognosis.setType(PrognosisType.valueOf(prognosisMessage.getType().name()));
-            prognosis.setPower(ptu.getPower());
-            prognosis.setParticipantDomain(participantDomain);
-            prognosis.setConnectionGroup(connectionGroup);
-            prognosis.setSubstitute(isSubstitute);
+            if (ptuContainer == null) {
+                LOGGER.warn("PTU container can not be found for PTU {}", ptu.getStart().intValue());
+            } else {
+                PtuPrognosis prognosis = new PtuPrognosis();
+                prognosis.setPtuContainer(ptuContainer);
+                prognosis.setSequence(prognosisMessage.getSequence());
+                prognosis.setType(PrognosisType.valueOf(prognosisMessage.getType().name()));
+                prognosis.setPower(ptu.getPower());
+                prognosis.setParticipantDomain(participantDomain);
+                prognosis.setConnectionGroup(connectionGroup);
+                prognosis.setSubstitute(isSubstitute);
 
-            ptuPrognosisRepository.persist(prognosis);
-            storedPrognosis.add(prognosis);
-            ptuStateRepository.findOrCreatePtuState(ptuContainer, connectionGroup);
+                ptuPrognosisRepository.persist(prognosis);
+                storedPrognosis.add(prognosis);
+                ptuStateRepository.findOrCreatePtuState(ptuContainer, connectionGroup);
+            }
         }
         return storedPrognosis;
     }
