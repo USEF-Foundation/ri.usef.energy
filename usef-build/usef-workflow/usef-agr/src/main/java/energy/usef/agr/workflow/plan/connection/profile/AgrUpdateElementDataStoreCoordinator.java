@@ -85,22 +85,27 @@ public class AgrUpdateElementDataStoreCoordinator {
     @Lock(LockType.WRITE)
     @Transactional(Transactional.TxType.REQUIRES_NEW)
     public void updateElementDataStore(@Observes(during = TransactionPhase.AFTER_COMPLETION) AgrUpdateElementDataStoreEvent event) throws BusinessValidationException {
-        LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
-        eventValidationService.validateEventPeriodInFuture(event);
+        try {
+            LOGGER.info(LOG_COORDINATOR_START_HANDLING_EVENT, event);
+            eventValidationService.validateEventPeriodInFuture(event);
 
-        // retrieve the input for the PBC from the database
-        List<ConnectionPortfolioDto> connectionPortfolioDtoList = agrPortfolioBusinessService
-                .findConnectionPortfolioDto(event.getPeriod());
+            // retrieve the input for the PBC from the database
+            List<ConnectionPortfolioDto> connectionPortfolioDtoList = agrPortfolioBusinessService
+                    .findConnectionPortfolioDto(event.getPeriod());
 
-        List<ElementDto> elementDtoList = invokePBC(event.getPeriod(), connectionPortfolioDtoList);
+            List<ElementDto> elementDtoList = invokePBC(event.getPeriod(), connectionPortfolioDtoList);
 
-        // persist the elements
-        List<Element> elementList = ElementTransformer.transformToModelList(elementDtoList);
-        agrElementBusinessService.createElements(elementList);
+            // persist the elements
+            List<Element> elementList = ElementTransformer.transformToModelList(elementDtoList);
+            agrElementBusinessService.createElements(elementList);
 
-        createConnectionProfileEventManager.fire(new CreateConnectionProfileEvent(event.getPeriod()));
+            createConnectionProfileEventManager.fire(new CreateConnectionProfileEvent(event.getPeriod()));
 
-        LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
+            LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
+        } catch (Throwable t) {
+            LOGGER.error("UpdateElementDataStore", t);
+            throw t;
+        }
     }
 
     @SuppressWarnings("unchecked")
