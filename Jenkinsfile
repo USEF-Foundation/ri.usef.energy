@@ -12,13 +12,6 @@ pipeline {
     }
     stages {
 
-        stage('Start') {
-            agent any
-            steps {
-                sh 'env'
-            }
-        }
-
         stage('Build') {
             agent any
             tools {
@@ -27,7 +20,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('My SonarQube Server') {
                     script {
-                        if (env.BRANCH_NAME == "develop") {
+                        if (env.BRANCH_NAME == "master") {
                             sh 'git remote update'
                             sh 'git fetch'
                             sh 'git checkout --track origin/$BRANCH_NAME'
