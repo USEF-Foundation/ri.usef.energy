@@ -27,6 +27,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import org.junit.Assert;
 import org.junit.Test;
+import org.xml.sax.SAXParseException;
 
 /**
  * XML Util Test.
@@ -104,11 +105,9 @@ public class XMLUtilTest {
         assertEquals(TEST_MESSAGE, xml);
     }
 
-    @Test
+    @Test(expected = TechnicalException.class)
     public void testXXE() {
-        MeterDataQuery message = XMLUtil.xmlToMessage(XXE, MeterDataQuery.class);
-        String xml = XMLUtil.messageObjectToXml(message);
-        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><MeterDataQuery DateRangeStart=\"2017-01-06\" DateRangeEnd=\"2017-12-06\"><MessageMetadata SenderDomain=\"post-office-dso.usef-dynamo.nl\" SenderRole=\"DSO\" RecipientDomain=\"mdc-liander-acc.usef-dynamo.nl\" RecipientRole=\"MDC\" TimeStamp=\"2017-11-28T05:12:21.000\" MessageID=\"766fa716-580f-4011-aef4-6e6d02c3c6ec\" ConversationID=\"49303388-6e12-440a-9645-3e89d5273bf3\" Precedence=\"Routine\"/><Connections Parent=\"ea1.2017-09.nl.Energiekoplopers2:1\"><Connection>ean.871687140022316150</Connection><Connection>ean.871687140022316150</Connection><Connection></Connection></Connections></MeterDataQuery>", xml);
+        XMLUtil.xmlToMessage(XXE, MeterDataQuery.class);
     }
 
     @Test(expected = TechnicalException.class)

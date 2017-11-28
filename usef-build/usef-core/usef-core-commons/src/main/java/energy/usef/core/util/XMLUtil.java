@@ -22,22 +22,21 @@ import energy.usef.core.constant.USEFConstants;
 import energy.usef.core.exception.TechnicalException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.StringReader;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 
 /**
  * XML utility.
@@ -119,13 +118,13 @@ public class XMLUtil {
      * @return object corresponding to this xml
      */
     public static Object xmlToMessage(String xml, boolean validate) {
-        try (InputStream is = IOUtils.toInputStream(xml, UTF_8)) {
+        try {
             SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setFeature("http://xml.org/sax/features/external-general-entities", false);
-            spf.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
-            spf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+            spf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            XMLReader xmlReader = spf.newSAXParser().getXMLReader();
+            InputSource inputSource = new InputSource(new StringReader(xml));
+            SAXSource source = new SAXSource(xmlReader, inputSource);
 
-            Source xmlSource = new SAXSource(spf.newSAXParser().getXMLReader(), new InputSource(is));
             Unmarshaller unmarshaller = CONTEXT.createUnmarshaller();
 
             if (validate) {
@@ -136,8 +135,8 @@ public class XMLUtil {
                 unmarshaller.setSchema(schema);
             }
 
-            return unmarshaller.unmarshal(xmlSource);
-        } catch (JAXBException | IOException e) {
+            return unmarshaller.unmarshal(source);
+        } catch (JAXBException e) {
             LOGGER.error(e.getMessage(), e);
             throw new TechnicalException("Invalid XML content: " + e.getMessage(), e);
         } catch (SAXException e) {
