@@ -8,4 +8,14 @@
 	</parent>
 	<artifactId>usef-core-workflow-api</artifactId>
 	<packaging>jar</packaging>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<scope>provided</scope>
+		</dependency>
+
+	</dependencies>
 </project>

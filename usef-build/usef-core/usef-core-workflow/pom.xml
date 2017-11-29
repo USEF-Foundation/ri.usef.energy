@@ -15,24 +15,47 @@
             <artifactId>usef-core-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>energy.usef</groupId>
             <artifactId>usef-core-planboard</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>energy.usef</groupId>
             <artifactId>usef-core-workflow-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-
-        <!-- Google reflections -->
+        <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.reflections</groupId>
             <artifactId>reflections</artifactId>
-            <version>0.9.9-RC2</version>
         </dependency>
+
+        <!--Test dependencies-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-api-mockito</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.powermock</groupId>
+            <artifactId>powermock-module-junit4</artifactId>
+            <scope>test</scope>
+        </dependency>
+
     </dependencies>
 </project>
