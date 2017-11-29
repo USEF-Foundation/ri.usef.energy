@@ -27,16 +27,14 @@ import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.transform.sax.SAXSource;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.XMLReader;
 
 /**
  * XML utility.
@@ -119,31 +117,30 @@ public class XMLUtil {
      */
     public static Object xmlToMessage(String xml, boolean validate) {
         try {
-            SAXParserFactory spf = SAXParserFactory.newInstance();
-            spf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
-            XMLReader xmlReader = spf.newSAXParser().getXMLReader();
-            InputSource inputSource = new InputSource(new StringReader(xml));
-            SAXSource source = new SAXSource(xmlReader, inputSource);
-
             Unmarshaller unmarshaller = CONTEXT.createUnmarshaller();
-
             if (validate) {
                 // setup xsd validation
                 SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
                 Schema schema = sf.newSchema(XMLUtil.class.getClassLoader().getResource(MESSAGING_XSD_FILE));
-
                 unmarshaller.setSchema(schema);
             }
 
-            return unmarshaller.unmarshal(source);
+            XMLInputFactory xif = XMLInputFactory.newFactory();
+            xif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+            xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            xif.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+            XMLStreamReader xsr = xif.createXMLStreamReader(new StringReader(xml));
+
+            return unmarshaller.unmarshal(xsr);
         } catch (JAXBException e) {
             LOGGER.error(e.getMessage(), e);
             throw new TechnicalException("Invalid XML content: " + e.getMessage(), e);
+        } catch (XMLStreamException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new TechnicalException("Unable to parse message", e);
         } catch (SAXException e) {
             LOGGER.error(e.getMessage(), e);
             throw new TechnicalException("Unable to read XSD schema", e);
-        } catch (ParserConfigurationException e) {
-            throw new TechnicalException("XMLStreamException exception", e);
         }
     }
 

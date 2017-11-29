@@ -188,7 +188,10 @@ public class ReceiverEndpointTest extends BaseResourceTest {
 
         MockHttpRequest request = MockHttpRequest.post(URL);
         request.contentType(TEXT_XML);
-        request.content("<SignedMessage SenderDomain=\"stuff\" SenderRole=\"CRO\" Body=\"&lt;TestMessage /&gt;\"/>".getBytes());
+        String body = java.util.Base64.getEncoder().encodeToString("<TestMessage>test</TestMessage>".getBytes());
+        byte[] signedMessage = String.format("<SignedMessage SenderDomain=\"cro.domain\" SenderRole=\"CRO\" Body=\"%s\"/>", body).getBytes();
+        request.content(signedMessage);
+        System.out.println(new String(signedMessage));
 
         MockHttpResponse response = new MockHttpResponse();
 

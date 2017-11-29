@@ -17,7 +17,9 @@
 package energy.usef.core.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
+import energy.usef.core.data.xml.bean.message.MeterData;
 import energy.usef.core.data.xml.bean.message.MeterDataQuery;
 import energy.usef.core.data.xml.bean.message.Prognosis;
 import energy.usef.core.data.xml.bean.message.TestMessage;
@@ -25,6 +27,10 @@ import energy.usef.core.exception.TechnicalException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.xml.sax.SAXParseException;
@@ -44,7 +50,6 @@ public class XMLUtilTest {
             + "  <Connections"
             + "    Parent=\"ea1.2017-09.nl.Energiekoplopers2:1\">"
             + "    <Connection>ean.871687140022316150</Connection>"
-            + "    <Connection>ean.871687140022316150</Connection>"
             + "    <Connection>&foo;</Connection>"
             + "  </Connections>"
             + "</MeterDataQuery>";
@@ -62,6 +67,26 @@ public class XMLUtilTest {
         constructor.setAccessible(true);
         constructor.newInstance();
         constructor.setAccessible(false);
+    }
+
+    @Test
+    public void testWithExtension() {
+        String s = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
+                + "<MeterDataQuery DateRangeStart=\"2017-1"
+                + "1-16\" DateRangeEnd=\"2017-11-16\">"
+                + "  <MessageMetadata SenderDomain=\"dso-liander-int.usef-dynamo.nl\" SenderRole=\"DSO\""
+                + "    RecipientDomain=\"mdc-liander-int.usef-dynamo.nl\" RecipientRole=\"MDC\" TimeStamp=\"2017-11-29T15:29:12.911\""
+                + "    MessageID=\"e6f683f0-db1b-4181-b786-1788228a8ba9\" ConversationID=\"ca4672e6-be79-4358-8c7c-4f4db0472ab6\""
+                + "    Precedence=\"Transactional\" ValidUntil=\"2017-11-29T21:29:12.911\"/>"
+                + "  <Connections Parent=\"ea1.2017-08.nl.End2end:A\">"
+                + "    <Connection>ean.871685990003333333</Connection>"
+                + "    <Connection>ean.871685990001111111</Connection>"
+                + "    <Connection>ean.871685990002222222</Connection>"
+                + "  </Connections>"
+                + "  <dynamo:extension xmlns:dynamo=\"http://usef.dynamo\">DynamoMeterDataService"
+                + "  </dynamo:extension>"
+                + "</MeterDataQuery> ";
+        XMLUtil.xmlToMessage(s, true);
     }
 
     @Test
@@ -105,9 +130,11 @@ public class XMLUtilTest {
         assertEquals(TEST_MESSAGE, xml);
     }
 
-    @Test(expected = TechnicalException.class)
+    @Test
     public void testXXE() {
-        XMLUtil.xmlToMessage(XXE, MeterDataQuery.class);
+        MeterDataQuery q = XMLUtil.xmlToMessage(XXE, MeterDataQuery.class);
+        List<String> connections = q.getConnections().stream().flatMap(c -> c.getConnection().stream()).collect(Collectors.toList());
+        assertThat(connections, CoreMatchers.hasItems("ean.871687140022316150", ""));
     }
 
     @Test(expected = TechnicalException.class)

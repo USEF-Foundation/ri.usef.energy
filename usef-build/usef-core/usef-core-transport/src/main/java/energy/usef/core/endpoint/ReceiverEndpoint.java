@@ -95,8 +95,6 @@ public class ReceiverEndpoint {
             SignedMessage signedMessage = XMLUtil.xmlToMessage(messageText, SignedMessage.class,
                     config.getBooleanProperty(ConfigParam.VALIDATE_INCOMING_XML).booleanValue());
 
-
-
             // Get original senders IP-address, both directly and from the proxy('s).
             String addresslist = request.getRemoteAddr() + "," + request.getRemoteHost();
             String address = request.getHeader("X-Forwarded-For");
