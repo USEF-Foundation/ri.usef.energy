@@ -31,3 +31,4 @@ usef-ddl-generate/
 *.dir_IS_UNDEFINED
 test_keystore
 pom.xml.releaseBackup
+pom.xml.versionsBackup
