@@ -17,7 +17,9 @@
 package energy.usef.core.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
+import energy.usef.core.data.xml.bean.message.MeterDataQuery;
 import energy.usef.core.data.xml.bean.message.Prognosis;
 import energy.usef.core.data.xml.bean.message.TestMessage;
 import energy.usef.core.exception.TechnicalException;
@@ -26,6 +28,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 
+import java.util.List;
+import java.util.stream.Collectors;
+import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -38,7 +43,19 @@ public class XMLUtilTest {
     private static final String FAILED_TEST_MESSAGE = "<TestMe!ssage><MessageMetadata MessageID=\"12345678-1234-1234-1234567890ab\"/></TestMessage>";
     private static final String PROGNOSIS_MESSAGE = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Prognosis Type=\"D-Prognosis\" PTU-Duration=\"PT15M\" Period=\"2020-01-01\" TimeZone=\"Europe/Amsterdam\" CongestionPoint=\"ea1.1992-01.com.usef-example:gridpoint.11111111-1111-1111-1111\" Sequence=\"000000000001\"><MessageMetadata SenderDomain=\"agr.usef-example.com\" SenderRole=\"AGR\" RecipientDomain=\"dso.usef-example.com\" RecipientRole=\"DSO\" TimeStamp=\"2015-02-09T10:49:56.397\" MessageID=\"b78d0af7-2486-4d5f-a680-44d915b9c43c\" ConversationID=\"b78d0af7-2486-4d5f-a680-44d915b9c43c\" Precedence=\"Transactional\" ValidUntil=\"2015-02-09T10:49:56.397\" /><PTU Power=\"100\" Start=\"1\" Duration=\"96\"/></Prognosis>";
     private static final String PROGNOSIS_FAILED_MESSAGE = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><Prognosis Type=\"D-Prognosis\" PTU-Duration=\"PT15M\" Period=\"2020-01-01\" TimeZone=\"Europe/Amsterdam\" CongestionPoint=\"ea1.1992-01.com.usef-example:gridpoint.11111111-1111-1111-1111\" Sequence=\"000000000001\"><MessageMetadata SenderDomain=\"agr.usef-example.com\" SenderRole=\"AGR\" RecipientDomain=\"dso.usef-example.com\" RecipientRole=\"DSO\" TimeStamp=\"2015/02/09T10:49:56.397Z\" MessageID=\"b78d0af7-2486-4d5f-a680-44d915b9c43c\" ConversationID=\"b78d0af7-2486-4d5f-a680-44d915b9c43c\" Precedence=\"Transactional\" ValidUntil=\"2015/02/09T10:49:56.397Z\" /><PTUFAIL Power=\"100\" Start=\"1\" Duration=\"96\"/></Prognosis>";
-
+    private static final String XXE = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!DOCTYPE root [<!ENTITY foo SYSTEM \"file:///etc/passwd\">]>"
+            + "<MeterDataQuery"
+            + "  DateRangeStart=\"2017-01-06\" DateRangeEnd=\"2017-12-06\">"
+            + "  <MessageMetadata SenderDomain=\"post-office-dso.usef-dynamo.nl\" SenderRole=\"DSO\""
+            + "    RecipientDomain=\"mdc-liander-acc.usef-dynamo.nl\" RecipientRole=\"MDC\" TimeStamp=\"2017-11-28T05:12:21\""
+            + "    MessageID=\"766fa716-580f-4011-aef4-6e6d02c3c6ec\" ConversationID=\"49303388-6e12-440a-9645-3e89d5273bf3\""
+            + "    Precedence=\"Routine\"/>"
+            + "  <Connections"
+            + "    Parent=\"ea1.2017-09.nl.Energiekoplopers2:1\">"
+            + "    <Connection>ean.871687140022316150</Connection>"
+            + "    <Connection>&foo;</Connection>"
+            + "  </Connections>"
+            + "</MeterDataQuery>";
 
     @Test
     public void testUtilityClass() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
@@ -99,5 +116,14 @@ public class XMLUtilTest {
     @Test(expected = IllegalArgumentException.class)
     public void testMessageToXmlNull() {
         XMLUtil.messageObjectToXml(null);
+    }
+
+    @Test
+    public void testXXE() {
+        MeterDataQuery q = XMLUtil.xmlToMessage(XXE, MeterDataQuery.class);
+        List<String> connections = q.getConnections().stream().flatMap(c -> c.getConnection().stream()).collect(
+                Collectors.toList());
+        //No entity expansion for &foo; so empty connection
+        assertThat(connections, CoreMatchers.hasItems("ean.871687140022316150", ""));
     }
 }

@@ -24,10 +24,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.io.StringReader;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
@@ -119,7 +123,7 @@ public class XMLUtil {
      * @return object corresponding to this xml
      */
     public static Object xmlToMessage(String xml, boolean validate) {
-        try (InputStream is = IOUtils.toInputStream(xml, UTF_8)) {
+        try {
             Unmarshaller unmarshaller = CONTEXT.createUnmarshaller();
 
             if (validate) {
@@ -130,10 +134,19 @@ public class XMLUtil {
                 unmarshaller.setSchema(schema);
             }
 
-            return unmarshaller.unmarshal(is);
-        } catch (JAXBException | IOException e) {
+            XMLInputFactory xif = XMLInputFactory.newFactory();
+            xif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+            xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            xif.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+            XMLStreamReader xsr = xif.createXMLStreamReader(new StringReader(xml));
+
+            return unmarshaller.unmarshal(xsr);
+        } catch (JAXBException e) {
             LOGGER.error(e.getMessage(), e);
             throw new TechnicalException("Invalid XML content: " + e.getMessage(), e);
+        } catch (XMLStreamException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new TechnicalException("Unable to parse message", e);
         } catch (SAXException e) {
             LOGGER.error(e.getMessage(), e);
             throw new TechnicalException("Unable to read XSD schema", e);
