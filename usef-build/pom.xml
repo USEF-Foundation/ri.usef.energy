@@ -13,6 +13,44 @@
     <sonar.junit.reportsPath>${project.build.directory}/surefire-reports</sonar.junit.reportsPath>
     <sonar.jacoco.reportPaths>${project.build.directory}/coverage-reports/jacoco-ut.exec</sonar.jacoco.reportPaths>
     <sonar.language>java</sonar.language>
+
+    <!--Dependencies-->
+    <commons-codec.version>1.10</commons-codec.version>
+    <commons-io.version>2.6</commons-io.version>
+    <commons-lang.version>2.6</commons-lang.version>
+    <commons-lang3.version>3.4</commons-lang3.version>
+    <dnsjava.version>2.1.6</dnsjava.version>
+    <findbugs.version>2.0.1</findbugs.version>
+    <google-http-client.version>1.19.0</google-http-client.version>
+    <guava.version>19.0</guava.version>
+    <httpclient.version>4.5.1</httpclient.version>
+    <httpcore.version>4.4.4</httpcore.version>
+    <jackson.version>2.8.9</jackson.version>
+    <janino.version>2.5.10</janino.version>
+    <javaee-api.version>7.0</javaee-api.version>
+    <javassist.version>3.18.1-GA</javassist.version>
+    <jboss-ejb3-ext-api.version>2.0.0</jboss-ejb3-ext-api.version>
+    <joda-time.version>1.6.2</joda-time.version>
+    <json-schema-core.version>1.2.5</json-schema-core.version>
+    <json-schema-validator.version>2.2.6</json-schema-validator.version>
+    <kalium.version>0.5.0</kalium.version>
+    <logback.version>1.1.2</logback.version>
+    <postgresql.version>9.4.1212.jre7</postgresql.version>
+    <prometheus-simpleclient.version>0.0.24</prometheus-simpleclient.version>
+    <recurrent.version>0.3.3</recurrent.version>
+    <reflections.version>0.9.9-RC2</reflections.version>
+    <resteasy.version>3.0.8.Final</resteasy.version>
+    <snakeyaml.version>1.15</snakeyaml.version>
+
+    <!--Test dependencies-->
+    <h2.version>1.4.190</h2.version>
+    <hibernate.version>4.3.5.Final</hibernate.version>
+    <junit.version>4.11</junit.version>
+    <mockito.version>1.9.5</mockito.version>
+    <powermock.version>1.5.6</powermock.version>
+    <slf4j.version>1.7.2</slf4j.version>
+    <wiremock.version>2.6.0</wiremock.version>
+    <xmlunit.version>1.5</xmlunit.version>
   </properties>
 
   <modules>
@@ -27,247 +65,252 @@
       <dependency>
         <groupId>javax</groupId>
         <artifactId>javaee-api</artifactId>
-        <version>7.0</version>
+        <version>${javaee-api.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-core</artifactId>
-        <version>2.8.9</version>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>com.fasterxml.jackson.core</groupId>
         <artifactId>jackson-annotations</artifactId>
-        <version>2.8.9</version>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.fge</groupId>
+        <artifactId>json-schema-core</artifactId>
+        <version>${json-schema-core.version}</version>
       </dependency>
       <dependency>
         <groupId>com.github.fge</groupId>
         <artifactId>json-schema-validator</artifactId>
-        <version>2.2.6</version>
+        <version>${json-schema-validator.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jboss.ejb3</groupId>
         <artifactId>jboss-ejb3-ext-api</artifactId>
-        <version>2.0.0</version>
+        <version>${jboss-ejb3-ext-api.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
-        <version>1.6.2</version>
+        <version>${joda-time.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>commons-codec</groupId>
         <artifactId>commons-codec</artifactId>
-        <version>1.10</version>
+        <version>${commons-codec.version}</version>
         <scope>compile</scope><!-- should be provided -->
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
         <artifactId>commons-io</artifactId>
-        <version>2.6</version>
+        <version>${commons-io.version}</version>
         <scope>compile</scope><!-- should be provided -->
       </dependency>
       <dependency>
         <groupId>janino</groupId>
         <artifactId>janino</artifactId>
-        <version>2.5.10</version>
+        <version>${janino.version}</version>
       </dependency>
       <dependency>
         <groupId>org.yaml</groupId>
         <artifactId>snakeyaml</artifactId>
-        <version>1.15</version>
+        <version>${snakeyaml.version}</version>
         <scope>compile</scope><!-- should be provided -->
       </dependency>
       <dependency>
         <groupId>commons-lang</groupId>
         <artifactId>commons-lang</artifactId>
-        <version>2.6</version>
+        <version>${commons-lang.version}</version>
         <scope>compile</scope><!-- should be provided -->
       </dependency>
       <dependency>
         <groupId>org.apache.commons</groupId>
         <artifactId>commons-lang3</artifactId>
-        <version>3.4</version>
+        <version>${commons-lang3.version}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>1.7.2</version>
+        <version>${slf4j.version}</version>
         <scope>compile</scope><!-- should be provided -->
       </dependency>
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-client</artifactId>
-        <version>3.0.8.Final</version>
+        <version>${resteasy.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-jaxrs</artifactId>
-        <version>3.0.8.Final</version>
+        <version>${resteasy.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>resteasy-jackson-provider</artifactId>
-        <version>3.0.8.Final</version>
+        <version>${resteasy.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>org.postgresql</groupId>
         <artifactId>postgresql</artifactId>
-        <version>9.4.1212.jre7</version>
+        <version>${postgresql.version}</version>
         <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
-        <version>1.1.2</version>
+        <version>${logback.version}</version>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-core</artifactId>
-        <version>1.1.2</version>
+        <version>${logback.version}</version>
       </dependency>
       <dependency>
         <groupId>io.prometheus</groupId>
         <artifactId>simpleclient_hotspot</artifactId>
-        <version>0.0.24</version>
+        <version>${prometheus-simpleclient.version}</version>
       </dependency>
       <dependency>
         <groupId>io.prometheus</groupId>
         <artifactId>simpleclient_logback</artifactId>
-        <version>0.0.24</version>
+        <version>${prometheus-simpleclient.version}</version>
       </dependency>
       <dependency>
         <groupId>io.prometheus</groupId>
         <artifactId>simpleclient_servlet</artifactId>
-        <version>0.0.24</version>
+        <version>${prometheus-simpleclient.version}</version>
       </dependency>
       <dependency>
         <groupId>org.abstractj.kalium</groupId>
         <artifactId>kalium</artifactId>
-        <version>0.5.0</version>
+        <version>${kalium.version}</version>
       </dependency>
       <dependency>
         <groupId>dnsjava</groupId>
         <artifactId>dnsjava</artifactId>
-        <version>2.1.6</version>
+        <version>${dnsjava.version}</version>
       </dependency>
       <dependency>
         <groupId>com.google.http-client</groupId>
         <artifactId>google-http-client</artifactId>
-        <version>1.19.0</version>
+        <version>${google-http-client.version}</version>
       </dependency>
       <dependency>
         <groupId>org.reflections</groupId>
         <artifactId>reflections</artifactId>
-        <version>0.9.9-RC2</version>
+        <version>${reflections.version}</version>
       </dependency>
       <dependency>
         <groupId>org.javassist</groupId>
         <artifactId>javassist</artifactId>
-        <version>3.18.1-GA</version>
+        <version>${javassist.version}</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>19.0</version>
+        <version>${guava.version}</version>
       </dependency>
       <dependency>
         <groupId>com.google.code.findbugs</groupId>
         <artifactId>jsr305</artifactId>
-        <version>2.0.1</version>
+        <version>${findbugs.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
-        <version>4.5.1</version>
+        <version>${httpclient.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpcore</artifactId>
-        <version>4.4.4</version>
+        <version>${httpcore.version}</version>
       </dependency>
       <dependency>
         <groupId>net.jodah</groupId>
         <artifactId>recurrent</artifactId>
-        <version>0.3.3</version>
+        <version>${recurrent.version}</version>
       </dependency>
 
       <!-- Test dependencies -->
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.11</version>
+        <version>${junit.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-all</artifactId>
-        <version>1.9.5</version>
+        <version>${mockito.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.powermock</groupId>
         <artifactId>powermock-core</artifactId>
-        <version>1.5.6</version>
+        <version>${powermock.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.powermock</groupId>
         <artifactId>powermock-api-mockito</artifactId>
-        <version>1.5.6</version>
+        <version>${powermock.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.powermock</groupId>
         <artifactId>powermock-module-junit4</artifactId>
-        <version>1.5.6</version>
+        <version>${powermock.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-entitymanager</artifactId>
-        <version>4.3.5.Final</version>
+        <version>${hibernate.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>com.h2database</groupId>
         <artifactId>h2</artifactId>
-        <version>1.4.190</version>
+        <version>${h2.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>xmlunit</groupId>
         <artifactId>xmlunit</artifactId>
-        <version>1.5</version>
+        <version>${xmlunit.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.jboss.resteasy</groupId>
         <artifactId>tjws</artifactId>
-        <version>3.0.8.Final</version>
+        <version>${resteasy.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-simple</artifactId>
-        <version>1.7.2</version>
+        <version>${slf4j.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>com.github.tomakehurst</groupId>
         <artifactId>wiremock</artifactId>
-        <version>2.6.0</version>
+        <version>${wiremock.version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>com.github.tomakehurst</groupId>
         <artifactId>wiremock-standalone</artifactId>
-        <version>2.6.0</version>
+        <version>${wiremock.version}</version>
         <scope>test</scope>
       </dependency>
 
