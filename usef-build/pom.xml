@@ -35,6 +35,8 @@
     <json-schema-validator.version>2.2.6</json-schema-validator.version>
     <kalium.version>0.5.0</kalium.version>
     <logback.version>1.1.2</logback.version>
+    <lombok.version>1.16.18</lombok.version>
+    <okhttp.version>3.8.1</okhttp.version>
     <postgresql.version>9.4.1212.jre7</postgresql.version>
     <prometheus-simpleclient.version>0.0.24</prometheus-simpleclient.version>
     <recurrent.version>0.3.3</recurrent.version>
@@ -79,8 +81,28 @@
         <version>${jackson.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
         <groupId>com.fasterxml.jackson.datatype</groupId>
         <artifactId>jackson-datatype-joda</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.datatype</groupId>
+        <artifactId>jackson-datatype-jdk8</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.datatype</groupId>
+        <artifactId>jackson-datatype-jsr310</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.module</groupId>
+        <artifactId>jackson-module-parameter-names</artifactId>
         <version>${jackson.version}</version>
       </dependency>
       <dependency>
@@ -243,6 +265,17 @@
         <groupId>net.jodah</groupId>
         <artifactId>recurrent</artifactId>
         <version>${recurrent.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.okhttp3</groupId>
+        <artifactId>okhttp</artifactId>
+        <version>${okhttp.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
+        <scope>compile</scope>
       </dependency>
 
       <!-- Test dependencies -->
