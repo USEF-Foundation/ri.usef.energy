@@ -19,7 +19,7 @@ package energy.usef.agr.repository;
 import energy.usef.agr.model.DeviceMessage;
 import energy.usef.agr.model.DeviceMessageStatus;
 import energy.usef.core.repository.BaseRepository;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.joda.time.LocalDate;
 
 import javax.ejb.Stateless;

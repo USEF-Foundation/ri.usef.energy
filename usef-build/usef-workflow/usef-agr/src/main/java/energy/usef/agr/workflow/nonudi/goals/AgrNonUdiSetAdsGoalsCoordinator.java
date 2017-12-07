@@ -41,7 +41,7 @@ import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -16,24 +16,21 @@
 
 package energy.usef.core.util;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
-
-import energy.usef.core.data.xml.bean.message.MeterData;
 import energy.usef.core.data.xml.bean.message.MeterDataQuery;
 import energy.usef.core.data.xml.bean.message.Prognosis;
 import energy.usef.core.data.xml.bean.message.TestMessage;
 import energy.usef.core.exception.TechnicalException;
+import org.junit.Assert;
+import org.junit.Test;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import org.hamcrest.CoreMatchers;
-import org.junit.Assert;
-import org.junit.Test;
-import org.xml.sax.SAXParseException;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * XML Util Test.
@@ -134,7 +131,8 @@ public class XMLUtilTest {
     public void testXXE() {
         MeterDataQuery q = XMLUtil.xmlToMessage(XXE, MeterDataQuery.class);
         List<String> connections = q.getConnections().stream().flatMap(c -> c.getConnection().stream()).collect(Collectors.toList());
-        assertThat(connections, CoreMatchers.hasItems("ean.871687140022316150", ""));
+        assertTrue(connections.contains("ean.871687140022316150"));
+        assertTrue(connections.contains(""));
     }
 
     @Test(expected = TechnicalException.class)

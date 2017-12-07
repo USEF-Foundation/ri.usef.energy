@@ -60,11 +60,6 @@
               <version>${json-schema-core.version}</version>
             </dependency>
             <dependency>
-              <groupId>com.google.code.findbugs</groupId>
-              <artifactId>annotations</artifactId>
-              <version>${findbugs.version}</version>
-            </dependency>
-            <dependency>
               <groupId>com.github.fge</groupId>
               <artifactId>jsr305</artifactId>
               <version>${findbugs.version}</version>

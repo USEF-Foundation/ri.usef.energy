@@ -30,7 +30,7 @@ import java.util.Set;
 import javax.ejb.Stateless;
 import javax.persistence.Query;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Congestion Point Repository for CRO.
