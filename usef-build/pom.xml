@@ -40,7 +40,7 @@
         <okhttp.version>3.9.1</okhttp.version>
         <postgresql.version>9.4.1212.jre7</postgresql.version><!--TODO: update me-->
         <prometheus-simpleclient.version>0.1.0</prometheus-simpleclient.version>
-        <recurrent.version>0.7.1</recurrent.version>
+        <recurrent.version>0.3.3</recurrent.version>
         <reflections.version>0.9.11</reflections.version>
         <resteasy.version>3.1.4.Final</resteasy.version>
         <snakeyaml.version>1.19</snakeyaml.version>
