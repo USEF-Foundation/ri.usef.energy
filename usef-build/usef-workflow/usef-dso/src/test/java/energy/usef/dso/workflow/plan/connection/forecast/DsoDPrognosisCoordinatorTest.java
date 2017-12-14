@@ -32,6 +32,7 @@ import energy.usef.core.service.helper.MessageMetadataBuilder;
 import energy.usef.dso.controller.PrognosisController;
 import energy.usef.dso.model.Aggregator;
 import energy.usef.dso.service.business.DsoPlanboardBusinessService;
+import energy.usef.dso.workflow.DPrognosisReceivedEvent;
 import energy.usef.dso.workflow.validate.gridsafetyanalysis.GridSafetyAnalysisEvent;
 
 import java.math.BigInteger;
@@ -65,7 +66,10 @@ public class DsoDPrognosisCoordinatorTest {
     private CorePlanboardBusinessService corePlanboardBusinessService;
 
     @Mock
-    private Event<GridSafetyAnalysisEvent> eventManager;
+    private Event<GridSafetyAnalysisEvent> gridSafetyAnalysisEventManager;
+
+    @Mock
+    private Event<DPrognosisReceivedEvent> dPrognosisReceivedEventManager;
 
     @Mock
     private DsoPlanboardBusinessService dsoPlanboardBusinessService;
@@ -73,13 +77,14 @@ public class DsoDPrognosisCoordinatorTest {
     @Before
     public void init() {
         coordinator = new DsoDPrognosisCoordinator();
-        Whitebox.setInternalState(coordinator, eventManager);
+        Whitebox.setInternalState(coordinator, "gridSafetyAnalysisEventManager", gridSafetyAnalysisEventManager);
+        Whitebox.setInternalState(coordinator, "dPrognosisReceivedEventManager", dPrognosisReceivedEventManager);
         Whitebox.setInternalState(coordinator, corePlanboardBusinessService);
         Whitebox.setInternalState(coordinator, dsoPlanboardBusinessService);
     }
 
     @Test
-    public void testInvokeForNewPrognosis() throws BusinessException {
+    public void testHandleDPrognosisReceivedEventForNewPrognosis() throws BusinessException {
         PowerMockito.when(corePlanboardBusinessService
                 .findLastPrognoses(Matchers.any(LocalDate.class), Matchers.any(PrognosisType.class), Matchers.any(String.class)))
                 .thenReturn(new ArrayList<>());
@@ -89,7 +94,8 @@ public class DsoDPrognosisCoordinatorTest {
         PowerMockito.when(dsoPlanboardBusinessService.getAggregatorsByEntityAddress(Matchers.any(String.class),
                         Matchers.any(LocalDate.class))).thenReturn(Arrays.asList(new Aggregator(), new Aggregator()));
         Prognosis prognosis = buildPrognosis();
-        coordinator.invokeWorkflow(prognosis, null);
+
+        coordinator.handleDPrognosisReceivedEvent(new DPrognosisReceivedEvent(prognosis, null));
 
         Mockito.verify(corePlanboardBusinessService, Mockito.times(1))
                 .findLastPrognoses(Matchers.any(LocalDate.class), Matchers.eq(PrognosisType.D_PROGNOSIS),
@@ -105,7 +111,7 @@ public class DsoDPrognosisCoordinatorTest {
 
     @SuppressWarnings("unchecked")
     @Test
-    public void testInvokeForUpdatedPrognosis() throws BusinessException {
+    public void testHandleDPrognosisReceivedEventForUpdatedPrognosis() throws BusinessException {
         PowerMockito.when(corePlanboardBusinessService
                 .findLastPrognoses(Matchers.any(LocalDate.class), Matchers.any(PrognosisType.class), Matchers.any(String.class)))
                 .thenReturn(buildPtuPrognosisList());
@@ -115,7 +121,7 @@ public class DsoDPrognosisCoordinatorTest {
         PowerMockito.when(dsoPlanboardBusinessService.getAggregatorsByEntityAddress(Matchers.any(String.class),
                         Matchers.any(LocalDate.class))).thenReturn(Arrays.asList(new Aggregator(), new Aggregator()));
         Prognosis prognosis = buildPrognosis();
-        coordinator.invokeWorkflow(prognosis, null);
+        coordinator.handleDPrognosisReceivedEvent(new DPrognosisReceivedEvent(prognosis, null));
         Mockito.verify(dsoPlanboardBusinessService, Mockito.times(1)).handleUpdatedPrognosis(
                 Matchers.eq(prognosis),
                 Matchers.any(List.class));
