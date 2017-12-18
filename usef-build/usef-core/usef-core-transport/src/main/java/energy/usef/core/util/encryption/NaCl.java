@@ -55,22 +55,18 @@ public class NaCl {
 
     private static final class SingletonHolder {
         public static final Sodium SODIUM_INSTANCE = LibraryLoader.create(Sodium.class).search("/usr/local/lib").load(LIBRARY_NAME);
-        static { // added to make sure library inits
+        static {
             final Logger LOGGER = LoggerFactory.getLogger(NaCl.class);
 
-            final String filename = "/usr/local/lib/" + LIBRARY_NAME;
-            File f = new File(filename);
-            if(f.exists() && !f.isDirectory()) {
-                LOGGER.info("File exists: " + filename);
-            } else {
-                LOGGER.debug("File does not exist: " + filename);
-            }
-
-            List<String> paths = new ArrayList<String>();
+            List<String> paths = new ArrayList<>();
             paths.add("/usr/local/lib");
             LOGGER.info("Library found: " + Platform.getNativePlatform().locateLibrary(LIBRARY_NAME, paths));
 
-            SODIUM_INSTANCE.sodium_init();
+            try {
+                SODIUM_INSTANCE.sodium_init();
+            } catch (Exception e) {
+                LOGGER.error("Unable to initialize Sodium", e);
+            }
             LOGGER.info("Finished initializing Sodium.");
         }
     }
