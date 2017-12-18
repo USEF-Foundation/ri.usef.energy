@@ -30,6 +30,10 @@
 			<artifactId>joda-time</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.ow2.asm</groupId>
+			<artifactId>asm</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.abstractj.kalium</groupId>
 			<artifactId>kalium</artifactId>
 		</dependency>
