@@ -60,7 +60,7 @@ public class DsoFlexOrderAcknowledgementCoordinatorTest {
     private static final AcknowledgementStatus ACKNOWLEDGEMENT_STATUS = AcknowledgementStatus.REJECTED;
     private static final String AGGREGATOR_DOMAIN = "test.com";
 
-    private DsoFlexOrderAcknowledgementCoordinator dsoFlexRequestAcknowledgementCoordinator;
+    private DsoFlexOrderAcknowledgementCoordinator dsoFlexOrderAcknowledgementCoordinator;
 
     @Mock
     private WorkflowStepExecuter workflowStepExecuter;
@@ -76,12 +76,12 @@ public class DsoFlexOrderAcknowledgementCoordinatorTest {
 
     @Before
     public void init() throws Exception {
-        dsoFlexRequestAcknowledgementCoordinator = new DsoFlexOrderAcknowledgementCoordinator();
+        dsoFlexOrderAcknowledgementCoordinator = new DsoFlexOrderAcknowledgementCoordinator();
 
         ReflectionUtil.setFinalStatic(DsoFlexOrderAcknowledgementCoordinator.class.getDeclaredField("LOGGER"), LOGGER);
-        Whitebox.setInternalState(dsoFlexRequestAcknowledgementCoordinator, dsoPlanboardBusinessService);
-        Whitebox.setInternalState(dsoFlexRequestAcknowledgementCoordinator, eventManager);
-        Whitebox.setInternalState(dsoFlexRequestAcknowledgementCoordinator, workflowStepExecuter);
+        Whitebox.setInternalState(dsoFlexOrderAcknowledgementCoordinator, dsoPlanboardBusinessService);
+        Whitebox.setInternalState(dsoFlexOrderAcknowledgementCoordinator, eventManager);
+        Whitebox.setInternalState(dsoFlexOrderAcknowledgementCoordinator, workflowStepExecuter);
     }
 
     /**
@@ -98,13 +98,14 @@ public class DsoFlexOrderAcknowledgementCoordinatorTest {
                         AGGREGATOR_DOMAIN))
                 .thenReturn(dto);
 
-        dsoFlexRequestAcknowledgementCoordinator.handleEvent(new FlexOrderAcknowledgementEvent(SEQUENCE, ACKNOWLEDGEMENT_STATUS,
+        dsoFlexOrderAcknowledgementCoordinator
+                .handleEvent(new FlexOrderAcknowledgementEvent(SEQUENCE, ACKNOWLEDGEMENT_STATUS,
                 AGGREGATOR_DOMAIN));
 
         Mockito.verify(eventManager, Mockito.times(1)).fire(eventCaptor.capture());
         Assert.assertEquals(dto.getConnectionGroupEntityAddress(), eventCaptor.getValue().getCongestionPointEntityAddress());
 
-        Mockito.verify(workflowStepExecuter, Mockito.timeout(1000).times(1)).invoke(Mockito.eq(DsoWorkflowStep.DSO_FLEX_REQUEST_ACKNOWLEDGEMENT.name()),
+        Mockito.verify(workflowStepExecuter, Mockito.timeout(1000).times(1)).invoke(Mockito.eq(DsoWorkflowStep.DSO_FLEX_ORDER_ACKNOWLEDGEMENT.name()),
                 contextCapturer.capture());
 
         Assert.assertNotNull(contextCapturer.getValue().getValue(ACKNOWLEDGEMENT_STATUS_DTO.name()));
@@ -126,11 +127,11 @@ public class DsoFlexOrderAcknowledgementCoordinatorTest {
                         AGGREGATOR_DOMAIN))
                 .thenReturn(dto);
 
-        dsoFlexRequestAcknowledgementCoordinator.handleEvent(new FlexOrderAcknowledgementEvent(SEQUENCE, ACCEPTED,
+        dsoFlexOrderAcknowledgementCoordinator.handleEvent(new FlexOrderAcknowledgementEvent(SEQUENCE, ACCEPTED,
                 AGGREGATOR_DOMAIN));
 
         Mockito.verifyZeroInteractions(eventManager);
-        Mockito.verify(workflowStepExecuter, Mockito.timeout(1000).times(1)).invoke(Mockito.eq(DsoWorkflowStep.DSO_FLEX_REQUEST_ACKNOWLEDGEMENT.name()),
+        Mockito.verify(workflowStepExecuter, Mockito.timeout(1000).times(1)).invoke(Mockito.eq(DsoWorkflowStep.DSO_FLEX_ORDER_ACKNOWLEDGEMENT.name()),
                 contextCapturer.capture());
 
         Assert.assertNotNull(contextCapturer.getValue().getValue(ACKNOWLEDGEMENT_STATUS_DTO.name()));
@@ -147,7 +148,8 @@ public class DsoFlexOrderAcknowledgementCoordinatorTest {
                         AGGREGATOR_DOMAIN))
                 .thenReturn(null);
 
-        dsoFlexRequestAcknowledgementCoordinator.handleEvent(new FlexOrderAcknowledgementEvent(SEQUENCE, ACKNOWLEDGEMENT_STATUS,
+        dsoFlexOrderAcknowledgementCoordinator
+                .handleEvent(new FlexOrderAcknowledgementEvent(SEQUENCE, ACKNOWLEDGEMENT_STATUS,
                 AGGREGATOR_DOMAIN));
 
         Mockito.verify(eventManager, Mockito.times(0)).fire(Matchers.any(CreateFlexRequestEvent.class));

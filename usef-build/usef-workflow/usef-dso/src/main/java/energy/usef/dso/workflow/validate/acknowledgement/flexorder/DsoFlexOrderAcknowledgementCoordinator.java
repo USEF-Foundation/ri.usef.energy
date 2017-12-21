@@ -18,7 +18,7 @@ package energy.usef.dso.workflow.validate.acknowledgement.flexorder;
 
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
-import static energy.usef.dso.workflow.DsoWorkflowStep.DSO_FLEX_REQUEST_ACKNOWLEDGEMENT;
+import static energy.usef.dso.workflow.DsoWorkflowStep.DSO_FLEX_ORDER_ACKNOWLEDGEMENT;
 
 import energy.usef.core.model.AcknowledgementStatus;
 import energy.usef.core.workflow.DefaultWorkflowContext;
@@ -30,15 +30,12 @@ import energy.usef.core.workflow.step.WorkflowStepExecuter;
 import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 import energy.usef.dso.workflow.validate.acknowledgement.flexorder.FlexOrderAcknowledgementStepParameter.IN;
 import energy.usef.dso.workflow.validate.create.flexrequest.CreateFlexRequestEvent;
-
 import java.math.BigInteger;
-
 import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +91,7 @@ public class DsoFlexOrderAcknowledgementCoordinator {
         inContext.setValue(IN.FLEX_ORDER_SEQUENCE_NUMBER.name(), flexOrderSequenceNumber);
         inContext.setValue(IN.AGGREGATOR.name(), event.getAggregatorDomain());
 
-        workflow.invoke(DSO_FLEX_REQUEST_ACKNOWLEDGEMENT.name(), inContext);
+        workflow.invoke(DSO_FLEX_ORDER_ACKNOWLEDGEMENT.name(), inContext);
     }
 
 
