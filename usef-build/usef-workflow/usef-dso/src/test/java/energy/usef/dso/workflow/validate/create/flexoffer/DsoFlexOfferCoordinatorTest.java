@@ -16,31 +16,19 @@
 
 package energy.usef.dso.workflow.validate.create.flexoffer;
 
-import static org.junit.Assert.fail;
-import static org.mockito.Matchers.any;
-
 import com.google.common.collect.Lists;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.FlexOffer;
-import energy.usef.core.data.xml.bean.message.PTU;
 import energy.usef.core.exception.BusinessException;
-import energy.usef.core.model.CongestionPointConnectionGroup;
-import energy.usef.core.model.DocumentStatus;
-import energy.usef.core.model.DocumentType;
-import energy.usef.core.model.PlanboardMessage;
-import energy.usef.core.model.PtuContainer;
-import energy.usef.core.model.PtuFlexOffer;
+import energy.usef.core.model.*;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
-import energy.usef.core.service.business.MessageService;
 import energy.usef.core.service.helper.JMSHelperService;
 import energy.usef.core.service.helper.MessageMetadataBuilder;
 import energy.usef.core.service.validation.CorePlanboardValidatorService;
 import energy.usef.core.workflow.step.WorkflowStepExecuter;
-import energy.usef.dso.controller.FlexOfferController;
-import energy.usef.dso.controller.FlexRequestResponseController;
+import energy.usef.dso.service.business.DsoPlanboardValidatorService;
 import energy.usef.dso.workflow.coloring.ColoringProcessEvent;
-import javax.enterprise.event.Event;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.Period;
@@ -53,6 +41,11 @@ import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
+
+import javax.enterprise.event.Event;
+
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 
 /**
  * Test class in charge of the unit tests related to the {@link DsoFlexOfferCoordinator}.
@@ -76,6 +69,9 @@ DsoFlexOfferCoordinatorTest {
     private CorePlanboardValidatorService corePlanboardValidatorService;
 
     @Mock
+    private DsoPlanboardValidatorService dsoPlanboardValidatorService;
+
+    @Mock
     private Event<ColoringProcessEvent> coloringEventManager;
 
     @Mock
@@ -90,6 +86,7 @@ DsoFlexOfferCoordinatorTest {
         Whitebox.setInternalState(coordinator, workflowStubLoader);
         Whitebox.setInternalState(coordinator, corePlanboardBusinessService);
         Whitebox.setInternalState(coordinator, corePlanboardValidatorService);
+        Whitebox.setInternalState(coordinator, dsoPlanboardValidatorService);
         Whitebox.setInternalState(coordinator, coloringEventManager);
         Whitebox.setInternalState(coordinator, config);
 

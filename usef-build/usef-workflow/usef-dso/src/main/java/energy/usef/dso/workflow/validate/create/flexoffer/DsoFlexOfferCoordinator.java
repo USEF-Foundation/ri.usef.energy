@@ -22,11 +22,7 @@ import static energy.usef.core.data.xml.bean.message.MessagePrecedence.ROUTINE;
 
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
-import energy.usef.core.data.xml.bean.message.DispositionAcceptedRejected;
-import energy.usef.core.data.xml.bean.message.FlexOffer;
-import energy.usef.core.data.xml.bean.message.FlexOfferResponse;
-import energy.usef.core.data.xml.bean.message.MessageMetadata;
-import energy.usef.core.data.xml.bean.message.USEFRole;
+import energy.usef.core.data.xml.bean.message.*;
 import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
@@ -36,14 +32,17 @@ import energy.usef.core.model.PtuFlexOffer;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
 import energy.usef.core.service.helper.JMSHelperService;
 import energy.usef.core.service.helper.MessageMetadataBuilder;
+import energy.usef.core.service.validation.CoreBusinessError;
 import energy.usef.core.service.validation.CorePlanboardValidatorService;
-import energy.usef.core.util.DateTimeUtil;
+import energy.usef.core.transformer.PtuListConverter;
+import energy.usef.core.util.PtuUtil;
 import energy.usef.core.util.XMLUtil;
 import energy.usef.core.workflow.DefaultWorkflowContext;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.dto.FlexOfferDto;
 import energy.usef.core.workflow.step.WorkflowStepExecuter;
 import energy.usef.core.workflow.transformer.FlexOfferTransformer;
+import energy.usef.dso.service.business.DsoPlanboardValidatorService;
 import energy.usef.dso.workflow.DsoWorkflowStep;
 import energy.usef.dso.workflow.coloring.ColoringProcessEvent;
 import energy.usef.dso.workflow.validate.create.flexorder.FlexOrderEvent;
@@ -82,6 +81,9 @@ public class DsoFlexOfferCoordinator {
     private CorePlanboardValidatorService corePlanboardValidatorService;
 
     @Inject
+    private DsoPlanboardValidatorService dsoPlanboardValidatorService;
+
+    @Inject
     private Event<ColoringProcessEvent> coloringEventManager;
 
     @Inject
@@ -107,10 +109,14 @@ public class DsoFlexOfferCoordinator {
             corePlanboardValidatorService.validateCurrency(flexOffer.getCurrency());
             corePlanboardValidatorService.validateTimezone(flexOffer.getTimeZone());
             corePlanboardValidatorService.validatePTUDuration(flexOffer.getPTUDuration());
+
             if (!flexOffer.getPTU().isEmpty()) {
                 corePlanboardValidatorService.validatePTUsForPeriod(flexOffer.getPTU(), flexOffer.getPeriod(), false);
             }
+
             corePlanboardValidatorService.validateDomain(flexOffer.getFlexRequestOrigin());
+
+            dsoPlanboardValidatorService.validateFlexOfferMatchesRequest(flexOffer);
 
             // The Period the offer applies to should have at least one PTU that is not already pending settlement.
             String usefIdentifier = flexOffer.getCongestionPoint();
@@ -218,5 +224,24 @@ public class DsoFlexOfferCoordinator {
         workflowStubLoader.invoke(DsoWorkflowStep.DSO_RECEIVE_FLEX_OFFER.name(), inContext);
     }
 
-
+    public void validatePTUsForPeriod(List<PTU> ptus, LocalDate period, boolean normalized) throws BusinessValidationException {
+        int numberOfPtusPerDay = PtuUtil.getNumberOfPtusPerDay(period, config.getIntegerProperty(ConfigParam.PTU_DURATION));
+        List<PTU> normalizedPtus = ptus;
+        if (!normalized) {
+            normalizedPtus = PtuListConverter.normalize(normalizedPtus);
+        }
+        if (normalizedPtus == null || numberOfPtusPerDay != normalizedPtus.size()) {
+            throw new BusinessValidationException(CoreBusinessError.WRONG_NUMBER_OF_PTUS, normalizedPtus.size(),
+                    numberOfPtusPerDay);
+        }
+        // check if all are present
+        PtuUtil.orderByStart(normalizedPtus);
+        int expectedStart = 1;
+        for (PTU ptu : normalizedPtus) {
+            if (ptu.getStart().intValue() != expectedStart) {
+                throw new BusinessValidationException(CoreBusinessError.INCOMPLETE_PTUS, expectedStart);
+            }
+            expectedStart++;
+        }
+    }
 }

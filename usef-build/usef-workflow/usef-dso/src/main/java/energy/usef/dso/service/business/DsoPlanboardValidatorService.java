@@ -18,25 +18,30 @@ package energy.usef.dso.service.business;
 
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
+import energy.usef.core.data.xml.bean.message.FlexOffer;
 import energy.usef.core.data.xml.bean.message.PTU;
 import energy.usef.core.data.xml.bean.message.Prognosis;
 import energy.usef.core.exception.BusinessValidationException;
 import energy.usef.core.model.CongestionPointConnectionGroup;
+import energy.usef.core.model.DispositionAvailableRequested;
 import energy.usef.core.model.DocumentType;
+import energy.usef.core.model.PtuFlexRequest;
 import energy.usef.core.repository.CongestionPointConnectionGroupRepository;
 import energy.usef.core.repository.PlanboardMessageRepository;
+import energy.usef.core.repository.PtuFlexRequestRepository;
+import energy.usef.core.transformer.PtuListConverter;
 import energy.usef.core.util.DateTimeUtil;
 import energy.usef.dso.exception.DsoBusinessError;
 import energy.usef.dso.model.Aggregator;
 import energy.usef.dso.repository.AggregatorOnConnectionGroupStateRepository;
-
-import java.math.BigInteger;
-import java.util.List;
+import org.joda.time.LocalDate;
 
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import java.math.BigInteger;
+import java.util.List;
 
-import org.joda.time.LocalDate;
+import static energy.usef.dso.exception.DsoBusinessError.FLEX_OFFER_NOT_AS_REQUESTED;
 
 /**
  * This service class implements the business logic related to the DSO part of the d-prognosis reception.
@@ -54,6 +59,9 @@ public class DsoPlanboardValidatorService {
 
     @Inject
     private AggregatorOnConnectionGroupStateRepository aggregatorOnConnectionGroupStateRepository;
+
+    @Inject
+    private PtuFlexRequestRepository ptuFlexRequestRepository;
 
     @Inject
     private Config config;
@@ -147,6 +155,31 @@ public class DsoPlanboardValidatorService {
                 prognosis.getCongestionPoint(), null);
         if (prognosis.getSequence() < maxSequence) {
             throw new BusinessValidationException(DsoBusinessError.DOCUMENT_SEQUENCE_NUMBER_IS_TOO_SMALL);
+        }
+    }
+
+    public void validateFlexOfferMatchesRequest(FlexOffer flexOffer) throws BusinessValidationException{
+        String congestionPoint = flexOffer.getCongestionPoint();
+        Long sequenceNumber = flexOffer.getFlexRequestSequence();
+        String senderDomain = flexOffer.getMessageMetadata().getSenderDomain();
+
+        List<PtuFlexRequest> ptuFlexRequests = ptuFlexRequestRepository.findPtuFlexRequestWithSequence(congestionPoint, sequenceNumber, senderDomain);
+        List<PTU> flexOfferPtus = PtuListConverter.normalize(flexOffer.getPTU());
+
+        boolean unacceptableFlexOffer = true;
+
+        for (PtuFlexRequest ptuFlexRequest : ptuFlexRequests) {
+            if (ptuFlexRequest.getDisposition() == DispositionAvailableRequested.REQUESTED) {
+                PTU flexOfferPtu = flexOfferPtus.get(ptuFlexRequest.getPtuContainer().getPtuIndex() - 1);
+                // Price must be provided and sign of requested and offered power must match
+                if (flexOfferPtu.getPrice() != null && flexOfferPtu.getPower().signum() == ptuFlexRequest.getPower().signum()) {
+                    unacceptableFlexOffer = false;
+                }
+            }
+        }
+
+        if (unacceptableFlexOffer) {
+            throw new BusinessValidationException(FLEX_OFFER_NOT_AS_REQUESTED);
         }
     }
 }
