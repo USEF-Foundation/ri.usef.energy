@@ -20,7 +20,7 @@ import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,9 +63,13 @@ public class WorkflowStepExecuter {
             if (clazz == null) {
                 throw new IllegalArgumentException("WorkflowStep: " + workflowStepName + " is not configured correctly, class " + workflowStepName + " .");
             }
-            LOGGER.debug("Executing PBC: {} with input: {}", clazz, inContext);
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Executing PBC: {} with input: {}", clazz, inContext);
+            }
             WorkflowContext resultContext = myBeans.select(clazz).get().invoke(inContext);
-            LOGGER.debug("Executed PBC: {} with output: {}", clazz, resultContext);
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("Executed PBC: {} with output: {}", clazz, resultContext);
+            }
             return resultContext;
         } finally {
             LOGGER.info("Finished WorkflowStep {}", workflowStepName);

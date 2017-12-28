@@ -224,6 +224,7 @@ public class MessageRepositoryTest {
     public void testHasEveryCommonReferenceQuerySentAResponseReceivedIsFalse() {
         boolean result = repository.hasEveryCommonReferenceQuerySentAResponseReceived(
                 new LocalDate(2014, 11, 21).toDateTimeAtCurrentTime().toLocalDateTime());
+
         Assert.assertFalse(result);
     }
 

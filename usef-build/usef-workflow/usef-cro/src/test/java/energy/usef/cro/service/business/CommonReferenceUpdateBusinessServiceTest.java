@@ -35,7 +35,6 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.Whitebox;
-import org.mockito.runners.MockitoJUnitRunner;
 
 import energy.usef.core.data.xml.bean.message.CommonReferenceEntityType;
 import energy.usef.core.data.xml.bean.message.CommonReferenceUpdate;
@@ -53,6 +52,7 @@ import energy.usef.cro.repository.CongestionPointRepository;
 import energy.usef.cro.repository.ConnectionRepository;
 import energy.usef.cro.repository.DistributionSystemOperatorRepository;
 import energy.usef.cro.repository.MeterDataCompanyRepository;
+import org.mockito.runners.MockitoJUnitRunner;
 
 /**
  * JUnit test for the CommonReferenceUpdateBusinessService class.

@@ -27,6 +27,7 @@ import energy.usef.core.model.DocumentType;
 import energy.usef.core.model.Message;
 import energy.usef.core.model.PlanboardMessage;
 import energy.usef.core.service.business.CorePlanboardBusinessService;
+import energy.usef.dso.workflow.settlement.SendDynamoMeterdataEvent;
 import energy.usef.dso.workflow.settlement.collect.FinalizeCollectOrangeRegimeDataEvent;
 import energy.usef.dso.workflow.settlement.initiate.FinalizeInitiateSettlementEvent;
 
@@ -39,6 +40,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
 
 /**
  * Controller class handling the reception of a {@link MeterDataQueryResponse} message.
@@ -54,12 +56,21 @@ public class MeterDataQueryResponseController extends BaseIncomingResponseMessag
     @Inject
     private Event<FinalizeCollectOrangeRegimeDataEvent> finalizeCollectOrangeRegimeDataEventManager;
 
+    @Inject
+    private Event<SendDynamoMeterdataEvent> sendMeterdataEventManager;
+
     @Override
     public void action(MeterDataQueryResponse message, Message savedMessage) throws BusinessException {
         LOGGER.debug("MeterDataQueryResponse received");
 
         DocumentType documentType = (message.getQueryType() == MeterDataQueryType.EVENTS) ? DocumentType.METER_DATA_QUERY_EVENTS
                 : DocumentType.METER_DATA_QUERY_USAGE;
+
+       // Dynamo addition
+       if (documentType == DocumentType.METER_DATA_QUERY_USAGE && isDynamoMeterDataQueryResponse(message)) {
+           sendMeterdataEventManager.fire(new SendDynamoMeterdataEvent(message));
+           return;
+       }
 
         // find sent Meter Data Query
         PlanboardMessage planboardMessage = corePlanboardBusinessService
@@ -93,5 +104,9 @@ public class MeterDataQueryResponseController extends BaseIncomingResponseMessag
         }
 
         planboardMessage.setDocumentStatus(DocumentStatus.PROCESSED);
+    }
+
+    private boolean isDynamoMeterDataQueryResponse(MeterDataQueryResponse message) {
+        return (message.getAny().stream().filter(e -> ((Element) e ).getFirstChild().getNodeValue().equalsIgnoreCase("DynamoMeterDataService")).count() == 1L);
     }
 }

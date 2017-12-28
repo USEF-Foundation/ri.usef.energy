@@ -25,7 +25,7 @@ import java.util.List;
 import javax.ejb.Singleton;
 import javax.inject.Inject;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xbill.DNS.DClass;
@@ -121,6 +121,9 @@ public class ParticipantDiscoveryService {
         String senderDomain = incomingMessage.getSenderDomain();
         USEFRole senderRole = incomingMessage.getSenderRole();
 
+        LOGGER.info("Signed message received from {} for role {}: {}", senderDomain, senderRole,
+                new String(incomingMessage.getBody()));
+
         if (byPassDNSCheck()) {
             checkSenderDomainAndRoleAvailable(incomingMessage);
             value = findLocalParticipantUnsigningPublicKey(senderDomain, senderRole);
@@ -145,7 +148,7 @@ public class ParticipantDiscoveryService {
         if (!isFileExists(participantDnsFileName)) {
             participantDnsFileName = AbstractConfig.DOMAIN_CONFIG_FOLDER + File.separator + PARTICIPANTS_YAML;
         }
-
+        LOGGER.info("Participants will be retrieved from file {}", participantDnsFileName);
         List<Participant> participants = participantListBuilder.buildParticipantList(participantDnsFileName);
 
         checkParticipantsListIsAvailable(participants);
@@ -156,6 +159,9 @@ public class ParticipantDiscoveryService {
          */
         Participant foundParticipant = iterateOverParticipants(participants, domain, participantRole);
         if (foundParticipant == null) {
+            // Added temporarely
+            LOGGER.warn("Participant [{}:{}] has not been found in the local configuration file", participantRole,
+                    domain);
             LOGGER_CONFIDENTIAL.debug("Participant [{}:{}] has not been found in the local configuration file", participantRole,
                     domain);
             throw new BusinessException(ParticipantDiscoveryError.PARTICIPANT_NOT_FOUND);

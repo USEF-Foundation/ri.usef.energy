@@ -24,7 +24,7 @@ public class VersionUtil {
         // Hide default constructor
     }
     /**
-     * Compares two semantic version numebers
+     * Compares two semantic version numbers
      *
      * @param version1
      * @param version2

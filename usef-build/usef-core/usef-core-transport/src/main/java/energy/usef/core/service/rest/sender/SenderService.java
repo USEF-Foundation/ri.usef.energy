@@ -75,6 +75,9 @@ public class SenderService {
     private static final Logger LOGGER = LoggerFactory.getLogger(SenderService.class);
     private static final Logger LOGGER_CONFIDENTIAL = LoggerFactory.getLogger(USEFLogCategory.CONFIDENTIAL);
 
+    // Constants added because DSO needs a Basic Authentication Header on the HTTP client connections.
+    private static final String AUTH_HEADER = "_AUTH_HEADER";
+
     @Inject
     private MessageService messageService;
 
@@ -101,6 +104,8 @@ public class SenderService {
         LOGGER.debug("Started sending message");
         LOGGER_CONFIDENTIAL.debug("Trying to send message {} ", xmlString);
 
+        LOGGER.info("Sending message {}", xmlString);
+
         Message dtoMessage = (Message) XMLUtil
                 .xmlToMessage(xmlString, config.getBooleanProperty(ConfigParam.VALIDATE_OUTGOING_XML).booleanValue());
         energy.usef.core.model.Message storedMessage = messageService.storeMessage(xmlString, dtoMessage, MessageDirection.OUTBOUND);
@@ -122,7 +127,7 @@ public class SenderService {
 
             SignedMessage signedMessage = createSignedMessage(xmlString, dtoMessage);
 
-            HttpRequest request = buildHttpRequest(url, signedMessage, backoff, retries);
+            HttpRequest request = buildHttpRequest(url, signedMessage, backoff, retries, dtoMessage);
 
             // send request
             HttpResponse response = request.execute();
@@ -188,7 +193,8 @@ public class SenderService {
         notificationHelperService.notifyMessageNotSent(storedMessage.getXml(), dtoMessage);
     }
 
-    private HttpRequest buildHttpRequest(String address, SignedMessage message, BackOff backoff, int retries) throws IOException {
+    private HttpRequest buildHttpRequest(String address, SignedMessage message, BackOff backoff, int retries,
+    		Message dtoMessage) throws IOException {
         GenericUrl targetURL = new GenericUrl(address);
 
         LOGGER.debug("Sending message to the target URL: {}", targetURL);
@@ -204,6 +210,21 @@ public class SenderService {
                 xmlMessage.getBytes(UTF_8));
 
         HttpRequest request = requestFactory.buildPostRequest(targetURL, content);
+
+        String propName = dtoMessage.getMessageMetadata().getRecipientDomain().replace(".","_").toUpperCase() + AUTH_HEADER;
+        String base64DsoAuthorization = System.getenv(propName.replace("-","_"));
+
+        if (base64DsoAuthorization == null || "".equals(base64DsoAuthorization)) {
+        	base64DsoAuthorization = config.getProperties().getProperty(propName);
+        }
+
+        if (base64DsoAuthorization != null && !"".equals(base64DsoAuthorization)) {
+            if (base64DsoAuthorization.length() < 10 ) {
+                LOGGER.warn("The configuration parameter " + propName + " in the config-local.properties is too short");                
+            } else {
+                request.getHeaders().setAuthorization(base64DsoAuthorization);
+            }
+        }
 
         // Setting Unsuccessful Response Handler
         request.setUnsuccessfulResponseHandler(new HttpBackOffUnsuccessfulResponseHandler(

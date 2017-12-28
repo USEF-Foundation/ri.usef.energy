@@ -43,8 +43,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 /**
  * JUnit test for the FlexOfferRevocationEndpoint class.
@@ -144,7 +144,7 @@ public class FlexOfferRevocationEndpointTest extends BaseResourceTest {
      */
     @Test
     public void testRevokeFlexOfferWithWrongSequenceNumber() throws URISyntaxException {
-        MockHttpRequest request = MockHttpRequest.get(URL + "/" + FLEX_OFFER_REVOKE_WRONG_SEQUENCE_STR);
+        MockHttpRequest request = MockHttpRequest.get(URL + FLEX_OFFER_REVOKE_WRONG_SEQUENCE_STR);
         MockHttpResponse response = new MockHttpResponse();
         dispatcher.invoke(request, response);
 

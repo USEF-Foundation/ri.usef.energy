@@ -39,7 +39,10 @@ import energy.usef.core.util.DateTimeUtil;
 import java.io.ByteArrayInputStream;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Properties;
 
+import org.junit.After;
+import org.junit.Rule;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,6 +60,17 @@ import org.slf4j.Logger;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpTransport;
+import com.github.tomakehurst.wiremock.client.WireMock;
+import com.github.tomakehurst.wiremock.junit.WireMockRule;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.deleteRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
 
 /**
  * JUnit test for the SenderService class.
@@ -92,6 +106,9 @@ public class SenderServiceTest {
 
     private static final String SENDER_DOMAIN = "localhost";
     private static final String TLS_VERIFICATION_DISABLED_MESSAGE = "TLS/SSL verification is disabled. Certificates of the destination of the message will not be checked.";
+
+    @Rule
+    public WireMockRule usefEndpoint = new WireMockRule(6667);
 
     @Mock
     private MessageService messageService;
@@ -137,6 +154,11 @@ public class SenderServiceTest {
         // message = (Message) XMLUtil.xmlToMessage(MSG);
     }
 
+    @After
+    public void reset() {
+    	usefEndpoint.resetAll();
+    }
+
     /**
      * Basic test for the SenderService.sendScheduledMsg method. Verify whether the error massage is correctly saved.
      *
@@ -152,6 +174,73 @@ public class SenderServiceTest {
 
         verify(messageService).storeMessage(Matchers.anyString(), Matchers.any(Message.class),
                 Matchers.eq(MessageDirection.OUTBOUND));
+    }
+
+    /**
+     * Tests whether the Logger is correctly called to warn that the DSO basic authorization string is too short .
+     *
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     * @throws NoSuchFieldException
+     * @throws SecurityException
+     * @throws BusinessException
+     */
+    @Test
+    public void testDSOBasicAuthorizationTooShort() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException,
+            SecurityException, BusinessException {
+        Logger loggerMock = PowerMockito.mock(Logger.class);
+        setFinalStatic(SenderService.class.getDeclaredField("LOGGER"), loggerMock);
+        
+        Properties props = new Properties();
+        props.setProperty("DSO_USEF-EXAMPLE_COM_AUTH_HEADER", "Basic");
+
+        Mockito.when(config.getBooleanProperty(ConfigParam.BYPASS_TLS_VERIFICATION)).thenReturn(Boolean.FALSE);
+        Mockito.when(config.getProperties()).thenReturn(props);
+        Mockito.when(messageService.storeMessage(Matchers.any(String.class),
+                Matchers.any(Message.class), Matchers.any(MessageDirection.class)))
+                .thenReturn(new energy.usef.core.model.Message());
+
+        senderService.sendMessage(MSG);
+
+        verify(loggerMock, times(1)).warn(eq("The configuration parameter DSO_USEF-EXAMPLE_COM_AUTH_HEADER in the config-local.properties is too short"));
+    }
+
+    /**
+     * Tests whether the Basic Authorization header is added to the request.
+     *
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     * @throws NoSuchFieldException
+     * @throws SecurityException
+     * @throws BusinessException
+     */
+    @Test
+    public void testDSOBasicAuthorization() throws IllegalArgumentException, IllegalAccessException, NoSuchFieldException,
+            SecurityException, BusinessException, Exception {
+        SenderService instance = PowerMockito.spy(senderService);
+
+        Logger loggerMock = PowerMockito.mock(Logger.class);
+        setFinalStatic(SenderService.class.getDeclaredField("LOGGER"), loggerMock);
+
+        Properties props = new Properties();
+        props.setProperty("DSO_USEF-EXAMPLE_COM_AUTH_HEADER", "Basic 123456789");
+
+        PowerMockito.when(messageService.storeMessage(Matchers.any(String.class), Matchers.any(Message.class),
+                Matchers.any(MessageDirection.class))).thenReturn(new energy.usef.core.model.Message());
+
+        usefEndpoint.stubFor(WireMock.post(urlEqualTo("/")).willReturn(aResponse().withStatus(200)));
+
+        Mockito.when(config.getBooleanProperty(ConfigParam.BYPASS_TLS_VERIFICATION)).thenReturn(Boolean.FALSE);
+        Mockito.when(config.getProperties()).thenReturn(props);
+        Mockito.when(messageService.storeMessage(Matchers.any(String.class),
+                Matchers.any(Message.class), Matchers.any(MessageDirection.class)))
+                .thenReturn(new energy.usef.core.model.Message());
+
+        instance.sendMessage(MSG);
+
+        verify(postRequestedFor(urlEqualTo("/"))
+                .withHeader("Content-Type", equalTo("text/xml"))
+                .withHeader("Authorization", equalTo("Basic 123456789")));
     }
 
     /**
@@ -244,10 +333,6 @@ public class SenderServiceTest {
         PowerMockito.when(messageService.storeMessage(Matchers.any(String.class), Matchers.any(Message.class),
                 Matchers.any(MessageDirection.class))).thenReturn(new energy.usef.core.model.Message());
 
-        PowerMockito.whenNew(HttpRequest.class).withAnyArguments().thenReturn(httpRequest);
-        PowerMockito.when(httpRequest.execute()).thenReturn(httpResponse);
-        PowerMockito.when(httpResponse.getContent()).thenReturn(new ByteArrayInputStream("dummy".getBytes()));
-
         // if validate outgoing xml is not enabled, force TechnicalException to succeed test
         PowerMockito.when(config.getBooleanProperty(ConfigParam.VALIDATE_OUTGOING_XML).booleanValue()).thenThrow(
                 new TechnicalException(""));
@@ -260,7 +345,7 @@ public class SenderServiceTest {
         participant.setSpecVersion("2015");
 
         ParticipantRole role = new ParticipantRole(USEFRole.DSO);
-        role.setUrl("http://localhost:666");
+        role.setUrl("http://localhost:6667");
         role.setPublicKeys(Arrays.asList("unsigningKey", "KEY2"));
 
         participant.setRoles(Collections.singletonList(role));

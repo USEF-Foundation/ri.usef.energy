@@ -18,11 +18,11 @@ package energy.usef.core.workflow.util;
 
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.exception.WorkflowException;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Util class to do simple workflow checks.

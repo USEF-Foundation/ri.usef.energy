@@ -16,13 +16,16 @@
 
 package energy.usef.dso.workflow.validate.revoke.flexoffer;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
 
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.FlexOfferRevocation;
 import energy.usef.core.data.xml.bean.message.USEFRole;
 import energy.usef.core.exception.BusinessValidationException;
+import energy.usef.core.model.CongestionPointConnectionGroup;
 import energy.usef.core.model.ConnectionGroup;
 import energy.usef.core.model.DocumentStatus;
 import energy.usef.core.model.DocumentType;
@@ -37,7 +40,14 @@ import energy.usef.core.service.helper.JMSHelperService;
 import energy.usef.core.service.helper.MessageMetadataBuilder;
 import energy.usef.core.service.validation.CorePlanboardValidatorService;
 
+import energy.usef.core.workflow.WorkflowContext;
+import energy.usef.core.workflow.WorkflowStep;
+import energy.usef.core.workflow.step.WorkflowStepExecuter;
+import energy.usef.dso.workflow.DsoWorkflowStep;
+import energy.usef.dso.workflow.validate.revoke.flexoffer.RevokeFlexOfferStepParameter.IN;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -84,6 +94,8 @@ public class DsoFlexOfferRevocationCoordinatorTest {
     private PtuStateRepository ptuStateRepository;
     @Mock
     private Config config;
+    @Mock
+    private WorkflowStepExecuter workflowStepExecuter;
 
     @Before
     public void init() {
@@ -96,13 +108,14 @@ public class DsoFlexOfferRevocationCoordinatorTest {
         Whitebox.setInternalState(coordinator, planboardValidatorService);
         Whitebox.setInternalState(planboardValidatorService, ptuStateRepository);
         Whitebox.setInternalState(coordinator, config);
+        Whitebox.setInternalState(coordinator, workflowStepExecuter);
 
         PowerMockito.when(config.getProperty(Matchers.eq(ConfigParam.HOST_DOMAIN))).thenReturn("usef-example.com");
     }
 
     @Test
     public void testInvokeWorkflowSucceeds() throws XpathException, SAXException, IOException {
-        PowerMockito.when(planboardBusinessService.findPtuFlexOffer(Matchers.any(Long.class), Matchers.any(String.class)))
+        PowerMockito.when(planboardBusinessService.findPtuFlexOffer(any(Long.class), any(String.class)))
                 .thenReturn(buildFlexOffers().stream().collect(Collectors.toMap(fo -> fo.getPtuContainer().getPtuIndex(),
                         Function.identity())));
 
@@ -110,17 +123,17 @@ public class DsoFlexOfferRevocationCoordinatorTest {
         ptuState.setState(PtuContainerState.PlanValidate);
 
         PowerMockito.when(
-                ptuStateRepository.findOrCreatePtuState(Matchers.any(PtuContainer.class), Matchers.any(ConnectionGroup.class)))
+                ptuStateRepository.findOrCreatePtuState(any(PtuContainer.class), any(ConnectionGroup.class)))
                 .thenReturn(ptuState);
 
-        PowerMockito.when(planboardBusinessService.findPlanboardMessages(Matchers.any(Long.class), Matchers.any(DocumentType.class),
+        PowerMockito.when(planboardBusinessService.findPlanboardMessages(any(Long.class), any(DocumentType.class),
                         Matchers.anyString())).
                 thenReturn(buildPlanboardMessageList());
 
         coordinator.handleEvent(new FlexOfferRevocationEvent(buildContext()));
 
         try {
-            Mockito.verify(planboardValidatorService, Mockito.times(1)).checkPtuPhase(Matchers.any(FlexOfferRevocation.class),
+            Mockito.verify(planboardValidatorService, Mockito.times(1)).checkPtuPhase(any(FlexOfferRevocation.class),
                     Matchers.anyMapOf(Integer.class, PtuFlexOffer.class));
         } catch (BusinessValidationException e) {
             fail("No BusinessValidationException expected");
@@ -132,12 +145,19 @@ public class DsoFlexOfferRevocationCoordinatorTest {
         Assert.assertNotNull(responseMessage);
         XMLAssert.assertXpathEvaluatesTo("Accepted", "/FlexOfferRevocationResponse/@Result", responseMessage);
 
+        ArgumentCaptor<WorkflowContext> workflowContext = ArgumentCaptor.forClass(WorkflowContext.class);
+        Mockito.verify(workflowStepExecuter, Mockito.timeout(1000).times(1)).invoke(Mockito.eq(DsoWorkflowStep.DSO_FLEX_OFFER_REVOCATION.name()),
+                workflowContext.capture());
+        WorkflowContext context = workflowContext.getValue();
+        assertNotNull(context.getValue(IN.FLEX_OFFER_DTO.name()));
+        assertNotNull(context.getValue(IN.AGGREGATOR.name()));
+
         LOGGER.info("Response message:\n{}", responseMessage);
     }
 
     @Test
     public void testInvokeWorkflowOrdered() throws XpathException, SAXException, IOException {
-        PowerMockito.when(planboardBusinessService.findPtuFlexOffer(Matchers.any(Long.class), Matchers.any(String.class)))
+        PowerMockito.when(planboardBusinessService.findPtuFlexOffer(any(Long.class), any(String.class)))
                 .thenReturn(buildFlexOffers().stream().collect(Collectors.toMap(fo -> fo.getPtuContainer().getPtuIndex(),
                         Function.identity())));
 
@@ -145,14 +165,14 @@ public class DsoFlexOfferRevocationCoordinatorTest {
         ptuState.setState(PtuContainerState.PlanValidate);
 
         PowerMockito.when(
-                ptuStateRepository.findOrCreatePtuState(Matchers.any(PtuContainer.class), Matchers.any(ConnectionGroup.class)))
+                ptuStateRepository.findOrCreatePtuState(any(PtuContainer.class), any(ConnectionGroup.class)))
                 .thenReturn(ptuState);
 
-        PowerMockito.when(planboardBusinessService.findPlanboardMessages(Matchers.any(Long.class), Matchers.any(DocumentType.class),
+        PowerMockito.when(planboardBusinessService.findPlanboardMessages(any(Long.class), any(DocumentType.class),
                 Matchers.anyString())).
                 thenReturn(buildPlanboardMessageList());
         //used to find orders
-        PowerMockito.when(planboardBusinessService.findPlanboardMessagesWithOriginSequence(Matchers.any(Long.class), Matchers.any(DocumentType.class),
+        PowerMockito.when(planboardBusinessService.findPlanboardMessagesWithOriginSequence(any(Long.class), any(DocumentType.class),
                 Matchers.anyString())).
                 thenReturn(buildPlanboardMessageList());
 
@@ -170,11 +190,11 @@ public class DsoFlexOfferRevocationCoordinatorTest {
 
     @Test
     public void testInvokeWorkflowFailsForNoPlanboardMessage() throws XpathException, SAXException, IOException {
-        PowerMockito.when(planboardBusinessService.findPtuFlexOffer(Matchers.any(Long.class), Matchers.any(String.class)))
+        PowerMockito.when(planboardBusinessService.findPtuFlexOffer(any(Long.class), any(String.class)))
                 .thenReturn(buildFlexOffers().stream().collect(Collectors.toMap(fo -> fo.getPtuContainer().getPtuIndex(),
                         Function.identity())));
 
-        PowerMockito.when(planboardBusinessService.findPlanboardMessages(Matchers.any(Long.class), Matchers.any(DocumentType.class),
+        PowerMockito.when(planboardBusinessService.findPlanboardMessages(any(Long.class), any(DocumentType.class),
                         Matchers.anyString())).
                 thenReturn(new ArrayList<>());
 
@@ -196,22 +216,22 @@ public class DsoFlexOfferRevocationCoordinatorTest {
         PtuState ptuState = new PtuState();
         ptuState.setState(PtuContainerState.Operate);
 
-        PowerMockito.when(planboardBusinessService.findPtuFlexOffer(Matchers.any(Long.class), Matchers.any(String.class)))
+        PowerMockito.when(planboardBusinessService.findPtuFlexOffer(any(Long.class), any(String.class)))
                 .thenReturn(buildFlexOffers().stream().collect(Collectors.toMap(fo -> fo.getPtuContainer().getPtuIndex(),
                         Function.identity())));
 
         PowerMockito.when(
-                ptuStateRepository.findOrCreatePtuState(Matchers.any(PtuContainer.class), Matchers.any(ConnectionGroup.class)))
+                ptuStateRepository.findOrCreatePtuState(any(PtuContainer.class), any(ConnectionGroup.class)))
                 .thenReturn(ptuState);
 
-        PowerMockito.when(planboardBusinessService.findPlanboardMessages(Matchers.any(Long.class), Matchers.any(DocumentType.class),
+        PowerMockito.when(planboardBusinessService.findPlanboardMessages(any(Long.class), any(DocumentType.class),
                         Matchers.anyString())).
                 thenReturn(planboardMessages);
 
         coordinator.handleEvent(new FlexOfferRevocationEvent(buildContext()));
 
         try {
-            Mockito.verify(planboardValidatorService, Mockito.times(1)).checkPtuPhase(Matchers.any(FlexOfferRevocation.class),
+            Mockito.verify(planboardValidatorService, Mockito.times(1)).checkPtuPhase(any(FlexOfferRevocation.class),
                     Matchers.anyMapOf(Integer.class, PtuFlexOffer.class));
         } catch (BusinessValidationException e) {
             fail("No BusinessValidationException expected");
@@ -228,7 +248,7 @@ public class DsoFlexOfferRevocationCoordinatorTest {
 
     @Test
     public void testInvokeWorkflowFailsForNoFlexOffer() throws XpathException, SAXException, IOException {
-        PowerMockito.when(planboardBusinessService.findPtuFlexOffer(Matchers.any(Long.class), Matchers.any(String.class)))
+        PowerMockito.when(planboardBusinessService.findPtuFlexOffer(any(Long.class), any(String.class)))
                 .thenReturn(new HashMap<Integer, PtuFlexOffer>());
 
         coordinator.handleEvent(new FlexOfferRevocationEvent(buildContext()));
@@ -252,6 +272,11 @@ public class DsoFlexOfferRevocationCoordinatorTest {
 
     private List<PtuFlexOffer> buildFlexOffers() {
         PtuFlexOffer fo1 = new PtuFlexOffer();
+        fo1.setPower(BigInteger.TEN);
+        fo1.setPrice(BigDecimal.ZERO);
+        CongestionPointConnectionGroup cg = new CongestionPointConnectionGroup();
+        cg.setUsefIdentifier("senderd");
+        fo1.setConnectionGroup(cg);
         PtuContainer ptuc1 = new PtuContainer();
         ptuc1.setPtuIndex(1);
         fo1.setPtuContainer(ptuc1);

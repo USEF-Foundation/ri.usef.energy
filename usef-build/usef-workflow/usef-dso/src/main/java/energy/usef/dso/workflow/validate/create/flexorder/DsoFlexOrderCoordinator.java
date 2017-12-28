@@ -20,6 +20,7 @@ import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_H
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
 import static energy.usef.core.data.xml.bean.message.MessagePrecedence.ROUTINE;
 
+import com.google.common.collect.Lists;
 import energy.usef.core.config.Config;
 import energy.usef.core.config.ConfigParam;
 import energy.usef.core.data.xml.bean.message.FlexOrder;
@@ -38,6 +39,7 @@ import energy.usef.core.util.XMLUtil;
 import energy.usef.core.workflow.DefaultWorkflowContext;
 import energy.usef.core.workflow.WorkflowContext;
 import energy.usef.core.workflow.dto.FlexOfferDto;
+import energy.usef.core.workflow.dto.FlexOrderDto;
 import energy.usef.core.workflow.step.WorkflowStepExecuter;
 import energy.usef.core.workflow.transformer.FlexOfferTransformer;
 import energy.usef.core.workflow.util.WorkflowUtil;
@@ -45,6 +47,7 @@ import energy.usef.dso.config.ConfigDso;
 import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 import energy.usef.dso.workflow.DsoWorkflowStep;
 
+import energy.usef.dso.workflow.validate.create.flexorder.CreateFlexOrdersStepParameter.IN;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -153,6 +156,7 @@ public class DsoFlexOrderCoordinator {
 
     private void storeAndSendFlexOrders(Map<String, Map<LocalDate, List<PlanboardMessage>>> flexOffersPerCongestionPointPerDateMap,
             List<Long> acceptedFlexOffers, List<FlexOfferDto> flexOfferDtos, String congestionPoint, LocalDate period) {
+        List<FlexOrder>  flexOrders = Lists.newArrayList();
         for (Long flexOfferSequence : acceptedFlexOffers) {
 
             PlanboardMessage acceptedFlexOffer = getOfferByCongestionPointDateAndSequence(flexOffersPerCongestionPointPerDateMap,
@@ -170,6 +174,7 @@ public class DsoFlexOrderCoordinator {
             // create and send flex order message.
             FlexOrder flexOrderMessage = createFlexOrderMessage(acceptedFlexOffer, currentFlexOfferDto, flexOrderSequence,
                     DateTimeUtil.getEndOfDay(period));
+            flexOrders.add(flexOrderMessage);
 
             // store flex order on the planboard.
             corePlanboardBusinessService.storeFlexOrder(flexOrderMessage.getCongestionPoint(), flexOrderMessage,
@@ -180,6 +185,20 @@ public class DsoFlexOrderCoordinator {
             // set the offer status on PROCESSED, so it won't be processed again.
             acceptedFlexOffer.setDocumentStatus(DocumentStatus.PROCESSED);
         }
+        invokeCreateFlexOrdersPbc(flexOrders);
+    }
+
+    private void invokeCreateFlexOrdersPbc(List<FlexOrder> flexOrders) {
+        List<FlexOrderDto> flexOrderDtos = flexOrders.stream().map(f -> {
+            FlexOrderDto dto = new FlexOrderDto();
+            dto.setSequenceNumber(f.getSequence());
+            dto.setFlexOfferSequenceNumber(f.getFlexOfferSequence());
+            return dto;
+        }).collect(Collectors.toList());
+        WorkflowContext inContext = new DefaultWorkflowContext();
+        inContext.setValue(IN.FLEX_ORDER_DTO_LIST.name(), flexOrderDtos);
+
+        workflowStubLoader.invoke(DsoWorkflowStep.DSO_CREATE_FLEX_ORDERS.name(), inContext);
     }
 
     private FlexOrder createFlexOrderMessage(PlanboardMessage offer, FlexOfferDto offerDto, Long flexOrderSequence,

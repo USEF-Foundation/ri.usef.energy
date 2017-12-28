@@ -41,8 +41,8 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.internal.util.reflection.Whitebox;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.reflect.Whitebox;
 
 /**
  * Tests for the {@link UpdateConnectionForecastEndpoint}

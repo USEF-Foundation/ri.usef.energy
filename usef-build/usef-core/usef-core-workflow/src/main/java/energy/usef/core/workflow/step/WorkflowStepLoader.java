@@ -44,7 +44,7 @@ import javax.enterprise.inject.Any;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +94,7 @@ public class WorkflowStepLoader {
                 if (StringUtils.isEmpty((String)entry.getValue())) {
                     LOGGER.error("Invalid configuration for WorkflowStep {}, class name can not be empty.", entry.getKey());
                 }
+                LOGGER.info("Loading class: {}", entry.getKey());
                 Class<WorkflowStep> clazz = (Class<WorkflowStep>) Class.forName((String) entry.getValue());
 
                 if (!hasWorkflowStepInterface(clazz)) {

@@ -16,16 +16,24 @@
 
 package energy.usef.dso.service.business;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-import java.io.StringWriter;
-import java.math.BigInteger;
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-
+import energy.usef.core.config.Config;
+import energy.usef.core.config.ConfigParam;
+import energy.usef.core.data.xml.bean.message.FlexOffer;
+import energy.usef.core.data.xml.bean.message.MessageMetadata;
+import energy.usef.core.data.xml.bean.message.PTU;
+import energy.usef.core.data.xml.bean.message.Prognosis;
+import energy.usef.core.exception.BusinessValidationException;
+import energy.usef.core.model.CongestionPointConnectionGroup;
+import energy.usef.core.model.DispositionAvailableRequested;
+import energy.usef.core.model.PtuContainer;
+import energy.usef.core.model.PtuFlexRequest;
+import energy.usef.core.repository.CongestionPointConnectionGroupRepository;
+import energy.usef.core.repository.PlanboardMessageRepository;
+import energy.usef.core.repository.PtuFlexRequestRepository;
+import energy.usef.core.util.XMLUtil;
+import energy.usef.dso.exception.DsoBusinessError;
+import energy.usef.dso.model.Aggregator;
+import energy.usef.dso.repository.AggregatorOnConnectionGroupStateRepository;
 import org.apache.commons.io.IOUtils;
 import org.joda.time.LocalDate;
 import org.junit.Assert;
@@ -38,17 +46,16 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.powermock.reflect.Whitebox;
 
-import energy.usef.core.config.Config;
-import energy.usef.core.config.ConfigParam;
-import energy.usef.core.data.xml.bean.message.Prognosis;
-import energy.usef.core.exception.BusinessValidationException;
-import energy.usef.core.model.CongestionPointConnectionGroup;
-import energy.usef.core.repository.CongestionPointConnectionGroupRepository;
-import energy.usef.core.repository.PlanboardMessageRepository;
-import energy.usef.core.util.XMLUtil;
-import energy.usef.dso.exception.DsoBusinessError;
-import energy.usef.dso.model.Aggregator;
-import energy.usef.dso.repository.AggregatorOnConnectionGroupStateRepository;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * Test class in charge of the unit tests related to the {@link DsoPlanboardValidatorService}.
@@ -65,11 +72,14 @@ public class DsoPlanboardValidatorServiceTest {
     private AggregatorOnConnectionGroupStateRepository aggregatorOnConnectionGroupStateRepository;
     @Mock
     private PlanboardMessageRepository planboardMessageRepository;
+    @Mock
+    private PtuFlexRequestRepository ptuFlexRequestRepository;
 
     @Before
     public void init() {
         service = new DsoPlanboardValidatorService();
         Whitebox.setInternalState(service, config);
+        Whitebox.setInternalState(service, ptuFlexRequestRepository);
         Whitebox.setInternalState(service, congestionPointConnectionGroupRepository);
         Whitebox.setInternalState(service, aggregatorOnConnectionGroupStateRepository);
         Whitebox.setInternalState(service, planboardMessageRepository);
@@ -84,6 +94,10 @@ public class DsoPlanboardValidatorServiceTest {
                 aggregatorOnConnectionGroupStateRepository.getAggregatorsByCongestionPointAddress(Matchers.any(String.class),
                         Matchers.any(LocalDate.class))).thenReturn(
                 buildAggregatorList());
+        PowerMockito.when(
+                ptuFlexRequestRepository.findPtuFlexRequestWithSequence(Matchers.any(String.class),Matchers.any(Long.class),
+                        Matchers.any(String.class))).thenReturn(
+                buildPtuFlexRequests());
     }
 
     private List<Aggregator> buildAggregatorList() {
@@ -164,6 +178,21 @@ public class DsoPlanboardValidatorServiceTest {
         }
     }
 
+    @Test
+    public void testValidateFlexOfferMatchesRequest() throws BusinessValidationException{
+       service.validateFlexOfferMatchesRequest(createFlexOffer(true, 1));
+    }
+
+    @Test (expected = BusinessValidationException.class)
+    public void testValidateFlexOfferMatchesRequestSignFails() throws BusinessValidationException{
+        service.validateFlexOfferMatchesRequest(createFlexOffer(true, -1));
+    }
+
+    @Test (expected = BusinessValidationException.class)
+    public void testValidateFlexOfferMatchesRequestPriceFails() throws BusinessValidationException{
+        service.validateFlexOfferMatchesRequest(createFlexOffer(false, 1));
+    }
+
     private Prognosis buildPrognosisMessage() throws IOException {
         StringWriter writer = new StringWriter();
         IOUtils.copy(
@@ -172,4 +201,41 @@ public class DsoPlanboardValidatorServiceTest {
         return (Prognosis) XMLUtil.xmlToMessage(writer.toString());
     }
 
+    private FlexOffer createFlexOffer(boolean valid, int multiplier) {
+        MessageMetadata metadata = new MessageMetadata();
+        metadata.setSenderDomain("some.aggregator.com");
+
+        FlexOffer flexOffer = new FlexOffer();
+        flexOffer.setMessageMetadata(metadata);
+        flexOffer.setFlexRequestSequence(2013L);
+        flexOffer.setCongestionPoint("");
+
+        for (long i = 1; i < 96; i++) {
+            PTU ptu = new PTU();
+            ptu.setStart(BigInteger.valueOf(i));
+            ptu.setDuration(BigInteger.ONE);
+            ptu.setPower(BigInteger.valueOf(multiplier).multiply(BigInteger.TEN));
+            ptu.setPrice(i % 10 == 0 && valid ? BigDecimal.valueOf(100) : null);
+            flexOffer.getPTU().add(ptu);
+        }
+
+        return flexOffer;
+    }
+
+    private List<PtuFlexRequest> buildPtuFlexRequests() {
+        ArrayList<PtuFlexRequest> list = new ArrayList<>();
+        LocalDate period = LocalDate.now();
+
+        for (int i = 1; i < 96; i++) {
+            PtuContainer ptuContainer = new PtuContainer(period, i);
+
+            PtuFlexRequest ptuFlexRequest = new PtuFlexRequest();
+            ptuFlexRequest.setDisposition(i % 10 == 0 ? DispositionAvailableRequested.REQUESTED: DispositionAvailableRequested.AVAILABLE);
+            ptuFlexRequest.setPower(BigInteger.valueOf(12));
+            ptuFlexRequest.setPtuContainer(ptuContainer);
+
+            list.add(ptuFlexRequest);
+        }
+        return list;
+    }
 }

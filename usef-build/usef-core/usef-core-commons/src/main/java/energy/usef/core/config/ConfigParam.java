@@ -79,7 +79,9 @@ public enum ConfigParam {
     VALIDATE_INCOMING_XML(Boolean.class),
 
     DAY_AHEAD_GATE_CLOSURE_TIME(String.class),
-    DAY_AHEAD_GATE_CLOSURE_PTUS(Integer.class);
+    DAY_AHEAD_GATE_CLOSURE_PTUS(Integer.class),
+
+    CONFIGURATION_ENDPOINT_PROPERTIES_WHITELIST(String.class);
 
     private Class<?> propertyClass;
 

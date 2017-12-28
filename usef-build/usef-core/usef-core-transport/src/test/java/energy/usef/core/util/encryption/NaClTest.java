@@ -27,7 +27,7 @@ import junit.framework.TestCase;
  */
 public class NaClTest extends TestCase {
 
-    private static final String VERSION = "1.0.8";
+    private static final String VERSION = "1.0.11";
 
     @Before
     public void init() throws Exception {

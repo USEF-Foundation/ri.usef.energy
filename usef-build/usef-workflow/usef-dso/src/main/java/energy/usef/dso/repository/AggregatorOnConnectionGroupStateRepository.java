@@ -29,13 +29,17 @@ import java.util.stream.Collectors;
 import javax.ejb.Stateless;
 import javax.persistence.TemporalType;
 
+import energy.usef.dso.service.business.DsoPlanboardBusinessService;
 import org.joda.time.LocalDate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Repository class for the {@link AggregatorOnConnectionGroupState} entity.
  */
 @Stateless
 public class AggregatorOnConnectionGroupStateRepository extends BaseRepository<AggregatorOnConnectionGroupState> {
+    private static final Logger LOGGER = LoggerFactory.getLogger(AggregatorOnConnectionGroupStateRepository.class);
 
     /**
      * Get Aggregators by CongestionPointAddress.
@@ -158,6 +162,8 @@ public class AggregatorOnConnectionGroupStateRepository extends BaseRepository<A
      */
     public List<AggregatorOnConnectionGroupState> findEndingAggregatorOnConnectionGroupStates(String usefIdentifier,
             LocalDate initializationDate) {
+        LOGGER.debug("Execute findEndingAggregatorOnConnectionGroupStates with usefIdentifier {} and period {}",
+                usefIdentifier, initializationDate);
         StringBuilder sql = new StringBuilder();
         sql.append("SELECT state ");
         sql.append("FROM AggregatorOnConnectionGroupState state ");

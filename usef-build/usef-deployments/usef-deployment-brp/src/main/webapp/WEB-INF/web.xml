@@ -4,7 +4,7 @@
 	version="3.1">
 	<servlet-mapping>
 		<servlet-name>resteasy-servlet</servlet-name>
-		<url-pattern>/rest/*</url-pattern>
+		<url-pattern>/USEF/2015/*</url-pattern>
 	</servlet-mapping>
 	<context-param>
 		<param-name>resteasy.scan</param-name>
@@ -12,7 +12,7 @@
 	</context-param>
 	<context-param>
 		<param-name>resteasy.servlet.mapping.prefix</param-name>
-		<param-value>/rest</param-value>
+		<param-value>/USEF/2015</param-value>
 	</context-param>
 	<listener>
 		<listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>

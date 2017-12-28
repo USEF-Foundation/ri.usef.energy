@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  * This class class has the logic to expose a REST endpoint to receive USEF messages. It does some basic checks on the message
  * before sending it to a queue for further processing. It handles the HTTP Response as well.
  */
-@Path("/ReceiverService")
+@Path("/SignedMessage")
 public class ReceiverEndpoint {
     private static final Logger LOGGER = LoggerFactory.getLogger(ReceiverEndpoint.class);
     private static final Logger LOGGER_CONFIDENTIAL = LoggerFactory.getLogger(USEFLogCategory.CONFIDENTIAL);
@@ -84,7 +84,7 @@ public class ReceiverEndpoint {
      * @return status
      */
     @POST
-    @Path("/receiveMessage")
+    @Path("/")
     @Consumes(TEXT_XML)
     public Response receiveMessage(String messageText, @Context HttpServletRequest request) {
         try {
@@ -94,8 +94,6 @@ public class ReceiverEndpoint {
             // transform the text/xml to a SignedMessage message
             SignedMessage signedMessage = XMLUtil.xmlToMessage(messageText, SignedMessage.class,
                     config.getBooleanProperty(ConfigParam.VALIDATE_INCOMING_XML).booleanValue());
-
-
 
             // Get original senders IP-address, both directly and from the proxy('s).
             String addresslist = request.getRemoteAddr() + "," + request.getRemoteHost();

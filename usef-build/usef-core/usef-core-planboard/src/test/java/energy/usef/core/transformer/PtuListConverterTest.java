@@ -16,10 +16,12 @@
 
 package energy.usef.core.transformer;
 
-import static org.junit.Assert.assertEquals;
-
 import energy.usef.core.data.xml.bean.message.DispositionAvailableRequested;
 import energy.usef.core.data.xml.bean.message.PTU;
+import org.junit.Assert;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -29,10 +31,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Assert;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Test case to test the conversion of a list of PTU's.
@@ -51,14 +51,21 @@ public class PtuListConverterTest {
     }
 
     @Test
+    public void testEmptyList() {
+        List<PTU> list = new ArrayList<>();
+        List<PTU> normalized = PtuListConverter.normalize(list);
+        assertNotNull(normalized);
+    }
+
+    @Test
     public void testSortOnStartOfList() {
         List<PTU> list = new ArrayList<>();
         list.add(createPTU(2, 1, 350, 0.08 / 1000));
         list.add(createPTU(1, 1, 350, 0.08 / 1000));
-        
+
         List<PTU> normalized = PtuListConverter.normalize(list);
         assertEquals(2, normalized.size());
-        
+
         assertEquals(BigInteger.valueOf(1), normalized.get(0).getStart());
         assertEquals(BigInteger.valueOf(2), normalized.get(1).getStart());
     }

@@ -36,7 +36,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -225,12 +225,23 @@ public abstract class AbstractConfig {
             properties = defaults;
         }
 
+        // merge the properties from environment variables into the properties set
+        Properties environmentVariableProperties = readEnvironmentVariableProperties();
+        properties.putAll(environmentVariableProperties);
+
         List<String> propertiesList = properties.entrySet().stream()
-                .map(entry -> entry.getKey() + "=" + entry.getValue())
+                .map(entry -> {
+                    String key = entry.getKey().toString();
+                    if (key.toLowerCase().contains("password")) {
+                        return key + "=***";
+                    } else {
+                        return key + "=" + entry.getValue();
+                    }
+                })
                 .collect(Collectors.toList());
         Collections.sort(propertiesList);
 
-        LOGGER.info("\nProperties:\n" + StringUtils.join(propertiesList.toArray(), "\n"));
+        LOGGER.trace("\nProperties:\n" + StringUtils.join(propertiesList.toArray(), "\n"));
     }
 
     /***
@@ -251,6 +262,19 @@ public abstract class AbstractConfig {
             throw new TechnicalException("Default properties file " + CONFIG_FILE_NAME + " could not be found");
         }
         return localProperties;
+    }
+
+    /***
+     * Reads properties from environment variables.
+     *
+     * @return - The read properties, named environmentVariableProperties within the scope of the method
+     */
+    public Properties readEnvironmentVariableProperties() {
+        Properties environmentVariableProperties = new Properties();
+        for (Entry<String, String> entries : System.getenv().entrySet()) {
+            environmentVariableProperties.put(entries.getKey(), entries.getValue());
+        }
+        return environmentVariableProperties;
     }
 
     /**

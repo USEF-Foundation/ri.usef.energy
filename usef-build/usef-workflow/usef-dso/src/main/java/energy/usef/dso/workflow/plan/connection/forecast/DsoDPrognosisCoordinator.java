@@ -18,12 +18,17 @@ package energy.usef.dso.workflow.plan.connection.forecast;
 
 import java.util.List;
 
+import javax.ejb.Asynchronous;
 import javax.ejb.Lock;
 import javax.ejb.LockType;
 import javax.ejb.Singleton;
 import javax.enterprise.event.Event;
+import javax.enterprise.event.Observes;
+import javax.enterprise.event.TransactionPhase;
 import javax.inject.Inject;
 
+import energy.usef.core.exception.BusinessValidationException;
+import energy.usef.dso.workflow.DPrognosisReceivedEvent;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,16 +57,21 @@ public class DsoDPrognosisCoordinator {
     private CorePlanboardBusinessService corePlanboardBusinessService;
 
     @Inject
-    private Event<GridSafetyAnalysisEvent> eventManager;
+    private Event<GridSafetyAnalysisEvent> gridSafetyAnalysisEventManager;
 
     @Inject
     private DsoPlanboardBusinessService dsoPlanboardBusinessService;
 
-    /**
-     * {@inheritDoc}
-     */
+    @Inject
+    private Event<DPrognosisReceivedEvent> dPrognosisReceivedEventManager;
+
+    @Asynchronous
     @Lock(LockType.WRITE)
-    public void invokeWorkflow(Prognosis prognosis, Message savedMessage) {
+    public void handleDPrognosisReceivedEvent(@Observes(during = TransactionPhase.AFTER_COMPLETION) DPrognosisReceivedEvent event) {
+
+        Prognosis prognosis = event.getPrognosis();
+        Message savedMessage = event.getSavedMessage();
+
         List<PtuPrognosis> existingPtuPrognoses = corePlanboardBusinessService
                 .findLastPrognoses(prognosis.getPeriod(), PrognosisType.D_PROGNOSIS, prognosis.getCongestionPoint());
 
@@ -75,6 +85,14 @@ public class DsoDPrognosisCoordinator {
                 DocumentStatus.ACCEPTED, prognosis.getMessageMetadata().getSenderDomain(), savedMessage, false);
 
         triggerGridSafetyAnalysisWorkflow(prognosis.getPeriod(), prognosis.getCongestionPoint());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Lock(LockType.WRITE)
+    public void invokeWorkflow(Prognosis prognosis, Message savedMessage) {
+        dPrognosisReceivedEventManager.fire(new DPrognosisReceivedEvent(prognosis, savedMessage));
     }
 
     private boolean isPrognosisNewPrognosis(Prognosis dprognosis, List<PtuPrognosis> prognoses) {
@@ -108,6 +126,6 @@ public class DsoDPrognosisCoordinator {
             LOGGER.info("Did not receive all the d-prognoses yet. Grid Safety Analysis will not be triggered.");
             return;
         }
-        eventManager.fire(new GridSafetyAnalysisEvent(congestionPointEntityAddress, analysisDate));
+        gridSafetyAnalysisEventManager.fire(new GridSafetyAnalysisEvent(congestionPointEntityAddress, analysisDate));
     }
 }

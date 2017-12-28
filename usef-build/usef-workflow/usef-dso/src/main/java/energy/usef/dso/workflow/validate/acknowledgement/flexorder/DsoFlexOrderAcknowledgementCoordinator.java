@@ -18,21 +18,24 @@ package energy.usef.dso.workflow.validate.acknowledgement.flexorder;
 
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_FINISHED_HANDLING_EVENT;
 import static energy.usef.core.constant.USEFConstants.LOG_COORDINATOR_START_HANDLING_EVENT;
+import static energy.usef.dso.workflow.DsoWorkflowStep.DSO_FLEX_ORDER_ACKNOWLEDGEMENT;
 
 import energy.usef.core.model.AcknowledgementStatus;
+import energy.usef.core.workflow.DefaultWorkflowContext;
+import energy.usef.core.workflow.WorkflowContext;
+import energy.usef.core.workflow.dto.AcknowledgementStatusDto;
 import energy.usef.core.workflow.dto.FlexOrderDto;
 import energy.usef.core.workflow.dto.PtuFlexOrderDto;
+import energy.usef.core.workflow.step.WorkflowStepExecuter;
 import energy.usef.dso.service.business.DsoPlanboardBusinessService;
+import energy.usef.dso.workflow.validate.acknowledgement.flexorder.FlexOrderAcknowledgementStepParameter.IN;
 import energy.usef.dso.workflow.validate.create.flexrequest.CreateFlexRequestEvent;
-
 import java.math.BigInteger;
-
 import javax.ejb.Asynchronous;
 import javax.ejb.Stateless;
 import javax.enterprise.event.Event;
 import javax.enterprise.event.Observes;
 import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +51,8 @@ public class DsoFlexOrderAcknowledgementCoordinator {
 
     @Inject
     private Event<CreateFlexRequestEvent> eventManager;
+    @Inject
+    private WorkflowStepExecuter workflow;
 
     /**
      * {@inheritDoc}
@@ -63,6 +68,7 @@ public class DsoFlexOrderAcknowledgementCoordinator {
         if (flexOrderDto == null) {
             LOGGER.warn("No flex order to update was found");
         } else if (AcknowledgementStatus.ACCEPTED != event.getAcknowledgementStatus()) {
+            invokePBC(event, flexOrderDto.getSequenceNumber());
             // Flexibility request is rejected or no response received, creating a new request
             CreateFlexRequestEvent createFlexRequestEvent = new CreateFlexRequestEvent(flexOrderDto.getConnectionGroupEntityAddress(),
                     flexOrderDto.getPeriod(),
@@ -72,8 +78,21 @@ public class DsoFlexOrderAcknowledgementCoordinator {
                             .mapToObj(Integer::valueOf)
                             .toArray(Integer[]::new));
             eventManager.fire(createFlexRequestEvent);
+        } else {
+            invokePBC(event, flexOrderDto.getSequenceNumber());
         }
         LOGGER.info(LOG_COORDINATOR_FINISHED_HANDLING_EVENT, event);
     }
+
+    private void invokePBC(FlexOrderAcknowledgementEvent event, Long flexOrderSequenceNumber) {
+        AcknowledgementStatusDto status = AcknowledgementStatusDto.valueOf(event.getAcknowledgementStatus().name());
+        WorkflowContext inContext = new DefaultWorkflowContext();
+        inContext.setValue(IN.ACKNOWLEDGEMENT_STATUS_DTO.name(), status);
+        inContext.setValue(IN.FLEX_ORDER_SEQUENCE_NUMBER.name(), flexOrderSequenceNumber);
+        inContext.setValue(IN.AGGREGATOR.name(), event.getAggregatorDomain());
+
+        workflow.invoke(DSO_FLEX_ORDER_ACKNOWLEDGEMENT.name(), inContext);
+    }
+
 
 }

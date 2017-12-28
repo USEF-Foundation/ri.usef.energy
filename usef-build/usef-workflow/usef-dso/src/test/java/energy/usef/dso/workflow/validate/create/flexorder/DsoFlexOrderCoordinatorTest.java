@@ -121,6 +121,7 @@ public class DsoFlexOrderCoordinatorTest {
         coordinator.handleEvent(new FlexOrderEvent());
         // validations
         verify(workflowStubLoader, times(1)).invoke(Matchers.eq(DsoWorkflowStep.DSO_PLACE_FLEX_ORDERS.name()), Matchers.any(WorkflowContext.class));
+        verify(workflowStubLoader, times(1)).invoke(Matchers.eq(DsoWorkflowStep.DSO_CREATE_FLEX_ORDERS.name()), Matchers.any(WorkflowContext.class));
         verify(dsoPlanboardBusinessService, times(1)).findOrderableFlexOffers();
         ArgumentCaptor<String> messageCaptor = ArgumentCaptor.forClass(String.class);
         verify(jmsHelperService, times(1)).sendMessageToOutQueue(messageCaptor.capture());

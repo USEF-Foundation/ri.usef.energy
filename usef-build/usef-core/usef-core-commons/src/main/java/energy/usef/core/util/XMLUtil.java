@@ -17,30 +17,30 @@
 package energy.usef.core.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+
 import energy.usef.core.constant.USEFConstants;
 import energy.usef.core.exception.TechnicalException;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-
+import java.io.StringReader;
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
  * XML utility.
- *
  */
 public class XMLUtil {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(XMLUtil.class);
 
     // XSD file that is used for validating XML (ALUS-184)
@@ -61,13 +61,12 @@ public class XMLUtil {
     }
 
     /**
-     * Converts xml string to object and verifies if the the object is an instance of the specified class without validating.
+     * Converts xml string to object and verifies if the the object is an instance of the specified class without
+     * validating.
      *
      * @param <T> message class
-     *
      * @param xml xml string
      * @param clazz message object class
-     *
      * @return corresponding object
      */
     @SuppressWarnings("unchecked")
@@ -84,11 +83,9 @@ public class XMLUtil {
      * Converts xml string to object and verifies if the the object is an instance of the specified class.
      *
      * @param <T> message class
-     *
      * @param xml xml string
      * @param clazz message object class
      * @param validate true when the xml needs to be validated
-     *
      * @return corresponding object
      */
     @SuppressWarnings("unchecked")
@@ -119,21 +116,28 @@ public class XMLUtil {
      * @return object corresponding to this xml
      */
     public static Object xmlToMessage(String xml, boolean validate) {
-        try (InputStream is = IOUtils.toInputStream(xml, UTF_8)) {
+        try {
             Unmarshaller unmarshaller = CONTEXT.createUnmarshaller();
-
             if (validate) {
                 // setup xsd validation
                 SchemaFactory sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
                 Schema schema = sf.newSchema(XMLUtil.class.getClassLoader().getResource(MESSAGING_XSD_FILE));
-
                 unmarshaller.setSchema(schema);
             }
 
-            return unmarshaller.unmarshal(is);
-        } catch (JAXBException | IOException e) {
+            XMLInputFactory xif = XMLInputFactory.newFactory();
+            xif.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+            xif.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            xif.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
+            XMLStreamReader xsr = xif.createXMLStreamReader(new StringReader(xml));
+
+            return unmarshaller.unmarshal(xsr);
+        } catch (JAXBException e) {
             LOGGER.error(e.getMessage(), e);
             throw new TechnicalException("Invalid XML content: " + e.getMessage(), e);
+        } catch (XMLStreamException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw new TechnicalException("Unable to parse message", e);
         } catch (SAXException e) {
             LOGGER.error(e.getMessage(), e);
             throw new TechnicalException("Unable to read XSD schema", e);
@@ -145,8 +149,6 @@ public class XMLUtil {
      *
      * @param message message object
      * @return xml
-     * 
-     * @throws TechnicalException
      */
     public static String messageObjectToXml(Object message) {
         try (ByteArrayOutputStream os = new ByteArrayOutputStream()) {
