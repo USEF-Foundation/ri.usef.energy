@@ -1,0 +1,6 @@
+*
+!usef-build
+usef-build/.idea
+usef-build/**/target
+!usef-environment
+!usef-environment-tool
