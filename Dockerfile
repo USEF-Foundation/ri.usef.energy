@@ -29,6 +29,15 @@ WORKDIR ${JBOSS_HOME}
 ARG WILDFLY_VERSION=10.0.0.Final
 ARG WILDFLY_BASE_URL=http://download.jboss.org/wildfly/${WILDFLY_VERSION}
 ARG WILDFLY_SHA=e00c4e4852add7ac09693e7600c91be40fa5f2791d0b232e768c00b2cb20a84b
+
+RUN  curl -SLo wildfly.tar.gz \
+      ${WILDFLY_BASE_URL}/wildfly-${WILDFLY_VERSION}.tar.gz \
+  && echo "${WILDFLY_SHA} *wildfly.tar.gz" | sha256sum -c - \
+  && tar -xzf wildfly.tar.gz --strip-components 1 \
+  && rm wildfly.tar.gz
+
+WORKDIR ${JBOSS_HOME}/modules/system/layers/base/com/h2database/h2/main
+
 # An alternative version of the H2 SQL database library is specified in the USEF
 # manual
 ARG H2_VERSION_DATE=2015-10-11
@@ -36,17 +45,10 @@ ARG H2_VERSION=1.4.190
 ARG H2_BASE_URL=http://www.h2database.com
 ARG H2_SHA=7881f308debe6d587219db3610b699af21d5e4b50ccb6fccac563382772a09c8
 
-RUN  curl -SLo wildfly.tar.gz \
-      ${WILDFLY_BASE_URL}/wildfly-${WILDFLY_VERSION}.tar.gz \
-  && echo "${WILDFLY_SHA} *wildfly.tar.gz" | sha256sum -c - \
-  && tar -xzf wildfly.tar.gz --strip-components 1 \
-  && rm wildfly.tar.gz \
-  && curl -SLo h2.zip ${H2_BASE_URL}/h2-${H2_VERSION_DATE}.zip \
+RUN curl -SLo h2.zip ${H2_BASE_URL}/h2-${H2_VERSION_DATE}.zip \
   && echo "${H2_SHA} *h2.zip" | sha256sum -c - \
   && unzip -q h2.zip h2/bin/h2-${H2_VERSION}.jar \
-      -d modules/system/layers/base/com/h2database/h2/main \
   && rm h2.zip \
-  && cd modules/system/layers/base/com/h2database/h2/main \
   # Replace bundled H2 version with required version
   && mv h2/bin/h2-${H2_VERSION}.jar h2-${H2_VERSION}.jar \
   && rm -rf h2 && rm h2-1.3.173.jar \
